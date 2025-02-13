@@ -8,10 +8,14 @@ const Login = () => {
   console.log("Login component loaded!"); 
 
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({ username: "", password: "", rememberMe: false });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -20,6 +24,11 @@ const Login = () => {
       const response = await axios.post("http://localhost:5000/api/login", formData);
       console.log("Login success:", response.data);
       localStorage.setItem("token", response.data.token);
+      if (formData.rememberMe) {
+        localStorage.setItem("rememberMe", formData.username);
+      } else {
+        localStorage.removeItem("rememberMe");
+      }
       navigate("/");
     } catch (error) {
       console.error("Login failed:", error.response?.data);
@@ -48,8 +57,18 @@ const Login = () => {
           onChange={handleChange}
           required
         />
+        <div className="login-options">
+          <label>
+            <input type="checkbox" name="rememberMe" checked={formData.rememberMe} onChange={handleChange} />
+            Remember me
+          </label>
+          <a href="/forgot-password" className="forgot-password">Forgot password?</a>
+        </div>
         <button type="submit">Login</button>
       </form>
+      <p className="register-link">
+        Don't have an account? <a href="/register">Sign up now</a>
+      </p>
     </div>
   );
 };
