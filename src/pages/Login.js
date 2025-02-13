@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  console.log("Login component loaded!"); // Kiểm tra xem component có render không
+
   const clientId = "YOUR_GOOGLE_CLIENT_ID"; // Thay bằng Google Client ID
   const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ const Login = () => {
       localStorage.setItem("token", response.data.token); // Lưu token vào localStorage
       navigate("/"); // Chuyển hướng về trang chủ sau khi login
     } catch (error) {
-      console.error("Login failed:", error.response.data);
+      console.error("Login failed:", error.response?.data);
       alert("Sai tài khoản hoặc mật khẩu!");
     }
   };
