@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../Login.css";
+import "./Login.css";
 import skincareImage from "../assets/skincare.jpg"; // Đảm bảo đúng đường dẫn
 
 const Login = () => {

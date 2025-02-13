@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../Register.css";
+import "./Register.css";
 import registerImage from "../assets/skincare.jpg"; // Import ảnh
 
 const Register = () => {

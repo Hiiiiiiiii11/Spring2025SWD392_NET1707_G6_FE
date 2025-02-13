@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "../Home.css";
+import "./Home.css";
 
-export default function Home() {
+function Home() {
   const [role, setRole] = useState("Guest");
   const [formData, setFormData] = useState({
     name: "",
@@ -68,3 +68,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default Home;
