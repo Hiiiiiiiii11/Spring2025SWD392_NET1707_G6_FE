@@ -1,0 +1,81 @@
+/* Định dạng tổng thể cho trang đăng ký */
+.register-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Tiêu đề */
+.register-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+}
+
+/* Định dạng form */
+.register-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.register-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.register-form input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Định dạng nút đăng ký */
+.register-form button {
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.register-form button:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Tạo hiệu ứng chuyển đổi nhẹ nhàng */
+.register-form input,
+.register-form button {
+    transition: all 0.3s ease;
+}
+
+/* Điều chỉnh kích thước hình ảnh trong trang đăng ký */
+.register-image {
+    width: 100%;
+    /* Đảm bảo ảnh không vượt quá phần chứa nó */
+    max-width: 400px;
+    /* Giới hạn kích thước tối đa */
+    height: auto;
+    /* Giữ tỷ lệ khung hình */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Căn chỉnh ảnh ở giữa theo chiều dọc */
+.register-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import "../App.css";
-import registerImage from "../assests/skincare.jpg"; // Import ảnh
+import "../Register.css";
+import registerImage from "../assets/skincare.jpg"; // Import ảnh
 
 const Register = () => {
   const [formData, setFormData] = useState({

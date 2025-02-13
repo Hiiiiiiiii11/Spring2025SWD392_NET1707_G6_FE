@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../App.css";
+import "../Home.css";
 
 export default function Home() {
   const [role, setRole] = useState("Guest");

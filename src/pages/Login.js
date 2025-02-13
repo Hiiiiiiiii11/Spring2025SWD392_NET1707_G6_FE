@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../App.css";
-import skincareImage from "../assests/skincare.jpg"; // Đảm bảo đúng đường dẫn
+import "../Login.css";
+import skincareImage from "../assets/skincare.jpg"; // Đảm bảo đúng đường dẫn
 
 const Login = () => {
-  console.log("Login component loaded!"); 
+  console.log("Login component loaded!");
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ username: "", password: "", rememberMe: false });
@@ -17,7 +17,7 @@ const Login = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
