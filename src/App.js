@@ -1,13 +1,15 @@
-
+import { Route, Routes } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register"; // Import trang đăng ký
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-
-
-      </header>
-    </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} /> {/* Thêm route mới */}
+    </Routes>
   );
 }
 
