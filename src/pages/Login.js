@@ -1,18 +1,14 @@
 import React, { useState } from "react";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "../App.css";
+import skincareImage from "../assests/skincare.jpg"; // Đảm bảo đúng đường dẫn
 
 const Login = () => {
-  console.log("Login component loaded!"); // Kiểm tra xem component có render không
+  console.log("Login component loaded!"); 
 
-  const clientId = "YOUR_GOOGLE_CLIENT_ID"; // Thay bằng Google Client ID
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ username: "", password: "" });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,8 +19,8 @@ const Login = () => {
     try {
       const response = await axios.post("http://localhost:5000/api/login", formData);
       console.log("Login success:", response.data);
-      localStorage.setItem("token", response.data.token); // Lưu token vào localStorage
-      navigate("/"); // Chuyển hướng về trang chủ sau khi login
+      localStorage.setItem("token", response.data.token);
+      navigate("/");
     } catch (error) {
       console.error("Login failed:", error.response?.data);
       alert("Sai tài khoản hoặc mật khẩu!");
@@ -32,46 +28,29 @@ const Login = () => {
   };
 
   return (
-    <GoogleOAuthProvider clientId={clientId}>
-      <div className="login-container">
-        <h2>Login</h2>
-
-        {/* Form đăng nhập bằng Username/Password */}
-        <form onSubmit={handleSubmit} className="login-form">
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-          <button type="submit">Login</button>
-        </form>
-
-        <p>Or</p>
-
-        {/* Nút đăng nhập bằng Google */}
-        <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            console.log("Google Login Success:", credentialResponse);
-            localStorage.setItem("google_token", credentialResponse.credential);
-            navigate("/");
-          }}
-          onError={() => {
-            console.log("Google Login Failed");
-          }}
+    <div className="login-container">
+      <img src={skincareImage} alt="Skincare" className="login-image" />
+      <h2>Sign In for your beauty</h2>
+      <form onSubmit={handleSubmit} className="login-form">
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={formData.username}
+          onChange={handleChange}
+          required
         />
-      </div>
-    </GoogleOAuthProvider>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
+    </div>
   );
 };
 
