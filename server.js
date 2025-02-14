@@ -1,19 +1,23 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 4000;
 
-// Trỏ đến thư mục chứa React build
-const buildDir = path.join(__dirname, 'build');
-app.use(express.static(buildDir));
+// 🛠 Trỏ đến thư mục build của React
+const buildPath = path.join(__dirname, 'build');
+app.use(express.static(buildPath));
 
-// Phục vụ index.html cho tất cả các request không khớp
+// 🛠 Trả về index.html cho mọi route không phải API
 app.get('*', (req, res) => {
-    res.sendFile(path.join(buildDir, 'index.html'));
+    res.sendFile(path.join(buildPath, 'index.html'));
 });
 
+// 🛠 Khởi động server và tự động mở trình duyệt
 app.listen(port, () => {
-    console.log(`✅ Server is running on port ${port}`);
+    console.log(`✅ React server is running on http://localhost:${port}`);
+    // 🛠 Mở trình duyệt tự động (chỉ trên Windows, Mac, Linux cần chỉnh sửa)
+    const open = require('open');
+    open(`http://localhost:${port}`);
 });
