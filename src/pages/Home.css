@@ -1,0 +1,110 @@
+/* HomeStyles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  
+  .home-container {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  /* Navbar */
+  .navbar {
+    background-color: #333;
+    color: white;
+    padding: 15px;
+  }
+  
+  .navbar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .navbar ul li {
+    display: inline;
+    margin: 0 15px;
+  }
+  
+  .navbar a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  /* Hero Section */
+  .hero {
+    background-color: #ffc0cb;
+    padding: 50px;
+    margin-bottom: 20px;
+  }
+  
+  .hero h1 {
+    margin: 0;
+  }
+  
+  /* Role Selector */
+  .role-selector {
+    margin: 20px 0;
+  }
+  
+  /* Product Section */
+  .product-section {
+    background-color: white;
+    padding: 20px;
+    margin: 20px;
+  }
+  
+  .product-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .product-card {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-card img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  /* Contact Form */
+  .contact-section {
+    padding: 20px;
+  }
+  
+  .contact-form input,
+  .contact-form textarea {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 10px;
+  }
+  
+  .contact-form button {
+    background-color: #ff69b4;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .contact-form button:hover {
+    background-color: #d1478c;
+  }
+  
+  /* Footer */
+  .footer {
+    background-color: #222;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
+  }
+  

@@ -1,87 +1,90 @@
-/* Định dạng tổng thể cho trang đăng ký */
+/* Container chính */
 .register-container {
     width: 100%;
-    max-width: 400px;
+    max-width: 420px; /* Giữ form gọn gàng */
     margin: 80px auto;
-    padding: 25px;
+    padding: 30px;
     background: #fff;
     border-radius: 15px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     text-align: center;
-    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Tạo khoảng cách đều */
 }
 
 /* Tiêu đề */
 .register-container h2 {
-    margin-bottom: 25px;
-    color: #333;
     font-size: 26px;
     font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
 }
 
-/* Định dạng form */
+/* Form đăng ký */
 .register-form {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    align-items: center;
+    gap: 15px; /* Khoảng cách giữa các ô input */
 }
 
+/* Ô input */
 .register-form input {
     width: 100%;
     padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
     font-size: 16px;
-    transition: all 0.3s;
-    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
+/* Hiệu ứng khi focus vào input */
 .register-form input:focus {
     border-color: #ff69b4;
     outline: none;
-    background: #fff;
-    box-shadow: 0 0 8px rgba(255, 105, 180, 0.3);
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.4);
 }
 
-/* Định dạng nút đăng ký */
+/* Nút đăng ký */
 .register-form button {
-    padding: 12px;
-    background: #ff69b4;
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: bold;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 17px;
-    font-weight: bold;
+    background: linear-gradient(135deg, #ff69b4, #ff1493);
     cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
-}
-
-.register-form button:hover {
-    background: #d14791;
-    transform: scale(1.05);
-    box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
-}
-
-/* Tạo hiệu ứng chuyển đổi nhẹ nhàng */
-.register-form input,
-.register-form button {
     transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+    text-align: center;
 }
 
-/* Điều chỉnh kích thước hình ảnh trong trang đăng ký */
+/* Hiệu ứng hover */
+.register-form button:hover {
+    background: linear-gradient(135deg, #d14791, #c71585);
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(255, 105, 180, 0.4);
+}
+
+
 .register-image {
     width: 100%;
-    max-width: 350px;
+    max-width: 320px;
     height: auto;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Căn chỉnh ảnh ở giữa theo chiều dọc */
+/* Ảnh */
 .register-image-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    width: 100%;
 }
