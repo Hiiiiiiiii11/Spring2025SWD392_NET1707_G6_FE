@@ -39,7 +39,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <img src={skincareImage} alt="Skincare" className="login-image" />
-      <h2>Sign In for your beauty</h2>
+      <h2>Sign in for your beauty</h2>
       <form onSubmit={handleSubmit} className="login-form">
         <input
           type="text"
