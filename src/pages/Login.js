@@ -44,7 +44,7 @@ const Login = () => {
         <input
           type="text"
           name="username"
-          placeholder="Username"
+          placeholder="Username or email"
           value={formData.username}
           onChange={handleChange}
           required
