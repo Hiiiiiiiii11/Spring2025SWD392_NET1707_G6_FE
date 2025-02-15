@@ -1,90 +1,101 @@
-/* Container chính */
+/* ===== Hiệu ứng Glassmorphism cho khung đăng ký ===== */
 .register-container {
     width: 100%;
-    max-width: 420px; /* Giữ form gọn gàng */
-    margin: 80px auto;
-    padding: 30px;
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    max-width: 450px; /* Mở rộng form giống login */
+    padding: 50px; /* Giãn khoảng cách để form thoáng hơn */
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px; /* Tạo khoảng cách đều */
+    transition: transform 0.3s ease-in-out;
 }
 
-/* Tiêu đề */
-.register-container h2 {
-    font-size: 26px;
-    font-weight: bold;
+.register-container:hover {
+    transform: translateY(-5px);
+}
+
+/* ===== Tiêu đề ===== */
+h2 {
     color: #333;
-    margin-bottom: 10px;
+    font-size: 28px;
+    margin-bottom: 20px;
 }
 
-/* Form đăng ký */
-.register-form {
+/* ===== Ảnh minh họa hoặc logo (nếu có) ===== */
+.register-image {
     width: 100%;
+    max-width: 250px;
+    display: block;
+    margin: 0 auto 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== Form đăng ký ===== */
+.register-form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 15px; /* Khoảng cách giữa các ô input */
+    width: 100%;
 }
 
-/* Ô input */
+/* ===== Ô nhập liệu với hiệu ứng focus ===== */
 .register-form input {
     width: 100%;
-    padding: 12px;
+    padding: 10px; /* Tăng padding cho input thoáng hơn */
+    margin-bottom: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
     font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    color: #333;
+    transition: 0.3s ease-in-out;
 }
 
-/* Hiệu ứng khi focus vào input */
+.register-form input::placeholder {
+    color: rgba(51, 51, 51, 0.6);
+}
+
 .register-form input:focus {
-    border-color: #ff69b4;
+    border-color: #007bff;
     outline: none;
-    box-shadow: 0 0 10px rgba(255, 105, 180, 0.4);
+    background: rgba(255, 255, 255, 0.3);
 }
 
-/* Nút đăng ký */
+/* ===== Nút đăng ký với hiệu ứng động ===== */
 .register-form button {
     width: 100%;
     padding: 14px;
-    font-size: 18px;
-    font-weight: bold;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
     color: white;
     border: none;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #ff69b4, #ff1493);
+    border-radius: 10px;
+    font-size: 18px;
     cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
-    text-align: center;
+    transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(255, 118, 136, 0.4);
+    margin-top: 10px; /* Tạo khoảng cách giữa input cuối cùng và nút */
 }
 
-/* Hiệu ứng hover */
 .register-form button:hover {
-    background: linear-gradient(135deg, #d14791, #c71585);
+    background: linear-gradient(135deg, #ff5f6d, #ff7eb3);
     transform: scale(1.05);
-    box-shadow: 0 6px 18px rgba(255, 105, 180, 0.4);
 }
 
-
-.register-image {
-    width: 100%;
-    max-width: 320px;
-    height: auto;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+.register-form button:active {
+    transform: scale(0.95);
 }
 
-/* Ảnh */
-.register-image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+/* ===== Responsive (Tương thích Mobile) ===== */
+@media (max-width: 480px) {
+    .register-container {
+        max-width: 90%;
+        padding: 25px;
+    }
+    .register-form input {
+        font-size: 14px;
+    }
+    .register-form button {
+        font-size: 16px;
+    }
 }
