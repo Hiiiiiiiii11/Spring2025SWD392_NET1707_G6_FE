@@ -1,28 +1,40 @@
 import React, { useState } from "react";
 import "./Register.css";
 import registerImage from "../assets/skincare.jpg"; // Import ảnh
-
+import axios from "axios";
 const Register = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    fullName: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    phone: "",
+    address: "",
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    console.log("Register success:", formData);
-    alert("Account created successfully!");
+
+    try {
+      const response = await axios.post("http://localhost:8080/auth/register", formData);
+      console.log("Register success:", response.data);
+      alert("Account created successfully!");
+      // Optionally, you can redirect to login or home page after successful registration.
+      // navigate("/login"); // or navigate("/");
+
+    } catch (error) {
+      console.error("Registration failed:", error.response?.data);
+      alert("Registration failed. Please try again.");
+    }
   };
+
 
   return (
     <div className="register-container">
@@ -35,9 +47,9 @@ const Register = () => {
         <form onSubmit={handleSubmit} className="register-form">
           <input
             type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
+            name="fullName"
+            placeholder="Full Name"
+            value={formData.fullName}
             onChange={handleChange}
             required
           />
@@ -62,6 +74,22 @@ const Register = () => {
             name="confirmPassword"
             placeholder="Confirm Password"
             value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="phone"
+            placeholder="Phone Number"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="address"
+            placeholder="Your address"
+            value={formData.address}
             onChange={handleChange}
             required
           />

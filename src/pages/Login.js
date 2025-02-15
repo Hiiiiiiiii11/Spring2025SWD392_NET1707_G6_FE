@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
-import skincareImage from "../assets/skincare.jpg"; // Đảm bảo đúng đường dẫn
+import skincareImage from "../assets/skincare.jpg";
+import { notification } from "antd";
+// Đảm bảo đúng đường dẫn
 
 const Login = () => {
   console.log("Login component loaded!");
 
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: "", password: "", rememberMe: false });
+  const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -21,7 +23,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/api/login", formData);
+      const response = await axios.post("http://localhost:8080/auth/login", formData);
       console.log("Login success:", response.data);
       localStorage.setItem("token", response.data.token);
       if (formData.rememberMe) {
@@ -32,7 +34,7 @@ const Login = () => {
       navigate("/");
     } catch (error) {
       console.error("Login failed:", error.response?.data);
-      alert("Sai tài khoản hoặc mật khẩu!");
+      notification("Sai tài khoản hoặc mật khẩu!");
     }
   };
 
@@ -43,9 +45,9 @@ const Login = () => {
       <form onSubmit={handleSubmit} className="login-form">
         <input
           type="text"
-          name="username"
+          name="email"
           placeholder="Username or email"
-          value={formData.username}
+          value={formData.email}
           onChange={handleChange}
           required
         />
