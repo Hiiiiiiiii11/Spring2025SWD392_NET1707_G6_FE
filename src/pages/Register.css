@@ -64,7 +64,7 @@ h2 {
 
 /* ===== Nút đăng ký với hiệu ứng động ===== */
 .register-form button {
-    width: 100%;
+    width: 50%;
     padding: 14px;
     background: linear-gradient(135deg, #ff758c, #ff7eb3);
     color: white;
@@ -74,7 +74,9 @@ h2 {
     cursor: pointer;
     transition: 0.3s;
     box-shadow: 0 5px 15px rgba(255, 118, 136, 0.4);
-    margin-top: 10px; /* Tạo khoảng cách giữa input cuối cùng và nút */
+    margin: 10px auto 0; /* Đặt margin auto để căn giữa */
+    display: block; /* Đảm bảo button là block để căn giữa */
+    text-align: center; /* Căn giữa nội dung bên trong */
 }
 
 .register-form button:hover {
