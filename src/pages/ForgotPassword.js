@@ -7,8 +7,19 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Hàm kiểm tra email hợp lệ
+  const validateEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateEmail(email)) {
+      alert("Invalid email format! Please enter a valid email.");
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post("http://localhost:8080/auth/forgot-password", { email });
