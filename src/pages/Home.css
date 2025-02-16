@@ -1,111 +1,75 @@
-body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f8f9fa;
+/* General Styling */
+.home-container {
+  font-family: "Arial", sans-serif;
   color: #333;
 }
 
-.home-container {
-  text-align: center;
-  padding: 20px;
-}
-
-/* Navbar */
 .navbar {
-  background-color: #343a40;
-  color: white;
-  padding: 15px;
+  background-color: #fff;
+  padding: 15px 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.navbar h2 {
-  margin: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .navbar ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
   display: flex;
+  gap: 20px;
 }
 
-.navbar ul li {
-  margin: 0 15px;
-}
-
-.navbar a {
-  color: white;
+.navbar ul li a {
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-}
-
-.navbar a:hover {
-  color: #ff69b4;
-}
-
-/* Hero Section */
-.hero {
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-  padding: 60px 20px;
-  border-radius: 10px;
-  margin: 20px;
-}
-
-.hero h1 {
-  margin: 0;
-  font-size: 2.5em;
+  color: #555;
   font-weight: bold;
 }
 
-.hero p {
-  font-size: 1.2em;
+.hero {
+  background-size: cover;
+  background-position: center;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-/* Role Selector */
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
 .role-selector {
+  text-align: center;
   margin: 20px 0;
-  font-size: 1.1em;
-  font-weight: 500;
 }
 
-select {
-  padding: 8px 15px;
-  font-size: 1em;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  transition: border 0.3s;
-}
-
-select:focus {
-  border: 1px solid #ff69b4;
+.role-message {
+  text-align: center;
+  font-size: 1.2em;
+  margin-bottom: 20px;
 }
 
 /* Product Section */
 .product-section {
-  background-color: white;
-  padding: 30px;
-  margin: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 40px 20px;
 }
 
 .product-list {
   display: flex;
   justify-content: center;
   gap: 20px;
-  flex-wrap: wrap;
 }
 
 .product-card {
-  background-color: #fff;
+  background: #fff;
   padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: transform 0.3s;
 }
@@ -115,52 +79,50 @@ select:focus {
 }
 
 .product-card img {
-  width: 120px;
-  height: 120px;
+  width: 150px;
   border-radius: 10px;
 }
 
-/* Contact Form */
+/* Contact Section */
 .contact-section {
-  padding: 30px;
-  background: white;
-  margin: 20px;
+  background-size: cover;
+  background-position: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.contact-overlay {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .contact-form input,
 .contact-form textarea {
-  display: block;
-  width: 80%;
-  margin: 10px auto;
-  padding: 12px;
-  border: 1px solid #ddd;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
   border-radius: 5px;
-  font-size: 1em;
 }
 
 .contact-form button {
-  background-color: #ff69b4;
+  background: #ff6b6b;
   color: white;
-  padding: 12px 20px;
   border: none;
-  border-radius: 5px;
-  font-size: 1.1em;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: background 0.3s;
 }
 
 .contact-form button:hover {
-  background-color: #d1478c;
+  background: #e63946;
 }
 
 /* Footer */
 .footer {
-  background-color: #343a40;
-  color: white;
-  padding: 15px;
-  margin-top: 20px;
   text-align: center;
-  font-size: 0.9em;
+  padding: 20px;
+  background: #f8f8f8;
+  margin-top: 20px;
 }
