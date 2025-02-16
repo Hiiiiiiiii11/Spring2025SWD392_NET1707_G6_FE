@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import skincareImage from "../assets/skincare.jpg";
 import { notification } from "antd";
-// Đảm bảo đúng đường dẫn
 
 const Login = () => {
   console.log("Login component loaded!");
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
+  const [errors, setErrors] = useState({}); // Thêm state lưu lỗi
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -20,21 +20,44 @@ const Login = () => {
     }));
   };
 
+  // Hàm kiểm tra email hợp lệ
+  const validateEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Kiểm tra lỗi trước khi gửi request
+    let newErrors = {};
+    if (!formData.email) {
+      newErrors.email = "Email is required!";
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = "Invalid email format!";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required!";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       const response = await axios.post("http://localhost:8080/auth/login", formData);
       console.log("Login success:", response.data);
       localStorage.setItem("token", response.data.token);
       if (formData.rememberMe) {
-        localStorage.setItem("rememberMe", formData.username);
+        localStorage.setItem("rememberMe", formData.email);
       } else {
         localStorage.removeItem("rememberMe");
       }
+      notification.success({ message: "Login successful!" });
       navigate("/");
     } catch (error) {
       console.error("Login failed:", error.response?.data);
-      notification("Sai tài khoản hoặc mật khẩu!");
+      notification.error({ message: "Sai tài khoản hoặc mật khẩu!" });
     }
   };
 
@@ -51,6 +74,8 @@ const Login = () => {
           onChange={handleChange}
           required
         />
+        {errors.email && <p className="error-message">{errors.email}</p>} {/* Hiển thị lỗi email */}
+        
         <input
           type="password"
           name="password"
@@ -59,6 +84,8 @@ const Login = () => {
           onChange={handleChange}
           required
         />
+        {errors.password && <p className="error-message">{errors.password}</p>} {/* Hiển thị lỗi password */}
+
         <div className="login-options">
           <label>
             <input type="checkbox" name="rememberMe" checked={formData.rememberMe} onChange={handleChange} />
