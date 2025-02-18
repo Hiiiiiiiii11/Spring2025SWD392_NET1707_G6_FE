@@ -16,31 +16,63 @@ function Manager() {
     discount: 0,
     image: ""
   });
+
   const [search, setSearch] = useState("");
   const [editingProduct, setEditingProduct] = useState(null); // Track which product is being edited
+
+  // Validation state
+  const [errors, setErrors] = useState({
+    name: "",
+    price: "",
+    discount: "",
+    stock: ""
+  });
 
   useEffect(() => {
     localStorage.setItem("products", JSON.stringify(products));
   }, [products]);
 
+  // Validate form fields
+  const validateForm = () => {
+    let formErrors = {};
+    let isValid = true;
+
+    if (!newProduct.name) {
+      formErrors.name = "Name is required";
+      isValid = false;
+    }
+
+    if (!newProduct.price || newProduct.price <= 0) {
+      formErrors.price = "Price must be a positive number";
+      isValid = false;
+    }
+
+    if (newProduct.discount < 0 || newProduct.discount > 100) {
+      formErrors.discount = "Discount must be between 0% and 100%";
+      isValid = false;
+    }
+
+    if (newProduct.stock <= 0) {
+      formErrors.stock = "Stock must be a positive number";
+      isValid = false;
+    }
+
+    setErrors(formErrors);
+    return isValid;
+  };
+
   // Add new product
   const addProduct = () => {
-    if (!newProduct.name || !newProduct.price) return alert("Please fill all fields");
+    if (!validateForm()) return;
+
     const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
     setProducts([...products, { ...newProduct, id: Date.now(), priceAfterDiscount }]);
     setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
   };
 
-  // Delete product
-  const deleteProduct = (id) => {
-    if (window.confirm("Are you sure?")) {
-      setProducts(products.filter((p) => p.id !== id));
-    }
-  };
-
   // Edit product
   const editProduct = (product) => {
-    setEditingProduct(product);  // Set the product to be edited
+    setEditingProduct(product);
     setNewProduct({
       name: product.name,
       price: product.price,
@@ -54,7 +86,8 @@ function Manager() {
 
   // Save edited product
   const saveProduct = () => {
-    if (!newProduct.name || !newProduct.price) return alert("Please fill all fields");
+    if (!validateForm()) return;
+
     const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
     const updatedProducts = products.map((product) =>
       product.id === editingProduct.id
@@ -64,6 +97,13 @@ function Manager() {
     setProducts(updatedProducts);
     setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
     setEditingProduct(null); // Reset editing state
+  };
+
+  // Delete product
+  const deleteProduct = (id) => {
+    if (window.confirm("Are you sure?")) {
+      setProducts(products.filter((p) => p.id !== id));
+    }
   };
 
   return (
@@ -76,7 +116,7 @@ function Manager() {
       />
 
       <h3>{editingProduct ? "Edit Product" : "Add Product"}</h3>
-      
+
       {/* Title for Add Product */}
       <h4>Please fill in the details of the product you want to add:</h4>
       
@@ -86,30 +126,39 @@ function Manager() {
         value={newProduct.name} 
         onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} 
       />
+      {errors.name && <span className="error">{errors.name}</span>}
+      
       <input 
         type="number" 
         placeholder="Price" 
         value={newProduct.price} 
         onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} 
       />
+      {errors.price && <span className="error">{errors.price}</span>}
+      
       <input 
         type="text" 
         placeholder="Description" 
         value={newProduct.description} 
         onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} 
       />
+      
       <input 
         type="number" 
         placeholder="Stock" 
         value={newProduct.stock} 
         onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })} 
       />
+      {errors.stock && <span className="error">{errors.stock}</span>}
+      
       <input 
         type="number" 
         placeholder="Discount (%)" 
         value={newProduct.discount} 
         onChange={(e) => setNewProduct({ ...newProduct, discount: e.target.value })} 
       />
+      {errors.discount && <span className="error">{errors.discount}</span>}
+      
       <select 
         onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
         value={newProduct.category}
@@ -119,6 +168,7 @@ function Manager() {
         <option>Brightening</option>
         <option>Sunscreen</option>
       </select>
+
       <button onClick={editingProduct ? saveProduct : addProduct}>
         {editingProduct ? "Save Changes" : "Add Product"}
       </button>
