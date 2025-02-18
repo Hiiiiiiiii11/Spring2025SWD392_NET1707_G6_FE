@@ -1,0 +1,35 @@
+.manager-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .manager-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .manager-table th, .manager-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .add-btn, .edit-btn, .delete-btn {
+    padding: 5px 10px;
+    margin: 5px;
+    cursor: pointer;
+  }
+  
+  .edit-btn {
+    background: #ffcc00;
+    border: none;
+  }
+  
+  .delete-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+  }
+  

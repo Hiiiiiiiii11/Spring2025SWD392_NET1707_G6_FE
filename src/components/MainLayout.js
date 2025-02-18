@@ -1,16 +1,17 @@
-import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
 
-
-const MainLayout = () => {
-    return (
-        <div>
-
-            Hello
-        </div>
-    );
-};
-
-
-
+function MainLayout() {
+  return (
+    <div className="main-layout">
+      <Header />
+      <main className="content">
+        <Outlet /> {/* Render nội dung của từng trang */}
+      </main>
+      <Footer />
+    </div>
+  );
+}
 
 export default MainLayout;
