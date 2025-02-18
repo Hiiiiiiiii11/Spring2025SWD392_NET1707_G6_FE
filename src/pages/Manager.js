@@ -1,44 +1,124 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Manager.css";
 
 function Manager() {
-  const [products, setProducts] = useState([
-    { id: 1, name: "Moisturizing Cream", price: "$25.99" },
-    { id: 2, name: "Vitamin C Serum", price: "$30.99" },
-  ]);
+  // Load dữ liệu từ localStorage
+  const [products, setProducts] = useState(() => {
+    return JSON.parse(localStorage.getItem("products")) || [];
+  });
+
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    price: "",
+    category: "Moisturizer",
+    description: "",
+    stock: 10,
+    discount: 0,
+    image: ""
+  });
+  const [search, setSearch] = useState("");
+  const [editingProduct, setEditingProduct] = useState(null); // Track which product is being edited
+
+  useEffect(() => {
+    localStorage.setItem("products", JSON.stringify(products));
+  }, [products]);
+
+  // Add product
+  const addProduct = () => {
+    if (!newProduct.name || !newProduct.price) return alert("Please fill all fields");
+    const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
+    setProducts([...products, { ...newProduct, id: Date.now(), priceAfterDiscount }]);
+    setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
+  };
+
+  // Delete product
+  const deleteProduct = (id) => {
+    if (window.confirm("Are you sure?")) {
+      setProducts(products.filter((p) => p.id !== id));
+    }
+  };
+
+  // Edit product
+  const editProduct = (product) => {
+    setEditingProduct(product);  // Set the product to be edited
+    setNewProduct({
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      description: product.description,
+      stock: product.stock,
+      discount: product.discount,
+      image: product.image,
+    });
+  };
+
+  // Save edited product
+  const saveProduct = () => {
+    if (!newProduct.name || !newProduct.price) return alert("Please fill all fields");
+    const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
+    const updatedProducts = products.map((product) =>
+      product.id === editingProduct.id
+        ? { ...newProduct, id: product.id, priceAfterDiscount }
+        : product
+    );
+    setProducts(updatedProducts);
+    setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
+    setEditingProduct(null); // Reset editing state
+  };
 
   return (
     <div className="manager-container">
       <h2>Manager Dashboard</h2>
+      <input type="text" placeholder="Search product..." onChange={(e) => setSearch(e.target.value)} />
+      
+      <h3>{editingProduct ? "Edit Product" : "Add Product"}</h3>
+      <input type="text" placeholder="Name" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
+      <input type="number" placeholder="Price" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
+      <input type="text" placeholder="Description" value={newProduct.description} onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} />
+      <input type="number" placeholder="Stock" value={newProduct.stock} onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })} />
+      <input type="number" placeholder="Discount (%)" value={newProduct.discount} onChange={(e) => setNewProduct({ ...newProduct, discount: e.target.value })} />
+      <select onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}>
+        <option>Moisturizer</option>
+        <option>Anti-aging</option>
+        <option>Brightening</option>
+        <option>Sunscreen</option>
+      </select>
+      <button onClick={editingProduct ? saveProduct : addProduct}>
+        {editingProduct ? "Save Changes" : "Add Product"}
+      </button>
 
-      {/* Quản lý sản phẩm */}
-      <section>
-        <h3>Product Management</h3>
-        <button className="add-btn">Add Product</button>
-        <table className="manager-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td>{product.id}</td>
-                <td>{product.name}</td>
-                <td>{product.price}</td>
+      <h3>Product List</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Discount</th>
+            <th>Final Price</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products
+            .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+            .map((p) => (
+              <tr key={p.id}>
+                <td>{p.name}</td>
+                <td>${p.price}</td>
+                <td>{p.discount}%</td>
+                <td>${p.priceAfterDiscount.toFixed(2)}</td>
+                <td>{p.category}</td>
+                <td>{p.stock > 0 ? p.stock : <span style={{ color: "red" }}>Out of stock</span>}</td>
                 <td>
-                  <button className="edit-btn">Edit</button>
-                  <button className="delete-btn">Delete</button>
+                  <button onClick={() => editProduct(p)}>Edit</button>
+                  <button onClick={() => deleteProduct(p.id)}>Delete</button>
                 </td>
               </tr>
             ))}
-          </tbody>
-        </table>
-      </section>
+        </tbody>
+      </table>
     </div>
   );
 }

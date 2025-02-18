@@ -1,35 +1,107 @@
 .manager-container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .manager-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-  
-  .manager-table th, .manager-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  
-  .add-btn, .edit-btn, .delete-btn {
-    padding: 5px 10px;
-    margin: 5px;
-    cursor: pointer;
-  }
-  
-  .edit-btn {
-    background: #ffcc00;
-    border: none;
-  }
-  
-  .delete-btn {
-    background: #ff4444;
-    color: white;
-    border: none;
-  }
-  
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+}
+
+h2 {
+  color: #333;
+}
+
+h3 {
+  color: #007bff;
+}
+
+input, select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 200px;
+}
+
+input[type="number"] {
+  width: 120px;
+}
+
+button {
+  background-color: #28a745;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+.add-product-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.add-product-form input, .add-product-form select {
+  width: calc(33.33% - 10px);
+}
+
+.add-product-form button {
+  width: auto;
+  padding: 10px 15px;
+}
+
+input[type="text"], input[type="number"], select {
+  max-width: 300px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+button {
+  padding: 5px 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #c82333;
+}
+
+input[type="text"], input[type="number"], select {
+  margin-bottom: 10px;
+}
+
+button:focus {
+  outline: none;
+}
+
+table td span {
+  color: red;
+}
