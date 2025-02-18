@@ -5,11 +5,11 @@ import Footer from "./Footer";
 function MainLayout() {
   return (
     <div className="main-layout">
-      <Header />
-      <main className="content">
-        <Outlet /> {/* Render nội dung của từng trang */}
-      </main>
-      <Footer />
+
+      <div className="content">
+        <Outlet />  {/* Đây là nơi sẽ hiển thị trang hiện tại */}
+      </div>
+
     </div>
   );
 }

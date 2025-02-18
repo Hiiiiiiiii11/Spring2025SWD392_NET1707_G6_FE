@@ -1,8 +1,20 @@
 /* ===== Hiệu ứng Glassmorphism cho khung đăng ký ===== */
+.register-page {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0;
+}
+
 .register-container {
     width: 100%;
-    max-width: 450px; /* Mở rộng form giống login */
-    padding: 50px; /* Giãn khoảng cách để form thoáng hơn */
+    max-width: 450px;
+    /* Mở rộng form giống login */
+    padding: 50px;
+    /* Giãn khoảng cách để form thoáng hơn */
     background: rgba(255, 255, 255, 0.15);
     border-radius: 20px;
     backdrop-filter: blur(10px);
@@ -41,8 +53,9 @@ h2 {
 
 /* ===== Ô nhập liệu với hiệu ứng focus ===== */
 .register-form input {
-    width: 100%;
-    padding: 10px; /* Tăng padding cho input thoáng hơn */
+
+    padding: 10px;
+    /* Tăng padding cho input thoáng hơn */
     margin-bottom: 18px;
     border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
@@ -74,9 +87,12 @@ h2 {
     cursor: pointer;
     transition: 0.3s;
     box-shadow: 0 5px 15px rgba(255, 118, 136, 0.4);
-    margin: 10px auto 0; /* Đặt margin auto để căn giữa */
-    display: block; /* Đảm bảo button là block để căn giữa */
-    text-align: center; /* Căn giữa nội dung bên trong */
+    margin: 10px auto 0;
+    /* Đặt margin auto để căn giữa */
+    display: block;
+    /* Đảm bảo button là block để căn giữa */
+    text-align: center;
+    /* Căn giữa nội dung bên trong */
 }
 
 .register-form button:hover {
@@ -94,9 +110,11 @@ h2 {
         max-width: 90%;
         padding: 25px;
     }
+
     .register-form input {
         font-size: 14px;
     }
+
     .register-form button {
         font-size: 16px;
     }
@@ -106,5 +124,4 @@ h2 {
     color: red;
     font-size: 14px;
     margin-top: 5px;
-  }
-  
+}

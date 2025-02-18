@@ -2,7 +2,7 @@
 .home-container {
   font-family: "Arial", sans-serif;
   color: #333;
-  max-width: 1000px;
+
   margin: auto;
   padding: 0 15px;
 }
@@ -39,23 +39,10 @@
   padding: 15px;
 }
 
-.hero-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  padding: 12px;
-  border-radius: 6px;
-}
 
-.role-selector {
-  text-align: center;
-  margin: 10px 0;
-}
 
-.role-message {
-  text-align: center;
-  font-size: 0.9em;
-  margin-bottom: 10px;
-}
+
+
 
 /* Product Section */
 .product-section {
@@ -98,6 +85,8 @@
 }
 
 .contact-overlay {
+  justify-content: center;
+  display: flex;
   background: rgba(0, 0, 0, 0.6);
   color: white;
   padding: 12px;

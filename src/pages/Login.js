@@ -62,42 +62,40 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <img src={skincareImage} alt="Skincare" className="login-image" />
-      <h2>Sign in for your beauty</h2>
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="text"
-          name="email"
-          placeholder="Username or email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        {errors.email && <p className="error-message">{errors.email}</p>} {/* Hiển thị lỗi email */}
-        
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        {errors.password && <p className="error-message">{errors.password}</p>} {/* Hiển thị lỗi password */}
+    <div className="login-page">
+      <div className="login-container">
+        <img src={skincareImage} alt="Skincare" className="login-image" />
+        <h2>Sign in for your beauty</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="text"
+            name="email"
+            placeholder="Username or email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          {errors.email && <p className="error-message">{errors.email}</p>} {/* Hiển thị lỗi email */}
 
-        <div className="login-options">
-          <label>
-            <input type="checkbox" name="rememberMe" checked={formData.rememberMe} onChange={handleChange} />
-            Remember me
-          </label>
-          <a href="/forgot-password" className="forgot-password">Forgot password?</a>
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      <p className="register-link">
-        Don't have an account? <a href="/register">Sign up now</a>
-      </p>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          {errors.password && <p className="error-message">{errors.password}</p>} {/* Hiển thị lỗi password */}
+
+          <div className="login-options">
+            <a href="/forgot-password" className="forgot-password">Forgot password?</a>
+          </div>
+          <button type="submit">Login</button>
+        </form>
+        <p className="register-link">
+          Don't have an account? <a href="/register">Sign up now</a>
+        </p>
+      </div>
     </div>
   );
 };

@@ -1,11 +1,11 @@
 /* Tổng thể trang đăng nhập */
-body {
+.login-page {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #a8edea, #fed6e3);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+
     margin: 0;
 }
 
@@ -51,7 +51,7 @@ h2 {
 
 /* Input với hiệu ứng focus */
 .login-form input {
-    width: 100%;
+
     padding: 12px;
     margin-bottom: 15px;
     border: 2px solid rgba(255, 255, 255, 0.5);
@@ -98,5 +98,4 @@ h2 {
     color: red;
     font-size: 14px;
     margin-top: 5px;
-  }
-  
+}

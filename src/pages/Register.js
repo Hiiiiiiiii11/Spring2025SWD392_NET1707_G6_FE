@@ -82,70 +82,72 @@ const Register = () => {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-image-container">
-        <img src={registerImage} alt="Register" className="register-image" />
-      </div>
+    <div className="register-page">
+      <div className="register-container">
+        <div className="register-image-container">
+          <img src={registerImage} alt="Register" className="register-image" />
+        </div>
 
-      <div className="register-form-container">
-        <h2>Create an Account</h2>
-        <form onSubmit={handleSubmit} className="register-form">
-          <input
-            type="text"
-            name="fullName"
-            placeholder="Full Name"
-            value={formData.fullName}
-            onChange={handleChange}
-          />
-          {errors.fullName && <p className="error-message">{errors.fullName}</p>}
+        <div className="register-form-container">
+          <h2>Create an Account</h2>
+          <form onSubmit={handleSubmit} className="register-form">
+            <input
+              type="text"
+              name="fullName"
+              placeholder="Full Name"
+              value={formData.fullName}
+              onChange={handleChange}
+            />
+            {errors.fullName && <p className="error-message">{errors.fullName}</p>}
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          {errors.email && <p className="error-message">{errors.email}</p>}
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            {errors.email && <p className="error-message">{errors.email}</p>}
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          {errors.password && <p className="error-message">{errors.password}</p>}
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            {errors.password && <p className="error-message">{errors.password}</p>}
 
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-          {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+            />
+            {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
 
-          <input
-            type="text"
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-          {errors.phone && <p className="error-message">{errors.phone}</p>}
+            <input
+              type="text"
+              name="phone"
+              placeholder="Phone Number"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+            {errors.phone && <p className="error-message">{errors.phone}</p>}
 
-          <input
-            type="text"
-            name="address"
-            placeholder="Your Address"
-            value={formData.address}
-            onChange={handleChange}
-          />
-          {errors.address && <p className="error-message">{errors.address}</p>}
+            <input
+              type="text"
+              name="address"
+              placeholder="Your Address"
+              value={formData.address}
+              onChange={handleChange}
+            />
+            {errors.address && <p className="error-message">{errors.address}</p>}
 
-          <button type="submit">Register</button>
-        </form>
+            <button type="submit">Register</button>
+          </form>
+        </div>
       </div>
     </div>
   );
