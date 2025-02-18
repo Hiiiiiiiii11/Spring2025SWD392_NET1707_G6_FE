@@ -1,94 +1,132 @@
+/* Container chính */
 .manager-container {
-  width: 80%;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  font-family: Arial, sans-serif;
   background-color: #f9f9f9;
-  border-radius: 8px;
 }
 
+h2, h3 {
+  text-align: center;
+  color: #333;
+}
+
+h3 {
+  margin-top: 20px;
+  font-size: 20px;
+}
+
+/* Tìm kiếm sản phẩm */
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Form sản phẩm */
 .add-product-form {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
+/* Mỗi input trong form */
 .add-product-form .input-container {
+  flex: 1 1 calc(33% - 15px);
+  min-width: 250px;
   display: flex;
   flex-direction: column;
-  width: 48%;
 }
 
-.add-product-form .input-container input,
-.add-product-form .input-container select {
+.add-product-form input,
+.add-product-form select {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  height: 40px;
-  font-size: 14px;
-  width: 100%;
-  margin-bottom: 5px;
+  font-size: 16px;
+  margin-bottom: 8px;
 }
 
+.add-product-form select {
+  background-color: #f9f9f9;
+}
+
+/* Button thêm sản phẩm */
 .add-product-form button {
   background-color: #28a745;
   color: white;
   border: none;
-  padding: 10px 15px;
+  padding: 12px 20px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  width: 100%;
+  margin-top: 15px;
 }
 
 .add-product-form button:hover {
   background-color: #218838;
 }
 
+/* Lỗi và validate */
 .error {
   color: red;
   font-size: 12px;
   margin-top: 5px;
 }
 
-input.error,
-select.error {
+.input-container input.error,
+.input-container select.error {
   border-color: red;
 }
 
+/* Bảng sản phẩm */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
 
-table th,
-table td {
-  padding: 12px 15px;
+table th, table td {
+  padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #ccc;
 }
 
 table th {
   background-color: #f4f4f4;
 }
 
-table td button {
-  background-color: #dc3545;
-  color: white;
-  border: none;
+button {
   padding: 6px 12px;
+  border: none;
+  background-color: #007bff;
+  color: white;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
 }
 
-table td button:hover {
-  background-color: #c82333;
+button:hover {
+  background-color: #0056b3;
 }
 
-table td span {
+/* Định dạng cho ô "Out of stock" */
+span {
   color: red;
   font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .add-product-form .input-container {
+    flex: 1 1 100%;
+  }
+
+  .add-product-form button {
+    width: 100%;
+  }
 }

@@ -8,7 +8,6 @@ function Manager() {
   });
 
   const [newProduct, setNewProduct] = useState({
-    id: null,
     name: "",
     price: "",
     category: "Moisturizer",
@@ -20,57 +19,63 @@ function Manager() {
 
   const [errors, setErrors] = useState({});
   const [search, setSearch] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const [editingProductId, setEditingProductId] = useState(null);
 
   useEffect(() => {
     localStorage.setItem("products", JSON.stringify(products));
   }, [products]);
 
-  const validate = () => {
-    const errors = {};
-
-    if (!newProduct.name) {
-      errors.name = "Product name is required";
-    }
-
-    if (!newProduct.price) {
-      errors.price = "Price is required";
-    } else if (isNaN(newProduct.price)) {
-      errors.price = "Price must be a number";
-    }
-
-    if (newProduct.stock < 0) {
-      errors.stock = "Stock cannot be negative";
-    }
-
-    setErrors(errors);
-
-    return Object.keys(errors).length === 0;
-  };
-
+  // Thêm sản phẩm
   const addProduct = () => {
-    if (validate()) {
-      if (newProduct.id) {
-        // Edit Product
-        const updatedProducts = products.map(p => 
-          p.id === newProduct.id ? { ...newProduct, priceAfterDiscount: newProduct.price - (newProduct.price * newProduct.discount) / 100 } : p
-        );
-        setProducts(updatedProducts);
-      } else {
-        // Add New Product
-        const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
-        setProducts([...products, { ...newProduct, id: Date.now(), priceAfterDiscount }]);
-      }
-
-      // Reset form
-      setNewProduct({ id: null, name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
+    let formErrors = {};
+    if (!newProduct.name) formErrors.name = "Product name is required!";
+    if (!newProduct.price) formErrors.price = "Price is required!";
+    if (isNaN(newProduct.price) || newProduct.price <= 0) formErrors.price = "Invalid price!";
+    
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
     }
+
+    const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
+    setProducts([...products, { ...newProduct, id: Date.now(), priceAfterDiscount }]);
+    setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
+    setErrors({});
   };
 
-  const editProduct = (id) => {
-    const productToEdit = products.find((p) => p.id === id);
-    setNewProduct({ ...productToEdit });
+  // Cập nhật sản phẩm
+  const updateProduct = () => {
+    let formErrors = {};
+    if (!newProduct.name) formErrors.name = "Product name is required!";
+    if (!newProduct.price) formErrors.price = "Price is required!";
+    if (isNaN(newProduct.price) || newProduct.price <= 0) formErrors.price = "Invalid price!";
+    
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
+
+    const updatedProducts = products.map((p) =>
+      p.id === editingProductId
+        ? { ...p, ...newProduct, priceAfterDiscount: newProduct.price - (newProduct.price * newProduct.discount) / 100 }
+        : p
+    );
+    setProducts(updatedProducts);
+    setEditMode(false);
+    setEditingProductId(null);
+    setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
+    setErrors({});
   };
 
+  // Bắt đầu chỉnh sửa sản phẩm
+  const startEditProduct = (product) => {
+    setEditMode(true);
+    setEditingProductId(product.id);
+    setNewProduct({ ...product });
+  };
+
+  // Xóa sản phẩm
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure?")) {
       setProducts(products.filter((p) => p.id !== id));
@@ -81,13 +86,13 @@ function Manager() {
     <div className="manager-container">
       <h2>Manager Dashboard</h2>
       <input type="text" placeholder="Search product..." onChange={(e) => setSearch(e.target.value)} />
-
-      <h3>{newProduct.id ? "Edit Product" : "Add Product"}</h3>
+      
+      <h3>{editMode ? "Edit Product" : "Add Product"}</h3>
       <div className="add-product-form">
         <div className="input-container">
           <input
             type="text"
-            placeholder="Product Name"
+            placeholder="Name"
             value={newProduct.name}
             onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
             className={errors.name ? "error" : ""}
@@ -135,8 +140,8 @@ function Manager() {
 
         <div className="input-container">
           <select
-            onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
             value={newProduct.category}
+            onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
           >
             <option>Moisturizer</option>
             <option>Anti-aging</option>
@@ -144,8 +149,10 @@ function Manager() {
             <option>Sunscreen</option>
           </select>
         </div>
-
-        <button onClick={addProduct}>{newProduct.id ? "Update Product" : "Add Product"}</button>
+        
+        <button onClick={editMode ? updateProduct : addProduct}>
+          {editMode ? "Save Changes" : "Add Product"}
+        </button>
       </div>
 
       <h3>Product List</h3>
@@ -173,7 +180,7 @@ function Manager() {
                 <td>{p.category}</td>
                 <td>{p.stock > 0 ? p.stock : <span style={{ color: "red" }}>Out of stock</span>}</td>
                 <td>
-                  <button onClick={() => editProduct(p.id)}>Edit</button>
+                  <button onClick={() => startEditProduct(p)}>Edit</button>
                   <button onClick={() => deleteProduct(p.id)}>Delete</button>
                 </td>
               </tr>
