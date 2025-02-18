@@ -5,12 +5,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-bottom: 100px;
 
-    margin: 0;
 }
 
 /* Hiệu ứng Glassmorphism cho khung đăng nhập */
 .login-container {
+    margin-top: 50px;
     width: 100%;
     max-width: 400px;
     padding: 30px;
