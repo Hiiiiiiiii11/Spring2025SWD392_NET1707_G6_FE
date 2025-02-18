@@ -8,6 +8,7 @@ function Manager() {
   });
 
   const [newProduct, setNewProduct] = useState({
+    id: null,
     name: "",
     price: "",
     category: "Moisturizer",
@@ -48,10 +49,26 @@ function Manager() {
 
   const addProduct = () => {
     if (validate()) {
-      const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
-      setProducts([...products, { ...newProduct, id: Date.now(), priceAfterDiscount }]);
-      setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
+      if (newProduct.id) {
+        // Edit Product
+        const updatedProducts = products.map(p => 
+          p.id === newProduct.id ? { ...newProduct, priceAfterDiscount: newProduct.price - (newProduct.price * newProduct.discount) / 100 } : p
+        );
+        setProducts(updatedProducts);
+      } else {
+        // Add New Product
+        const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
+        setProducts([...products, { ...newProduct, id: Date.now(), priceAfterDiscount }]);
+      }
+
+      // Reset form
+      setNewProduct({ id: null, name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
     }
+  };
+
+  const editProduct = (id) => {
+    const productToEdit = products.find((p) => p.id === id);
+    setNewProduct({ ...productToEdit });
   };
 
   const deleteProduct = (id) => {
@@ -64,8 +81,8 @@ function Manager() {
     <div className="manager-container">
       <h2>Manager Dashboard</h2>
       <input type="text" placeholder="Search product..." onChange={(e) => setSearch(e.target.value)} />
-      
-      <h3>Add Product</h3>
+
+      <h3>{newProduct.id ? "Edit Product" : "Add Product"}</h3>
       <div className="add-product-form">
         <div className="input-container">
           <input
@@ -128,7 +145,7 @@ function Manager() {
           </select>
         </div>
 
-        <button onClick={addProduct}>Add Product</button>
+        <button onClick={addProduct}>{newProduct.id ? "Update Product" : "Add Product"}</button>
       </div>
 
       <h3>Product List</h3>
@@ -156,6 +173,7 @@ function Manager() {
                 <td>{p.category}</td>
                 <td>{p.stock > 0 ? p.stock : <span style={{ color: "red" }}>Out of stock</span>}</td>
                 <td>
+                  <button onClick={() => editProduct(p.id)}>Edit</button>
                   <button onClick={() => deleteProduct(p.id)}>Delete</button>
                 </td>
               </tr>
