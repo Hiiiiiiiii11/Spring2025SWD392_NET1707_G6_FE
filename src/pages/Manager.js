@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Manager.css";
 
 function Manager() {
-  // Load dữ liệu từ localStorage
+  // Load products from localStorage
   const [products, setProducts] = useState(() => {
     return JSON.parse(localStorage.getItem("products")) || [];
   });
@@ -23,7 +23,7 @@ function Manager() {
     localStorage.setItem("products", JSON.stringify(products));
   }, [products]);
 
-  // Add product
+  // Add new product
   const addProduct = () => {
     if (!newProduct.name || !newProduct.price) return alert("Please fill all fields");
     const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
@@ -69,15 +69,51 @@ function Manager() {
   return (
     <div className="manager-container">
       <h2>Manager Dashboard</h2>
-      <input type="text" placeholder="Search product..." onChange={(e) => setSearch(e.target.value)} />
-      
+      <input 
+        type="text" 
+        placeholder="Search product..." 
+        onChange={(e) => setSearch(e.target.value)} 
+      />
+
       <h3>{editingProduct ? "Edit Product" : "Add Product"}</h3>
-      <input type="text" placeholder="Name" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
-      <input type="number" placeholder="Price" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
-      <input type="text" placeholder="Description" value={newProduct.description} onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} />
-      <input type="number" placeholder="Stock" value={newProduct.stock} onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })} />
-      <input type="number" placeholder="Discount (%)" value={newProduct.discount} onChange={(e) => setNewProduct({ ...newProduct, discount: e.target.value })} />
-      <select onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}>
+      
+      {/* Title for Add Product */}
+      <h4>Please fill in the details of the product you want to add:</h4>
+      
+      <input 
+        type="text" 
+        placeholder="Name" 
+        value={newProduct.name} 
+        onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} 
+      />
+      <input 
+        type="number" 
+        placeholder="Price" 
+        value={newProduct.price} 
+        onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} 
+      />
+      <input 
+        type="text" 
+        placeholder="Description" 
+        value={newProduct.description} 
+        onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} 
+      />
+      <input 
+        type="number" 
+        placeholder="Stock" 
+        value={newProduct.stock} 
+        onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })} 
+      />
+      <input 
+        type="number" 
+        placeholder="Discount (%)" 
+        value={newProduct.discount} 
+        onChange={(e) => setNewProduct({ ...newProduct, discount: e.target.value })} 
+      />
+      <select 
+        onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+        value={newProduct.category}
+      >
         <option>Moisturizer</option>
         <option>Anti-aging</option>
         <option>Brightening</option>
