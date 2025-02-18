@@ -14,7 +14,7 @@ function Manager() {
     description: "",
     stock: 10,
     discount: 0,
-    image: ""
+    image: "" // Thêm trường ảnh
   });
 
   const [errors, setErrors] = useState({});
@@ -79,6 +79,18 @@ function Manager() {
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure?")) {
       setProducts(products.filter((p) => p.id !== id));
+    }
+  };
+
+  // Xử lý thay đổi ảnh
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewProduct({ ...newProduct, image: reader.result });
+      };
+      reader.readAsDataURL(file); // Chuyển đổi ảnh thành URL
     }
   };
 
@@ -149,7 +161,16 @@ function Manager() {
             <option>Sunscreen</option>
           </select>
         </div>
-        
+
+        <div className="input-container">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+          {newProduct.image && <img src={newProduct.image} alt="Product" style={{ maxWidth: "100px", marginTop: "10px" }} />}
+        </div>
+
         <button onClick={editMode ? updateProduct : addProduct}>
           {editMode ? "Save Changes" : "Add Product"}
         </button>
@@ -165,6 +186,7 @@ function Manager() {
             <th>Final Price</th>
             <th>Category</th>
             <th>Stock</th>
+            <th>Image</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -179,6 +201,9 @@ function Manager() {
                 <td>${p.priceAfterDiscount.toFixed(2)}</td>
                 <td>{p.category}</td>
                 <td>{p.stock > 0 ? p.stock : <span style={{ color: "red" }}>Out of stock</span>}</td>
+                <td>
+                  {p.image && <img src={p.image} alt="Product" style={{ maxWidth: "100px" }} />}
+                </td>
                 <td>
                   <button onClick={() => startEditProduct(p)}>Edit</button>
                   <button onClick={() => deleteProduct(p.id)}>Delete</button>
