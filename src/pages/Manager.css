@@ -1,35 +1,114 @@
+/* General styles */
 .manager-container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-    text-align: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+h3 {
+  color: #555;
+  margin-bottom: 15px;
+}
+
+input, select, button {
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: auto;
+  padding: 10px 20px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Error messages */
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Form styles */
+.add-product-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.input-container {
+  width: 48%; /* Ensure two inputs fit per row */
+}
+
+.input-container input,
+.input-container select {
+  width: 100%; /* Make inputs fit the container */
+}
+
+.input-container img {
+  max-width: 100px;
+  margin-top: 10px;
+  display: block;
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+}
+
+td img {
+  max-width: 80px;
+  height: auto;
+}
+
+td button {
+  padding: 5px 10px;
+  margin-right: 5px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+td button:hover {
+  background-color: #d32f2f;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .input-container {
+    width: 100%; /* Stack inputs vertically on small screens */
   }
-  
-  .manager-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+
+  .add-product-form {
+    flex-direction: column;
   }
-  
-  .manager-table th, .manager-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  
-  .add-btn, .edit-btn, .delete-btn {
-    padding: 5px 10px;
-    margin: 5px;
-    cursor: pointer;
-  }
-  
-  .edit-btn {
-    background: #ffcc00;
-    border: none;
-  }
-  
-  .delete-btn {
-    background: #ff4444;
-    color: white;
-    border: none;
-  }
-  
+}
