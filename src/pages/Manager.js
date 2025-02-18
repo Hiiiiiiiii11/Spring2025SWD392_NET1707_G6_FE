@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Manager.css";
 
 function Manager() {
-  // Load data from localStorage
+  // Load dữ liệu từ localStorage
   const [products, setProducts] = useState(() => {
     return JSON.parse(localStorage.getItem("products")) || [];
   });
@@ -24,37 +24,36 @@ function Manager() {
     localStorage.setItem("products", JSON.stringify(products));
   }, [products]);
 
-  // Add product
-  const addProduct = () => {
-    const newErrors = {};
+  const validate = () => {
+    const errors = {};
 
-    if (!newProduct.name) newErrors.name = "Product name is required.";
-    if (!newProduct.price) newErrors.price = "Price is required.";
-    if (newProduct.price <= 0) newErrors.price = "Price must be greater than 0.";
-    if (!newProduct.stock) newErrors.stock = "Stock quantity is required.";
-    if (newProduct.stock < 0) newErrors.stock = "Stock cannot be negative.";
+    if (!newProduct.name) {
+      errors.name = "Product name is required";
+    }
 
-    setErrors(newErrors);
+    if (!newProduct.price) {
+      errors.price = "Price is required";
+    } else if (isNaN(newProduct.price)) {
+      errors.price = "Price must be a number";
+    }
 
-    if (Object.keys(newErrors).length > 0) return;
+    if (newProduct.stock < 0) {
+      errors.stock = "Stock cannot be negative";
+    }
 
-    const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
-    setProducts([
-      ...products,
-      { ...newProduct, id: Date.now(), priceAfterDiscount }
-    ]);
-    setNewProduct({
-      name: "",
-      price: "",
-      category: "Moisturizer",
-      description: "",
-      stock: 10,
-      discount: 0,
-      image: ""
-    });
+    setErrors(errors);
+
+    return Object.keys(errors).length === 0;
   };
 
-  // Delete product
+  const addProduct = () => {
+    if (validate()) {
+      const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
+      setProducts([...products, { ...newProduct, id: Date.now(), priceAfterDiscount }]);
+      setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
+    }
+  };
+
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure?")) {
       setProducts(products.filter((p) => p.id !== id));
@@ -64,29 +63,21 @@ function Manager() {
   return (
     <div className="manager-container">
       <h2>Manager Dashboard</h2>
-      <input
-        type="text"
-        placeholder="Search product..."
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
+      <input type="text" placeholder="Search product..." onChange={(e) => setSearch(e.target.value)} />
+      
       <h3>Add Product</h3>
       <div className="add-product-form">
-        <h4>Please fill in the details of the product you want to add:</h4>
-
-        {/* Name */}
         <div className="input-container">
           <input
             type="text"
-            placeholder="Name"
+            placeholder="Product Name"
             value={newProduct.name}
             onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
             className={errors.name ? "error" : ""}
           />
-          {errors.name && <span className="error">{errors.name}</span>}
+          {errors.name && <div className="error">{errors.name}</div>}
         </div>
 
-        {/* Price */}
         <div className="input-container">
           <input
             type="number"
@@ -95,10 +86,9 @@ function Manager() {
             onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
             className={errors.price ? "error" : ""}
           />
-          {errors.price && <span className="error">{errors.price}</span>}
+          {errors.price && <div className="error">{errors.price}</div>}
         </div>
 
-        {/* Description */}
         <div className="input-container">
           <input
             type="text"
@@ -108,35 +98,28 @@ function Manager() {
           />
         </div>
 
-        {/* Stock */}
         <div className="input-container">
           <input
             type="number"
             placeholder="Stock"
             value={newProduct.stock}
             onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
-            className={errors.stock ? "error" : ""}
           />
-          {errors.stock && <span className="error">{errors.stock}</span>}
         </div>
 
-        {/* Discount */}
         <div className="input-container">
           <input
             type="number"
             placeholder="Discount (%)"
             value={newProduct.discount}
             onChange={(e) => setNewProduct({ ...newProduct, discount: e.target.value })}
-            className={errors.discount ? "error" : ""}
           />
-          {errors.discount && <span className="error">{errors.discount}</span>}
         </div>
 
-        {/* Category */}
         <div className="input-container">
           <select
-            value={newProduct.category}
             onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+            value={newProduct.category}
           >
             <option>Moisturizer</option>
             <option>Anti-aging</option>

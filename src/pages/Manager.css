@@ -14,27 +14,21 @@
   margin-bottom: 20px;
 }
 
-.add-product-form h4 {
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: #333;
-  width: 100%;
-}
-
 .add-product-form .input-container {
   display: flex;
   flex-direction: column;
-  width: 48%; /* Makes the form elements appear side by side */
+  width: 48%;
 }
 
 .add-product-form .input-container input,
 .add-product-form .input-container select {
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   height: 40px;
   font-size: 14px;
   width: 100%;
+  margin-bottom: 5px;
 }
 
 .add-product-form button {
@@ -45,7 +39,6 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.3s;
   width: 100%;
 }
 
@@ -53,20 +46,14 @@
   background-color: #218838;
 }
 
-.input-container {
-  position: relative;
-}
-
 .error {
   color: red;
   font-size: 12px;
-  position: absolute;
-  top: 100%; /* Position below the input */
-  left: 0;
   margin-top: 5px;
 }
 
-input.error, select.error {
+input.error,
+select.error {
   border-color: red;
 }
 
@@ -76,7 +63,8 @@ table {
   margin-top: 20px;
 }
 
-table th, table td {
+table th,
+table td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -103,29 +91,4 @@ table td button:hover {
 table td span {
   color: red;
   font-weight: bold;
-}
-
-input[type="text"],
-input[type="number"] {
-  box-sizing: border-box;
-}
-
-h3 {
-  margin-top: 20px;
-  font-size: 24px;
-  color: #333;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-select:focus {
-  border-color: #28a745;
-  outline: none;
-}
-
-/* Responsive for small screens */
-@media (max-width: 768px) {
-  .add-product-form .input-container {
-    width: 100%; /* Stacks inputs on smaller screens */
-  }
 }
