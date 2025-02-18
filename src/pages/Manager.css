@@ -1,40 +1,10 @@
 .manager-container {
+  width: 80%;
+  max-width: 900px;
+  margin: 0 auto;
   padding: 20px;
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-}
-
-h2 {
-  color: #333;
-}
-
-h3 {
-  color: #007bff;
-}
-
-input, select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  width: 200px;
-}
-
-input[type="number"] {
-  width: 120px;
-}
-
-button {
-  background-color: #28a745;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #218838;
+  background-color: #f9f9f9;
+  border-radius: 8px;
 }
 
 .add-product-form {
@@ -44,70 +14,118 @@ button:hover {
   margin-bottom: 20px;
 }
 
-.add-product-form input, .add-product-form select {
-  width: calc(33.33% - 10px);
+.add-product-form h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #333;
+  width: 100%;
+}
+
+.add-product-form .input-container {
+  display: flex;
+  flex-direction: column;
+  width: 48%; /* Makes the form elements appear side by side */
+}
+
+.add-product-form .input-container input,
+.add-product-form .input-container select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  height: 40px;
+  font-size: 14px;
+  width: 100%;
 }
 
 .add-product-form button {
-  width: auto;
+  background-color: #28a745;
+  color: white;
+  border: none;
   padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  width: 100%;
 }
 
-input[type="text"], input[type="number"], select {
-  max-width: 300px;
+.add-product-form button:hover {
+  background-color: #218838;
+}
+
+.input-container {
+  position: relative;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  position: absolute;
+  top: 100%; /* Position below the input */
+  left: 0;
+  margin-top: 5px;
+}
+
+input.error, select.error {
+  border-color: red;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
-  padding: 12px;
+table th, table td {
+  padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #ddd;
 }
 
-th {
-  background-color: #007bff;
-  color: white;
+table th {
+  background-color: #f4f4f4;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-button {
-  padding: 5px 10px;
+table td button {
   background-color: #dc3545;
   color: white;
   border: none;
+  padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 14px;
 }
 
-button:hover {
+table td button:hover {
   background-color: #c82333;
-}
-
-input[type="text"], input[type="number"], select {
-  margin-bottom: 10px;
-}
-
-button:focus {
-  outline: none;
 }
 
 table td span {
   color: red;
+  font-weight: bold;
 }
 
-.error {
-  color: red;
-  font-size: 12px;
-  margin-top: 5px;
+input[type="text"],
+input[type="number"] {
+  box-sizing: border-box;
+}
+
+h3 {
+  margin-top: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: #28a745;
+  outline: none;
+}
+
+/* Responsive for small screens */
+@media (max-width: 768px) {
+  .add-product-form .input-container {
+    width: 100%; /* Stacks inputs on smaller screens */
+  }
 }
