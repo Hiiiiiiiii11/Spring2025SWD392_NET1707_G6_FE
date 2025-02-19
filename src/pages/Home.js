@@ -4,6 +4,9 @@ import heroImage from "../assets/hero.jpg"; // Ảnh nền hero
 import product1 from "../assets/product1.jpg"; // Ảnh sản phẩm 1
 import product2 from "../assets/product2.jpg"; // Ảnh sản phẩm 2
 import product3 from "../assets/product3.jpg"; // Ảnh sản phẩm 3
+import product4 from "../assets/product4.jpg"; // Ảnh sản phẩm 4
+import product5 from "../assets/product5.jpg"; // Ảnh sản phẩm 5
+import product6 from "../assets/product6.jpg"; // Ảnh sản phẩm 6
 import contactBg from "../assets/contact-bg.jpg"; // Ảnh nền form liên hệ
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -24,13 +27,10 @@ function Home() {
 
   return (
     <div className="home-container">
-
       <Header />
       {/* Hero Section */}
       <div className="hero" style={{ backgroundImage: `url(${heroImage})` }}>
-
       </div>
-
 
       {/* Product Section */}
       <section className="product-section">
@@ -51,6 +51,21 @@ function Home() {
             <h3>Sunscreen SPF 50</h3>
             <p>$19.99</p>
           </div>
+          <div className="product-card">
+            <img src={product4} alt="Product 4" />
+            <h3>Hydrating Toner</h3>
+            <p>$22.99</p>
+          </div>
+          <div className="product-card">
+            <img src={product5} alt="Product 5" />
+            <h3>Anti-Aging Cream</h3>
+            <p>$35.99</p>
+          </div>
+          <div className="product-card">
+            <img src={product6} alt="Product 6" />
+            <h3>Exfoliating Scrub</h3>
+            <p>$18.99</p>
+          </div>
         </div>
       </section>
 
@@ -69,7 +84,6 @@ function Home() {
         </div>
       </section>
       <Footer />
-
     </div>
   );
 }
