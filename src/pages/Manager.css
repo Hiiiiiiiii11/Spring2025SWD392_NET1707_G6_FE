@@ -2,7 +2,7 @@
 .manager-container {
   padding: 20px;
   font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+  background: linear-gradient(135deg, #a8edea, #fed6e3);
 }
 
 h2 {
