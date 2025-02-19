@@ -8,7 +8,7 @@ body {
     justify-content: space-between;
     align-items: center;
     background-color: #333;
-    padding: 10px 20px;
+    padding: 12px 20px;
 }
 
 .nav-links {
@@ -39,29 +39,39 @@ body {
     display: flex;
     align-items: center;
     background: white;
-    border-radius: 5px;
+    border-radius: 20px;
     overflow: hidden;
+    border: 2px solid #04AA6D;
+    padding: 3px 10px;
 }
 
 .search-box input {
     border: none;
-    padding: 8px;
+    padding: 8px 12px;
     font-size: 16px;
     outline: none;
-    width: 200px;
+    width: 250px;
 }
 
 .search-box button {
-    background: #04AA6D;
+    background: transparent;
     border: none;
-    color: white;
+    color: #888; /* Màu xám nhẹ */
     padding: 8px 12px;
     cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: color 0.3s ease, background 0.3s ease;
 }
 
 .search-box button:hover {
-    background: #028a57;
+    color: #555; /* Đậm hơn một chút khi hover */
+    background: rgba(0, 0, 0, 0.05); /* Hiệu ứng nhấn nhẹ */
 }
+
 
 /* Auth links (Login/Register) */
 .auth-links {
