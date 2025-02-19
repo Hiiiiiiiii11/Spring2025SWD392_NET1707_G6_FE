@@ -66,49 +66,125 @@ button:hover {
   display: block;
 }
 
-/* Table styles */
+/* Table Container */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Styles */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
-  padding: 12px;
-  text-align: left;
-  border: 1px solid #ddd;
+  padding: 14px 16px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
 th {
   background-color: #007bff;
   color: white;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
+tr:hover {
+  background-color: #f1f1f1;
+  transition: 0.3s ease-in-out;
+}
+
+/* Alternate Row Colors */
+tbody tr:nth-child(even) {
+  background-color: #f8f8f8;
+}
+
+/* Product Image */
 td img {
-  max-width: 80px;
+  max-width: 60px;
   height: auto;
+  border-radius: 5px;
+  display: block;
+  margin: auto;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-td button {
-  padding: 5px 10px;
-  margin-right: 5px;
-  background-color: #f44336;
-  color: white;
+/* Price & Stock Styling */
+.price {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.out-of-stock {
+  color: red;
+  font-weight: bold;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-buttons button {
   border: none;
+  padding: 8px 12px;
+  font-size: 14px;
   cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
+  font-weight: 600;
 }
 
-td button:hover {
-  background-color: #d32f2f;
+.edit-btn {
+  background-color: #ffc107;
+  color: black;
+}
+
+.edit-btn:hover {
+  background-color: #e0a800;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .input-container {
-    width: 100%; /* Stack inputs vertically on small screens */
+  .table-container {
+    padding: 10px;
   }
 
-  .add-product-form {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .action-buttons {
     flex-direction: column;
+    gap: 5px;
+  }
+
+  td, th {
+    padding: 10px;
   }
 }
+
+
