@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./Register.css";
-import registerImage from "../assets/skincare.jpg"; // Import ảnh
-import axios from "axios";
-import { notification } from "antd"; // Thêm thư viện notification
+import registerImage from "../assets/skincare.jpg";
+import { notification } from "antd";
+import { registerAPI } from "../services/authService";// Import API service
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,32 +14,25 @@ const Register = () => {
     address: "",
   });
 
-  const [errors, setErrors] = useState({}); // State lưu lỗi
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Hàm kiểm tra email hợp lệ
-  const validateEmail = (email) => {
-    return /\S+@\S+\.\S+/.test(email);
-  };
+  // Kiểm tra email hợp lệ
+  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
-  // Hàm kiểm tra mật khẩu mạnh
-  const validatePassword = (password) => {
-    return password.length >= 6 && /\d/.test(password); // Ít nhất 6 ký tự, có số
-  };
+  // Kiểm tra mật khẩu mạnh
+  const validatePassword = (password) => password.length >= 6 && /\d/.test(password);
 
-  // Hàm kiểm tra số điện thoại hợp lệ (chỉ chứa số, độ dài 9-11 số)
-  const validatePhone = (phone) => {
-    return /^[0-9]{9,11}$/.test(phone);
-  };
+  // Kiểm tra số điện thoại hợp lệ (9-11 số)
+  const validatePhone = (phone) => /^[0-9]{9,11}$/.test(phone);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     let newErrors = {};
-
     if (!formData.fullName) newErrors.fullName = "Full Name is required!";
     if (!formData.email) {
       newErrors.email = "Email is required!";
@@ -69,14 +62,13 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:8080/auth/register", formData);
-      console.log("Register success:", response.data);
+      const data = await registerAPI(formData);
+      console.log("Register success:", data);
       notification.success({ message: "Account created successfully!" });
-      // Redirect nếu cần
+      // Điều hướng nếu cần
       // navigate("/login");
-
     } catch (error) {
-      console.error("Registration failed:", error.response?.data);
+      console.error("Registration failed:", error);
       notification.error({ message: "Registration failed. Please try again." });
     }
   };
@@ -91,58 +83,22 @@ const Register = () => {
         <div className="register-form-container">
           <h2>Create an Account</h2>
           <form onSubmit={handleSubmit} className="register-form">
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Full Name"
-              value={formData.fullName}
-              onChange={handleChange}
-            />
+            <input type="text" name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleChange} />
             {errors.fullName && <p className="error-message">{errors.fullName}</p>}
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-            />
+            <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
             {errors.email && <p className="error-message">{errors.email}</p>}
 
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-            />
+            <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
             {errors.password && <p className="error-message">{errors.password}</p>}
 
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
             {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
 
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone Number"
-              value={formData.phone}
-              onChange={handleChange}
-            />
+            <input type="text" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} />
             {errors.phone && <p className="error-message">{errors.phone}</p>}
 
-            <input
-              type="text"
-              name="address"
-              placeholder="Your Address"
-              value={formData.address}
-              onChange={handleChange}
-            />
+            <input type="text" name="address" placeholder="Your Address" value={formData.address} onChange={handleChange} />
             {errors.address && <p className="error-message">{errors.address}</p>}
 
             <button type="submit">Register</button>

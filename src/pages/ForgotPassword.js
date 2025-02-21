@@ -33,22 +33,24 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="forgot-password-container">
-      <h2>Reset Your Password</h2>
-      <p>Enter your email to receive password reset instructions.</p>
-      <form onSubmit={handleSubmit} className="forgot-password-form">
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Sending..." : "Send Reset Link"}
-        </button>
-      </form>
+    <div className="forget-page">
+      <div className="forgot-password-container">
+        <h2>Reset Your Password</h2>
+        <p>Enter your email to receive password reset instructions.</p>
+        <form onSubmit={handleSubmit} className="forgot-password-form">
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? "Sending..." : "Send Reset Link"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

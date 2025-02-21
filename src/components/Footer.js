@@ -8,9 +8,9 @@ function Footer() {
             <div className="footer-content">
                 <div className="footer-section">
                     <h3>About Us</h3>
-                    <p>Your go-to skincare solution for radiant, healthy skin.</p>
+                    <p>Solution for radiant, healthy skin.</p>
                 </div>
-                
+
                 <div className="footer-section">
                     <h3>Follow Us</h3>
                     <div className="social-icons">

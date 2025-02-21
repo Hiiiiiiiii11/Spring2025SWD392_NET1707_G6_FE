@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import "./Manager.css";
+import { getAllProductAPI } from "../services/managerService";
 
 function Manager() {
   // Load dữ liệu từ localStorage
-  const [products, setProducts] = useState(() => {
-    return JSON.parse(localStorage.getItem("products")) || [];
-  });
+  const [products, setProducts] = useState([]);
+
 
   const [newProduct, setNewProduct] = useState({
-    name: "",
-    price: "",
-    category: "Moisturizer",
+    productName: "",
     description: "",
-    stock: 10,
-    discount: 0,
-    image: "" // Thêm trường ảnh
+    price: "",
+    category: "",
+    skinTypeCompatibility: "",
+    image: ""
+
   });
 
   const [errors, setErrors] = useState({});
@@ -23,24 +23,25 @@ function Manager() {
   const [editingProductId, setEditingProductId] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("products", JSON.stringify(products));
-  }, [products]);
+    getAllProductAPI();
+  }, []);
+
 
   // Thêm sản phẩm
-  const addProduct = () => {
+  const addProduct = async () => {
     let formErrors = {};
     if (!newProduct.name) formErrors.name = "Product name is required!";
     if (!newProduct.price) formErrors.price = "Price is required!";
     if (isNaN(newProduct.price) || newProduct.price <= 0) formErrors.price = "Invalid price!";
-    
+
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
+
     }
 
-    const priceAfterDiscount = newProduct.price - (newProduct.price * newProduct.discount) / 100;
-    setProducts([...products, { ...newProduct, id: Date.now(), priceAfterDiscount }]);
-    setNewProduct({ name: "", price: "", category: "Moisturizer", description: "", stock: 10, discount: 0, image: "" });
+    setProducts([...products, { ...newProduct, id: Date.now() }]);
+    setNewProduct({ name: "", price: "", category: "", description: "", stock: 10, discount: 0, image: "" });
     setErrors({});
   };
 
@@ -50,7 +51,7 @@ function Manager() {
     if (!newProduct.name) formErrors.name = "Product name is required!";
     if (!newProduct.price) formErrors.price = "Price is required!";
     if (isNaN(newProduct.price) || newProduct.price <= 0) formErrors.price = "Invalid price!";
-    
+
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
@@ -95,123 +96,116 @@ function Manager() {
   };
 
   return (
-    <div className="manager-container">
-      <h2>Manager Dashboard</h2>
-      <input type="text" placeholder="Search product..." onChange={(e) => setSearch(e.target.value)} />
-      
-      <h3>{editMode ? "Edit Product" : "Add Product"}</h3>
-      <div className="add-product-form">
-        <div className="input-container">
-          <input
-            type="text"
-            placeholder="Name"
-            value={newProduct.name}
-            onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-            className={errors.name ? "error" : ""}
-          />
-          {errors.name && <div className="error">{errors.name}</div>}
+    <div className="manager-page">
+      <div className="manager-container">
+        <h2>Manager Dashboard</h2>
+        <input type="text" placeholder="Search product..." onChange={(e) => setSearch(e.target.value)} />
+
+        <h3>{editMode ? "Edit Product" : "Add Product"}</h3>
+        <div className="add-product-form">
+          <div className="input-container">
+            <input
+              type="text"
+              placeholder="Product Name"
+              value={newProduct.productName}
+              onChange={(e) => setNewProduct({ ...newProduct, productName: e.target.value })}
+              className={errors.productName ? "error" : ""}
+            />
+            {errors.productName && <div className="error">{errors.productName}</div>}
+          </div>
+
+          <div className="input-container">
+            <input
+              type="text"
+              placeholder="Price"
+              value={newProduct.price}
+              onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+              className={errors.price ? "error" : ""}
+            />
+            {errors.price && <div className="error">{errors.price}</div>}
+          </div>
+
+
+          <div className="input-container">
+            <input
+              type="text"
+              placeholder="Category"
+              value={newProduct.category}
+              onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+            />
+          </div>
+
+          <div className="input-container">
+            <input
+              type="text"
+              placeholder="Skin Type"
+              value={newProduct.skinTypeCompatibility}
+              onChange={(e) => setNewProduct({ ...newProduct, skinTypeCompatibility: e.target.value })}
+            />
+          </div>
+
+
+
+          <div className="input-container">
+            <textarea
+              type="text"
+              placeholder="Decription"
+              value={newProduct.description}
+              onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+
+            />
+
+          </div>
+
+          <div className="input-container">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            {newProduct.image && <img src={newProduct.image} alt="Product" style={{ maxWidth: "100px", marginTop: "10px" }} />}
+          </div>
+
+          <button onClick={editMode ? updateProduct : addProduct}>
+            {editMode ? "Save Changes" : "Add Product"}
+          </button>
         </div>
 
-        <div className="input-container">
-          <input
-            type="number"
-            placeholder="Price"
-            value={newProduct.price}
-            onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-            className={errors.price ? "error" : ""}
-          />
-          {errors.price && <div className="error">{errors.price}</div>}
-        </div>
-
-        <div className="input-container">
-          <input
-            type="text"
-            placeholder="Description"
-            value={newProduct.description}
-            onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-          />
-        </div>
-
-        <div className="input-container">
-          <input
-            type="number"
-            placeholder="Stock"
-            value={newProduct.stock}
-            onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
-          />
-        </div>
-
-        <div className="input-container">
-          <input
-            type="number"
-            placeholder="Discount (%)"
-            value={newProduct.discount}
-            onChange={(e) => setNewProduct({ ...newProduct, discount: e.target.value })}
-          />
-        </div>
-
-        <div className="input-container">
-          <select
-            value={newProduct.category}
-            onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-          >
-            <option>Moisturizer</option>
-            <option>Anti-aging</option>
-            <option>Brightening</option>
-            <option>Sunscreen</option>
-          </select>
-        </div>
-
-        <div className="input-container">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-          {newProduct.image && <img src={newProduct.image} alt="Product" style={{ maxWidth: "100px", marginTop: "10px" }} />}
-        </div>
-
-        <button onClick={editMode ? updateProduct : addProduct}>
-          {editMode ? "Save Changes" : "Add Product"}
-        </button>
+        <h3>Product List</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Decription</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Image</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products
+              .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+              .map((p) => (
+                <tr key={p.id}>
+                  <td>{p.productName}</td>
+                  <td>{p.description}</td>
+                  <td>{p.price}</td>
+                  <td>{p.category}</td>
+                  <td>{p.skinTypeCompatibility}</td>
+                  <td>{p.image}</td>
+                  <td>
+                    {p.image && <img src={p.image} alt="Product" style={{ maxWidth: "100px" }} />}
+                  </td>
+                  <td>
+                    <button onClick={() => startEditProduct(p)}>Edit</button>
+                    <button onClick={() => deleteProduct(p.id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </div>
-
-      <h3>Product List</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Discount</th>
-            <th>Final Price</th>
-            <th>Category</th>
-            <th>Stock</th>
-            <th>Image</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products
-            .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
-            .map((p) => (
-              <tr key={p.id}>
-                <td>{p.name}</td>
-                <td>${p.price}</td>
-                <td>{p.discount}%</td>
-                <td>${p.priceAfterDiscount.toFixed(2)}</td>
-                <td>{p.category}</td>
-                <td>{p.stock > 0 ? p.stock : <span style={{ color: "red" }}>Out of stock</span>}</td>
-                <td>
-                  {p.image && <img src={p.image} alt="Product" style={{ maxWidth: "100px" }} />}
-                </td>
-                <td>
-                  <button onClick={() => startEditProduct(p)}>Edit</button>
-                  <button onClick={() => deleteProduct(p.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
     </div>
   );
 }

@@ -5,12 +5,15 @@ body {
 
 /* Header styling */
 .topnav {
+    width: 98.6%;
+    position: fixed;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #1b3a57; /* Xanh navy đậm */
-    padding: 12px 20px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Hiệu ứng bóng nhẹ */
+    background-color: #1b3a57;
+    padding: 0px 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-top-right-radius: 10px;
 }
 
 /* Navigation links */
@@ -18,18 +21,21 @@ body {
     display: flex;
 }
 
-.nav-links a, .auth-links a {
-    color: #ffdf8e; /* Vàng pastel */
+.nav-links a,
+.auth-links a {
+    color: #ffdf8e;
     text-decoration: none;
-    padding: 12px 16px;
+    padding: 10px 10px;
     font-size: 17px;
     font-weight: bold;
-    transition: all 0.3s ease-in-out;
+    transition: all 0.3sease-in-out;
 }
 
-.nav-links a:hover, .auth-links a:hover {
+.nav-links a:hover,
+.auth-links a:hover {
     background-color: #ffdf8e;
-    color: #1b3a57; /* Xanh navy */
+    color: #1b3a57;
+    /* Xanh navy */
     border-radius: 5px;
 }
 
@@ -49,6 +55,8 @@ body {
     overflow: hidden;
     border: 2px solid #ffdf8e;
     padding: 3px 10px;
+    height: 30px;
+    margin: 10px;
 }
 
 .search-box input {
@@ -62,7 +70,8 @@ body {
 .search-box button {
     background: transparent;
     border: none;
-    color: #ffdf8e; /* Màu vàng pastel nhẹ */
+    color: #ffdf8e;
+    /* Màu vàng pastel nhẹ */
     padding: 8px 12px;
     cursor: pointer;
     border-radius: 50%;
@@ -74,8 +83,10 @@ body {
 }
 
 .search-box button:hover {
-    color: #c9a74a; /* Vàng đậm hơn một chút */
-    background: rgba(255, 223, 142, 0.2); /* Màu vàng pastel mờ nhẹ */
+    color: #c9a74a;
+    /* Vàng đậm hơn một chút */
+    background: rgba(255, 223, 142, 0.2);
+    /* Màu vàng pastel mờ nhẹ */
 }
 
 /* Auth links (Login/Register) */

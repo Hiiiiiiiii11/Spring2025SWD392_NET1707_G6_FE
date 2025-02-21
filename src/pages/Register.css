@@ -12,15 +12,16 @@
 /* ===== Chỉnh lại container chính để có bố cục 2 phần ===== */
 .register-container {
     margin-top: 50px;
-    display: flex;
+    /* display: flex
+; */
     align-items: center;
-    justify-content: space-between;
-    width: 700px; /* Tăng chiều rộng để đủ chỗ cho hình và form */
+    /* justify-content: space-between; */
+    width: 500px;
     background: rgba(255, 255, 255, 0.15);
     border-radius: 20px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3sease-in-out;
     overflow: hidden;
 }
 
@@ -47,8 +48,8 @@
 
 /* ===== Form đăng ký nằm bên phải ===== */
 .register-form-container {
-    flex: 1;
-    padding: 40px;
+    flex: 1 1;
+    padding: 0 40px 40px;
     text-align: center;
 }
 
