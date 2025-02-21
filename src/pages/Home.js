@@ -42,8 +42,9 @@ function Home() {
         <div
           className="hero"
           style={{
+            marginTop: "50px",
             backgroundImage: `url(${heroImage})`,
-            height: "400px",
+            height: "250px",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}

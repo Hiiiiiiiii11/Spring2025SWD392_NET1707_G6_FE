@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Input, Button, Form, Modal, Upload, message } from "antd";
 import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
 import "./Manager.css";
-import { getAllProductAPI } from "../services/managerService";
+import { createNewProductAPI, getAllProductAPI } from "../services/manageProductService";
 
 function Manager() {
   const [products, setProducts] = useState([]);
@@ -13,9 +13,10 @@ function Manager() {
   const [editMode, setEditMode] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
   const [form] = Form.useForm();
+  // State lưu file image được chọn
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
-    // Giả sử getAllProductAPI trả về danh sách sản phẩm từ API
     const fetchProducts = async () => {
       const data = await getAllProductAPI();
       if (data) setProducts(data);
@@ -23,14 +24,15 @@ function Manager() {
     fetchProducts();
   }, []);
 
-  // Hàm mở modal để thêm sản phẩm
+  // Mở modal để thêm sản phẩm mới
   const handleAddNewProduct = () => {
     setEditMode(false);
     form.resetFields();
+    setFile(null);
     setIsModalVisible(true);
   };
 
-  // Hàm mở modal để chỉnh sửa sản phẩm
+  // Mở modal chỉnh sửa sản phẩm (ví dụ nếu cần hỗ trợ chỉnh sửa)
   const handleEditProduct = (record) => {
     setEditMode(true);
     setEditingProductId(record.id);
@@ -38,7 +40,7 @@ function Manager() {
     setIsModalVisible(true);
   };
 
-  // Hàm xóa sản phẩm
+  // Xóa sản phẩm
   const handleDeleteProduct = (id) => {
     Modal.confirm({
       title: "Are you sure you want to delete this product?",
@@ -49,26 +51,23 @@ function Manager() {
     });
   };
 
-  // Xử lý submit modal thêm/chỉnh sửa
-  const handleModalOk = () => {
-    form.validateFields().then((values) => {
-      if (editMode) {
-        const updatedProducts = products.map((p) =>
-          p.id === editingProductId ? { ...p, ...values } : p
-        );
-        setProducts(updatedProducts);
-        message.success("Product updated successfully!");
-      } else {
-        const newProduct = { ...values, id: Date.now() };
-        setProducts([...products, newProduct]);
-        message.success("Product added successfully!");
-      }
+  // Xử lý submit modal để thêm sản phẩm
+  const handleModalOk = async () => {
+    try {
+      const values = await form.validateFields();
+      // Gọi API tạo sản phẩm mới, truyền cả values (dữ liệu JSON) và file (file ảnh)
+      await createNewProductAPI(values, file);
+      message.success("Product added successfully!");
       setIsModalVisible(false);
       form.resetFields();
-    });
+      setFile(null);
+      // Bạn có thể refresh lại danh sách sản phẩm từ API nếu cần
+    } catch (error) {
+      message.error("Error creating product!");
+    }
   };
 
-  // Định nghĩa cột cho Table của antd
+  // Các cột hiển thị trong Table
   const columns = [
     {
       title: "Name",
@@ -165,10 +164,7 @@ function Manager() {
               rules={[
                 { required: true, message: "Price is required!" },
                 { type: "number", transform: (value) => Number(value), message: "Price must be a number!" },
-                {
-                  validator: (_, value) =>
-                    value > 0 ? Promise.resolve() : Promise.reject("Invalid price!")
-                }
+                { validator: (_, value) => (value > 0 ? Promise.resolve() : Promise.reject("Invalid price!")) }
               ]}
             >
               <Input placeholder="Price" />
@@ -185,12 +181,15 @@ function Manager() {
             <Form.Item name="image" label="Image">
               <Upload
                 beforeUpload={(file) => {
+                  // Lưu file vào state
+                  setFile(file);
+                  // Đọc file để hiển thị preview nếu cần
                   const reader = new FileReader();
                   reader.onload = (e) => {
                     form.setFieldsValue({ image: e.target.result });
                   };
                   reader.readAsDataURL(file);
-                  return false; // Không upload tự động
+                  return false; // Ngăn upload tự động
                 }}
                 maxCount={1}
               >

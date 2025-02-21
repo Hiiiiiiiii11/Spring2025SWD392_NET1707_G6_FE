@@ -77,15 +77,13 @@ body {
     background: transparent;
     border: none;
     color: #ffdf8e;
-    /* Màu vàng pastel nhẹ */
     padding: 8px 12px;
     cursor: pointer;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    transition: color 0.3s ease, background 0.3s ease;
+    font-size: 10px;
 }
 
 .search-box button:hover {
