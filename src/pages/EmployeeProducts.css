@@ -1,0 +1,40 @@
+.employee-products {
+    padding: 2rem;
+    background: linear-gradient(135deg, #a8edea, #fed6e3); /* Thêm gradient nền */
+  }
+  
+  .employee-products h2 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .employee-products button {
+    background: #ffd700;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+  }
+  
+  .employee-products button:hover {
+    background: #e6c200;
+  }
+  
+  .products-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .products-table th, .products-table td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  .products-table th {
+    background: #ffd700;
+    color: #333;
+  }
