@@ -6,9 +6,9 @@
     justify-content: center;
     align-items: center;
     padding-bottom: 150px;
-
+    height: 100vh; /* Thêm dòng này để chiếm toàn bộ chiều cao viewport */
+    margin: 0; /* Đảm bảo không có margin mặc định */
 }
-
 /* Hiệu ứng Glassmorphism cho khung đăng nhập */
 .login-container {
     margin-top: 50px;
