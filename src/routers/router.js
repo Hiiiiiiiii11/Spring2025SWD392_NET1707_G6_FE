@@ -6,6 +6,7 @@ import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
 import Manager from "../pages/Manager";
 import EmployeeProducts from "../pages/EmployeeProducts";
+import ProductPage from "../pages/ProductPage"; // Import ProductPage
 
 const AppRouter = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ const AppRouter = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/manager", element: <Manager /> },
       { path: "/employee-products", element: <EmployeeProducts /> },
+      { path: "/products", element: <ProductPage /> }, // Thêm đường dẫn đến ProductPage
     ],
   },
   { path: "/login", element: <Login /> },
