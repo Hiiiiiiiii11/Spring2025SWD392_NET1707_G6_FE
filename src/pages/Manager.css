@@ -2,31 +2,39 @@
 .manager-container {
   padding: 20px;
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #a8edea, #fed6e3); /* Gradient nền đẹp, phủ toàn màn hình */
-  min-height: 100vh; /* Đảm bảo nền phủ hết chiều cao viewport */
-  height: 100%; /* Đảm bảo chiều cao tối đa */
+  background: linear-gradient(135deg, #a8edea, #fed6e3);
+  min-height: 100vh;
+  /* height: 100%; */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* Đảm bảo nội dung bắt đầu từ trên cùng */
-  max-width: 1400px; /* Giới hạn chiều rộng nội dung */
-  margin: 0 auto; /* Căn giữa nội dung */
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ cho container */
-  width: 100%; /* Đảm bảo chiều rộng 100% */
+  /* align-items: center; */
+  justify-content: flex-start;
+  /* max-width: 1400px; */
+  margin: 0 auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 /* Các phần tử con sẽ không che phủ nền */
-.manager-page, .manager-container > * {
+.manager-page,
+.manager-container>* {
   width: 100%;
 }
 
+.search-product-manage {
+  max-width: 400px;
+}
+
 /* Đảm bảo nội dung không bị tràn ra ngoài nền */
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
-  height: 100%; /* Đảm bảo body và html cũng full height */
+  height: 100%;
+  /* Đảm bảo body và html cũng full height */
   width: 100%;
-  overflow-x: hidden; /* Ngăn tràn ngang */
+  overflow-x: hidden;
+  /* Ngăn tràn ngang */
 }
 
 h2 {
@@ -35,7 +43,8 @@ h2 {
   font-size: 2rem;
   font-weight: 700;
   text-align: center;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng chữ nhẹ */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  /* Hiệu ứng bóng chữ nhẹ */
   background: linear-gradient(45deg, #333, #555);
   -webkit-background-clip: text;
   background-clip: text;
@@ -47,8 +56,9 @@ h3 {
   margin-bottom: 15px;
   font-size: 1.5rem;
   font-weight: 600;
-  text-align: center;
-  text-transform: uppercase; /* Chữ in hoa */
+  /* text-align: center; */
+  text-transform: uppercase;
+  /* Chữ in hoa */
 }
 
 /* Input và select */
@@ -59,28 +69,45 @@ textarea {
   padding: 12px;
   margin: 8px 0;
   border: 1px solid #ddd;
-  border-radius: 8px; /* Bo góc lớn hơn */
+  border-radius: 8px;
+  /* Bo góc lớn hơn */
   box-sizing: border-box;
   font-size: 1rem;
-  transition: all 0.3s ease-in-out; /* Hiệu ứng mượt mà */
+  transition: all 0.3s ease-in-out;
+  /* Hiệu ứng mượt mà */
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #ffd700; /* Màu vàng nhạt, phù hợp chủ đề */
-  outline: none;
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5); /* Bóng vàng khi focus */
+:where(.css-dev-only-do-not-override-1yacf91).ant-modal .ant-modal-close {
+  position: absolute;
+  /* top: 12px; */
+  inset-inline-end: 12px;
+  /* z-index: 1010; */
+  padding: 0;
+  color: rgba(0, 0, 0, 0.45);
+  /* font-weight: 600; */
+  line-height: 1;
+  text-decoration: none;
+  background: transparent;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+  margin-right: 10px;
 }
 
 textarea {
   padding: 12px;
   margin: 8px 0;
   min-width: 100%;
-  min-height: 120px; /* Tăng chiều cao textarea */
+  min-height: 120px;
+  /* Tăng chiều cao textarea */
   border: 1px solid #ddd;
   border-radius: 8px;
-  resize: vertical; /* Cho phép kéo dãn chiều cao */
+  resize: vertical;
+  /* Cho phép kéo dãn chiều cao */
 }
 
 /* Nút */
@@ -90,22 +117,26 @@ button {
   border: none;
   cursor: pointer;
   width: auto;
-  padding: 12px 24px; /* Tăng kích thước nút */
+  padding: 12px 24px;
+  /* Tăng kích thước nút */
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
-  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); /* Bóng đổ cho nút */
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+  /* Bóng đổ cho nút */
   transition: all 0.3s ease-in-out;
 }
 
 button:hover {
   background-color: #0056b3;
-  transform: translateY(-2px); /* Nâng nút lên khi hover */
+  transform: translateY(-2px);
+  /* Nâng nút lên khi hover */
   box-shadow: 0 6px 12px rgba(0, 86, 179, 0.4);
 }
 
 /* Nút hành động (Edit, Delete) */
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
   padding: 10px 16px;
   font-size: 14px;
   border-radius: 6px;
@@ -150,23 +181,28 @@ button:hover {
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
-  max-width: 1000px; /* Giới hạn chiều rộng form */
+  max-width: 1000px;
+  /* Giới hạn chiều rộng form */
   width: 100%;
 }
 
 .input-container {
-  width: 48%; /* Ensure two inputs fit per row */
+  width: 48%;
+  /* Ensure two inputs fit per row */
   position: relative;
 }
 
 .input-container input,
 .input-container select {
-  width: 100%; /* Make inputs fit the container */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Bóng nhẹ cho input */
+  width: 100%;
+  /* Make inputs fit the container */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  /* Bóng nhẹ cho input */
 }
 
 .input-container img {
-  max-width: 150px; /* Tăng kích thước hình ảnh hiển thị */
+  max-width: 150px;
+  /* Tăng kích thước hình ảnh hiển thị */
   margin-top: 10px;
   display: block;
   border-radius: 8px;
@@ -197,7 +233,6 @@ table {
 th,
 td {
   padding: 14px 16px;
-  text-align: center;
   border-bottom: 1px solid #ddd;
   transition: all 0.3s ease-in-out;
 }
@@ -216,7 +251,8 @@ th:hover {
 
 tr:hover {
   background-color: #f1f1f1;
-  transform: translateY(-2px); /* Nâng dòng lên khi hover */
+  transform: translateY(-2px);
+  /* Nâng dòng lên khi hover */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -227,7 +263,8 @@ tbody tr:nth-child(even) {
 
 /* Product Image */
 td img {
-  max-width: 80px; /* Tăng kích thước hình ảnh trong bảng */
+  max-width: 80px;
+  /* Tăng kích thước hình ảnh trong bảng */
   height: auto;
   border-radius: 6px;
   display: block;
@@ -237,7 +274,8 @@ td img {
 }
 
 td img:hover {
-  transform: scale(1.1); /* Phóng to nhẹ khi hover */
+  transform: scale(1.1);
+  /* Phóng to nhẹ khi hover */
 }
 
 /* Price & Stock Styling */

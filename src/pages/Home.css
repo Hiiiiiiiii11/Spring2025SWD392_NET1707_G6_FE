@@ -118,3 +118,30 @@
   background: #f8f8f8;
   margin-top: 10px;
 }
+
+form.ant-form.ant-form-vertical.css-dev-only-do-not-override-1yacf91 {
+  border: 2px solid;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+:where(.css-dev-only-do-not-override-1yacf91).ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-form-item-label,
+:where(.css-dev-only-do-not-override-1yacf91).ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-24.ant-form-item-label,
+:where(.css-dev-only-do-not-override-1yacf91).ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-xl-24.ant-form-item-label {
+  /* padding: 0 0 8px; */
+  margin: 0;
+  white-space: initial;
+  text-align: start;
+}
+
+:where(.css-dev-only-do-not-override-1yacf91).ant-form-item .ant-form-item-control-input-content {
+  flex: auto;
+  display: flex;
+  justify-content: right;
+}
+
+:where(.css-dev-only-do-not-override-1yacf91).ant-btn.ant-btn-block {
+  justify-content: right;
+  width: auto;
+
+}
