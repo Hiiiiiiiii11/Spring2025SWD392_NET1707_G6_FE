@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { notification } from "antd";
 import skincareImage from "../assets/skincare.jpg";
 import { loginAPI } from "../services/authService"; // Import service
 import "./Login.css";
 
 const Login = () => {
-  console.log("Login component loaded!");
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
@@ -38,18 +36,21 @@ const Login = () => {
 
     try {
       const data = await loginAPI(formData);
-      localStorage.setItem("token", data.token);
-      if (formData.rememberMe) localStorage.setItem("rememberMe", formData.email);
-      else localStorage.removeItem("rememberMe");
-
-      alert({ message: "Login successful!" });
+      sessionStorage.setItem("token", data.token);
+      console.log(data.token)
+      alert("Login successful!");
       navigate("/");
     } catch (error) {
 
-      alert({ message: "Sai tài khoản hoặc mật khẩu!" });
+      alert("Sai tài khoản hoặc mật khẩu!");
     }
   };
-
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  }
+  const handleSignup = () => {
+    navigate("/register");
+  }
   return (
     <div className="login-page">
       <div className="login-container">
@@ -77,12 +78,13 @@ const Login = () => {
           {errors.password && <p className="error-message">{errors.password}</p>}
 
           <div className="login-options">
-            <a href="/forgot-password" className="forgot-password">Forgot password?</a>
+            <a className="forgot-password"
+              onClick={() => { handleForgotPassword() }}>Forgot password?</a>
           </div>
           <button type="submit">Login</button>
         </form>
         <p className="register-link">
-          Don't have an account? <a href="/register">Sign up now</a>
+          Don't have an account? <a className="signup" onClick={() => { handleSignup() }} >Sign up now</a>
         </p>
       </div>
     </div>
