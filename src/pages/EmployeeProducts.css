@@ -1,17 +1,25 @@
+/* Khu vực chính của trang EmployeeProducts */
 .employee-products {
     padding: 2rem;
-    background: linear-gradient(135deg, #a8edea, #fed6e3); /* Gradient nền đẹp */
+    background: linear-gradient(135deg, #a8edea, #fed6e3); /* Gradient nền đẹp, phù hợp skincare */
+    min-height: 100vh; /* Đảm bảo chiều cao tối thiểu để lấp đầy trang */
   }
   
+  /* Tiêu đề trang */
   .employee-products h2 {
     color: #333;
     margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
   }
   
+  /* Khu vực thống kê nhanh */
   .stats {
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
+    justify-content: center; /* Căn giữa các thẻ thống kê */
   }
   
   .stat-card {
@@ -20,20 +28,39 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     flex: 1;
+    max-width: 200px; /* Giới hạn chiều rộng thẻ */
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s; /* Hiệu ứng khi hover */
   }
   
+  .stat-card:hover {
+    transform: translateY(-2px); /* Nâng thẻ lên khi hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Khu vực tìm kiếm và lọc */
   .filters {
     margin-bottom: 1rem;
     display: flex;
     gap: 1rem;
+    flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+    justify-content: center; /* Căn giữa trên màn hình lớn */
   }
   
   .filters input, .filters select {
     padding: 0.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s; /* Hiệu ứng khi focus */
   }
   
+  .filters input:focus, .filters select:focus {
+    border-color: #ffd700; /* Màu vàng khi focus, phù hợp chủ đề */
+    outline: none;
+  }
+  
+  /* Nút thêm sản phẩm và xuất dữ liệu */
   .employee-products button, .export-button {
     background: #ffd700;
     border: none;
@@ -41,37 +68,62 @@
     border-radius: 4px;
     cursor: pointer;
     margin-bottom: 1rem;
+    font-size: 1rem;
+    transition: background 0.3s, transform 0.2s; /* Hiệu ứng khi hover */
   }
   
   .employee-products button:hover, .export-button:hover {
     background: #e6c200;
+    transform: translateY(-2px); /* Nâng nút lên khi hover */
   }
   
+  /* Bảng sản phẩm */
   .products-table {
     width: 100%;
     border-collapse: collapse;
     background: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+    border-radius: 4px; /* Bo góc cho bảng */
   }
   
   .products-table th, .products-table td {
     padding: 0.5rem;
     border: 1px solid #ddd;
     text-align: left;
+    vertical-align: middle; /* Căn giữa theo chiều dọc */
   }
   
   .products-table th {
     background: #ffd700;
     color: #333;
+    font-weight: bold;
+    text-transform: uppercase; /* Chữ in hoa cho tiêu đề */
   }
   
+  .products-table tr {
+    transition: background 0.3s; /* Hiệu ứng khi hover trên hàng */
+  }
+  
+  .products-table tr:hover {
+    background: #f9f9f9; /* Màu nền nhạt khi hover */
+  }
+  
+  /* Hình ảnh sản phẩm trong bảng */
   .product-image {
     width: 50px;
     height: 50px;
     object-fit: cover;
     border-radius: 4px;
+    border: 1px solid #ddd; /* Đường viền nhẹ cho hình ảnh */
+    transition: transform 0.3s; /* Hiệu ứng zoom khi hover */
   }
   
+  .product-image:hover {
+    transform: scale(1.1); /* Phóng to nhẹ khi hover */
+  }
+  
+  /* Overlay và form tạo/cập nhật sản phẩm */
   .product-form-overlay {
     position: fixed;
     top: 0;
@@ -82,6 +134,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000; /* Đảm bảo overlay ở trên cùng */
   }
   
   .product-form {
@@ -90,6 +143,19 @@
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 400px;
+    max-width: 90vw; /* Giới hạn chiều rộng trên màn hình nhỏ */
+    animation: slideIn 0.3s ease-out; /* Hiệu ứng xuất hiện */
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
   .product-form input, .product-form select, .product-form textarea {
@@ -98,14 +164,25 @@
     margin: 0.5rem 0;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  
+  .product-form input:focus, .product-form select:focus, .product-form textarea:focus {
+    border-color: #ffd700;
+    outline: none;
   }
   
   .product-form textarea {
     height: 100px;
+    resize: vertical; /* Cho phép kéo dãn chiều cao */
   }
   
   .product-form .form-actions {
     margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
   
   .product-form button {
@@ -114,6 +191,8 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s, transform 0.2s;
   }
   
   .product-form button[type="submit"] {
@@ -122,6 +201,7 @@
   
   .product-form button[type="submit"]:hover {
     background: #e6c200;
+    transform: translateY(-2px);
   }
   
   .product-form button[type="button"] {
@@ -130,8 +210,10 @@
   
   .product-form button[type="button"]:hover {
     background: #ccc;
+    transform: translateY(-2px);
   }
   
+  /* Modal chi tiết sản phẩm */
   .product-detail-overlay {
     position: fixed;
     top: 0;
@@ -142,6 +224,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
   }
   
   .product-detail {
@@ -150,7 +233,9 @@
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 400px;
+    max-width: 90vw;
     text-align: center;
+    animation: slideIn 0.3s ease-out;
   }
   
   .product-detail .product-image {
@@ -158,10 +243,34 @@
     height: 100px;
     object-fit: cover;
     border-radius: 4px;
+    border: 1px solid #ddd;
     margin-bottom: 1rem;
+    transition: transform 0.3s;
   }
   
+  .product-detail .product-image:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Responsive design */
   @media (max-width: 768px) {
+    .employee-products {
+      padding: 1rem;
+    }
+  
+    .employee-products h2 {
+      font-size: 1.2rem;
+    }
+  
+    .stats {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  
+    .stat-card {
+      max-width: 100%;
+    }
+  
     .products-table {
       font-size: 0.9rem;
     }
@@ -183,4 +292,18 @@
     .filters input, .filters select {
       width: 100%;
     }
+  
+    .product-form, .product-detail {
+      width: 80vw; /* Giảm kích thước form và modal trên mobile */
+    }
+  }
+  
+  /* Hiệu ứng chung */
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
   }
