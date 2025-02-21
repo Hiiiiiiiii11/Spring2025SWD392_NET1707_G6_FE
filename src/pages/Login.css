@@ -100,3 +100,16 @@ h2 {
     font-size: 14px;
     margin-top: 5px;
 }
+
+.forgot-password,
+.signup {
+    text-decoration: underline;
+    cursor: pointer;
+
+}
+
+.forgot-password:hover,
+.signup:hover {
+    color: #009dff;
+
+}
