@@ -1,6 +1,6 @@
 .employee-products {
     padding: 2rem;
-    background: linear-gradient(135deg, #a8edea, #fed6e3); /* Thêm gradient nền */
+    background: linear-gradient(135deg, #a8edea, #fed6e3); /* Gradient nền đẹp */
   }
   
   .employee-products h2 {
@@ -8,7 +8,33 @@
     margin-bottom: 1rem;
   }
   
-  .employee-products button {
+  .stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .stat-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1;
+  }
+  
+  .filters {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .filters input, .filters select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .employee-products button, .export-button {
     background: #ffd700;
     border: none;
     padding: 0.5rem 1rem;
@@ -17,7 +43,7 @@
     margin-bottom: 1rem;
   }
   
-  .employee-products button:hover {
+  .employee-products button:hover, .export-button:hover {
     background: #e6c200;
   }
   
@@ -37,4 +63,124 @@
   .products-table th {
     background: #ffd700;
     color: #333;
+  }
+  
+  .product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .product-form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .product-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+  }
+  
+  .product-form input, .product-form select, .product-form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .product-form textarea {
+    height: 100px;
+  }
+  
+  .product-form .form-actions {
+    margin-top: 1rem;
+  }
+  
+  .product-form button {
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .product-form button[type="submit"] {
+    background: #ffd700;
+  }
+  
+  .product-form button[type="submit"]:hover {
+    background: #e6c200;
+  }
+  
+  .product-form button[type="button"] {
+    background: #ddd;
+  }
+  
+  .product-form button[type="button"]:hover {
+    background: #ccc;
+  }
+  
+  .product-detail-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .product-detail {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+  }
+  
+  .product-detail .product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+    .products-table {
+      font-size: 0.9rem;
+    }
+  
+    .products-table th, .products-table td {
+      padding: 0.3rem;
+    }
+  
+    .employee-products button, .export-button {
+      padding: 0.3rem 0.8rem;
+      font-size: 0.9rem;
+    }
+  
+    .filters {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  
+    .filters input, .filters select {
+      width: 100%;
+    }
   }

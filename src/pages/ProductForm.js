@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ProductForm.css';
+import './EmployeeProducts.css'; // Sử dụng chung CSS với EmployeeProducts
 
 const ProductForm = ({ product, onSubmit, onClose }) => {
   const [formData, setFormData] = useState(product || {
@@ -7,7 +7,8 @@ const ProductForm = ({ product, onSubmit, onClose }) => {
     price: 0,
     stock: 0,
     image: '',
-    description: ''
+    description: '',
+    category: 'moisturizer', // Thêm category làm mặc định
   });
 
   const handleChange = (e) => {
@@ -56,6 +57,16 @@ const ProductForm = ({ product, onSubmit, onClose }) => {
             value={formData.image}
             onChange={handleChange}
           />
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            required
+          >
+            <option value="moisturizer">Kem dưỡng ẩm</option>
+            <option value="serum">Serum</option>
+            <option value="toner">Nước cân bằng</option>
+          </select>
           <textarea
             name="description"
             placeholder="Mô tả sản phẩm"
