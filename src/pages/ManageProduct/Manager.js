@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Table, Input, Button, Form, Modal, Upload, message } from "antd";
 import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
-import "./Manager.css";
-import { createNewProductAPI, getAllProductAPI } from "../services/manageProductService";
+import "../ManageProduct/Manager.css";
+import { createNewProductAPI, deleteProductAPI, getAllProductAPI, uploadToCloudinary } from "../../services/manageProductService";
 
 function Manager() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
-
-  // State cho modal thêm/chỉnh sửa sản phẩm
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
   const [form] = Form.useForm();
-  // State lưu file image được chọn
   const [file, setFile] = useState(null);
 
   useEffect(() => {
@@ -24,7 +21,6 @@ function Manager() {
     fetchProducts();
   }, []);
 
-  // Mở modal để thêm sản phẩm mới
   const handleAddNewProduct = () => {
     setEditMode(false);
     form.resetFields();
@@ -32,7 +28,6 @@ function Manager() {
     setIsModalVisible(true);
   };
 
-  // Mở modal chỉnh sửa sản phẩm (ví dụ nếu cần hỗ trợ chỉnh sửa)
   const handleEditProduct = (record) => {
     setEditMode(true);
     setEditingProductId(record.id);
@@ -40,34 +35,39 @@ function Manager() {
     setIsModalVisible(true);
   };
 
-  // Xóa sản phẩm
-  const handleDeleteProduct = (id) => {
+  const handleDeleteProduct = async (id) => {
     Modal.confirm({
       title: "Are you sure you want to delete this product?",
-      onOk: () => {
-        setProducts(products.filter((p) => p.id !== id));
-        message.success("Product deleted successfully!");
+      onOk: async () => {
+        try {
+          await deleteProductAPI(id);
+          setProducts(products.filter((p) => p.id !== id));
+          message.success("Product deleted successfully!");
+        } catch (error) {
+          message.error("Failed to delete product. Please try again.");
+        }
       }
     });
   };
 
-  // Xử lý submit modal để thêm sản phẩm
+
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
-      // Gọi API tạo sản phẩm mới, truyền cả values (dữ liệu JSON) và file (file ảnh)
-      await createNewProductAPI(values, file);
+      if (file) {
+        const imageURL = await uploadToCloudinary(file);
+        values.imageURL = imageURL;
+      }
+      await createNewProductAPI(values);
       message.success("Product added successfully!");
       setIsModalVisible(false);
       form.resetFields();
       setFile(null);
-      // Bạn có thể refresh lại danh sách sản phẩm từ API nếu cần
     } catch (error) {
       message.error("Error creating product!");
     }
   };
 
-  // Các cột hiển thị trong Table
   const columns = [
     {
       title: "Name",
@@ -98,11 +98,11 @@ function Manager() {
     },
     {
       title: "Image",
-      dataIndex: "image",
-      key: "image",
+      dataIndex: "imageURL",
+      key: "imageURL",
       render: (text, record) =>
-        record.image ? (
-          <img src={record.image} alt="Product" style={{ maxWidth: "100px" }} />
+        record.imageURL ? (
+          <img src={record.imageURL} alt="Product" style={{ maxWidth: "100px" }} />
         ) : null
     },
     {
@@ -121,11 +121,6 @@ function Manager() {
     }
   ];
 
-  // Lọc dữ liệu theo search
-  const filteredData = products.filter((p) =>
-    p.productName?.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <div className="manager-page">
       <div className="manager-container">
@@ -141,7 +136,7 @@ function Manager() {
             + Add new product
           </Button>
         </div>
-        <Table dataSource={filteredData} columns={columns} rowKey="id" />
+        <Table dataSource={products} columns={columns} rowKey="id" />
 
         <Modal
           title={editMode ? "Edit Product" : "Add Product"}
@@ -161,11 +156,7 @@ function Manager() {
             <Form.Item
               name="price"
               label="Price"
-              rules={[
-                { required: true, message: "Price is required!" },
-                { type: "number", transform: (value) => Number(value), message: "Price must be a number!" },
-                { validator: (_, value) => (value > 0 ? Promise.resolve() : Promise.reject("Invalid price!")) }
-              ]}
+              rules={[{ required: true, message: "Price is required!" }]}
             >
               <Input placeholder="Price" />
             </Form.Item>
@@ -178,18 +169,11 @@ function Manager() {
             <Form.Item name="description" label="Description">
               <Input.TextArea placeholder="Description" />
             </Form.Item>
-            <Form.Item name="image" label="Image">
+            <Form.Item name="imageURL" label="Image">
               <Upload
                 beforeUpload={(file) => {
-                  // Lưu file vào state
                   setFile(file);
-                  // Đọc file để hiển thị preview nếu cần
-                  const reader = new FileReader();
-                  reader.onload = (e) => {
-                    form.setFieldsValue({ image: e.target.result });
-                  };
-                  reader.readAsDataURL(file);
-                  return false; // Ngăn upload tự động
+                  return false;
                 }}
                 maxCount={1}
               >

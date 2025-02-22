@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import skincareImage from "../assets/skincare.jpg";
-import { loginAPI } from "../services/authService"; // Import service
+import skincareImage from "../../assets/skincare.jpg";
+import { loginAPI } from "../../services/authService"; // Import service
 import "./Login.css";
 
 const Login = () => {

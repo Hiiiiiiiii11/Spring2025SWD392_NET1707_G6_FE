@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { Carousel, Card, Row, Col, Form, Input, Button, message } from "antd";
 import { MailOutlined, UserOutlined } from "@ant-design/icons";
 import "./Home.css";
-import heroImage from "../assets/hero.jpg"; // Ảnh nền hero
-import product1 from "../assets/product1.jpg"; // Ảnh sản phẩm 1
-import product2 from "../assets/product2.jpg"; // Ảnh sản phẩm 2
-import product3 from "../assets/product3.jpg"; // Ảnh sản phẩm 3
-import product4 from "../assets/product4.jpg"; // Ảnh sản phẩm 4
-import product5 from "../assets/product5.jpg"; // Ảnh sản phẩm 5
-import product6 from "../assets/product6.jpg"; // Ảnh sản phẩm 6
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import heroImage from "../../assets/hero.jpg"; // Ảnh nền hero
+import product1 from "../../assets/product1.jpg"; // Ảnh sản phẩm 1
+import product2 from "../../assets/product2.jpg"; // Ảnh sản phẩm 2
+import product3 from "../../assets/product3.jpg"; // Ảnh sản phẩm 3
+import product4 from "../../assets/product4.jpg"; // Ảnh sản phẩm 4
+import product5 from "../../assets/product5.jpg"; // Ảnh sản phẩm 5
+import product6 from "../../assets/product6.jpg"; // Ảnh sản phẩm 6
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const { Meta } = Card;
 const { TextArea } = Input;

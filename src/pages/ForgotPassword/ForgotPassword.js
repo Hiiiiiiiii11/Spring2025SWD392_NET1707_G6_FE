@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { notification } from "antd";
 import "./ForgotPassword.css"; // Thêm CSS nếu cần
+import { Header } from "antd/es/layout/layout";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
