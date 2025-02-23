@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import '../ProductPage/ProductPage.css'
+import { Link } from 'react-router-dom'; // Import Link for navigation
+import '../ProductPage/ProductPage.css';
 import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 import Header from '../../components/Header';
 
@@ -45,7 +46,7 @@ const ProductPage = () => {
               <button className="add-to-cart" onClick={() => addToCart(product.name)}>
                 Thêm vào giỏ hàng
               </button>
-              <a href={`/product/${product.id}`} className="view-details">Xem chi tiết</a>
+              <Link to={`/product/${product.id}`} className="view-details">Xem chi tiết</Link>
             </div>
           ))}
         </div>
