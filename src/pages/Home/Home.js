@@ -1,7 +1,4 @@
 import React, { useState } from "react";
-import { Carousel, Card, Row, Col, Form, Input, Button, message } from "antd";
-import { MailOutlined, UserOutlined } from "@ant-design/icons";
-import "./Home.css";
 import heroImage from "../../assets/hero.jpg"; // Ảnh nền hero
 import product1 from "../../assets/product1.jpg"; // Ảnh sản phẩm 1
 import product2 from "../../assets/product2.jpg"; // Ảnh sản phẩm 2
@@ -9,109 +6,300 @@ import product3 from "../../assets/product3.jpg"; // Ảnh sản phẩm 3
 import product4 from "../../assets/product4.jpg"; // Ảnh sản phẩm 4
 import product5 from "../../assets/product5.jpg"; // Ảnh sản phẩm 5
 import product6 from "../../assets/product6.jpg"; // Ảnh sản phẩm 6
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
-
-const { Meta } = Card;
-const { TextArea } = Input;
-
+import "./Home.css";
+import BannerSlider from "../../components/BannerSlider/BannerSlider";
+import CategoryList from "../../components/CategoryList/CategoryList";
+import ProductCard from "../../components/ProductCard/ProductCard";
+import { PlusOutlined } from "@ant-design/icons";
+import Footer from "../../components/Footer/Footer";
+const productList = [
+  {
+    id: 1,
+    image: product1,
+    name: "Sữa Rửa Mặt Trắng Da",
+    brand: "L'Oreal",
+    price: "120.000",
+    originalPrice: "180.000",
+    discount: 33,
+    rating: 4.6,
+    reviews: 198,
+    sold: 3560,
+    gift: "Tặng: Kem Dưỡng Ẩm",
+  },
+  {
+    id: 2,
+    image: product2,
+    name: "Son Môi Đỏ Quyến Rũ",
+    brand: "Maybelline",
+    price: "99.000",
+    originalPrice: "149.000",
+    discount: 34,
+    rating: 4.8,
+    reviews: 276,
+    sold: 4220,
+    gift: "Tặng: Son Dưỡng Mini",
+  },
+  {
+    id: 3,
+    image: product3,
+    name: "Kem Chống Nắng SPF 50+",
+    brand: "La Roche-Posay",
+    price: "195.000",
+    originalPrice: "250.000",
+    discount: 22,
+    rating: 4.7,
+    reviews: 315,
+    sold: 5890,
+    gift: "Tặng: Mặt Nạ Dưỡng Da",
+  },
+  {
+    id: 4,
+    image: product4,
+    name: "Dầu Gội Dưỡng Tóc Mềm Mượt",
+    brand: "TRESemmé",
+    price: "150.000",
+    originalPrice: "210.000",
+    discount: 28,
+    rating: 4.5,
+    reviews: 180,
+    sold: 2780,
+    gift: "Tặng: Dầu Xả 50ml",
+  },
+  {
+    id: 5,
+    image: product5,
+    name: "Nước Hoa Hồng Cân Bằng Da",
+    brand: "Innisfree",
+    price: "175.000",
+    originalPrice: "230.000",
+    discount: 24,
+    rating: 4.9,
+    reviews: 410,
+    sold: 6290,
+    gift: "Tặng: Bông Tẩy Trang",
+  },
+  {
+    id: 6,
+    image: product6,
+    name: "Tẩy Trang Dịu Nhẹ Cho Da Nhạy Cảm",
+    brand: "Bioderma",
+    price: "135.000",
+    originalPrice: "189.000",
+    discount: 29,
+    rating: 4.8,
+    reviews: 327,
+    sold: 4750,
+    gift: "Tặng: Khăn Lau Mặt",
+  },
+];
+const productRecomment = [
+  {
+    id: 1,
+    image: product1,
+    name: "Sữa Rửa Mặt Trắng Da",
+    brand: "L'Oreal",
+    price: "120.000",
+    originalPrice: "180.000",
+    discount: 33,
+    rating: 4.6,
+    reviews: 198,
+    sold: 3560,
+    gift: "Tặng: Kem Dưỡng Ẩm",
+  },
+  {
+    id: 2,
+    image: product2,
+    name: "Son Môi Đỏ Quyến Rũ",
+    brand: "Maybelline",
+    price: "99.000",
+    originalPrice: "149.000",
+    discount: 34,
+    rating: 4.8,
+    reviews: 276,
+    sold: 4220,
+    gift: "Tặng: Son Dưỡng Mini",
+  },
+  {
+    id: 3,
+    image: product3,
+    name: "Kem Chống Nắng SPF 50+",
+    brand: "La Roche-Posay",
+    price: "195.000",
+    originalPrice: "250.000",
+    discount: 22,
+    rating: 4.7,
+    reviews: 315,
+    sold: 5890,
+    gift: "Tặng: Mặt Nạ Dưỡng Da",
+  },
+  {
+    id: 4,
+    image: product4,
+    name: "Dầu Gội Dưỡng Tóc Mềm Mượt",
+    brand: "TRESemmé",
+    price: "150.000",
+    originalPrice: "210.000",
+    discount: 28,
+    rating: 4.5,
+    reviews: 180,
+    sold: 2780,
+    gift: "Tặng: Dầu Xả 50ml",
+  },
+  {
+    id: 5,
+    image: product5,
+    name: "Nước Hoa Hồng Cân Bằng Da",
+    brand: "Innisfree",
+    price: "175.000",
+    originalPrice: "230.000",
+    discount: 24,
+    rating: 4.9,
+    reviews: 410,
+    sold: 6290,
+    gift: "Tặng: Bông Tẩy Trang",
+  },
+  {
+    id: 6,
+    image: product6,
+    name: "Tẩy Trang Dịu Nhẹ Cho Da Nhạy Cảm",
+    brand: "Bioderma",
+    price: "135.000",
+    originalPrice: "189.000",
+    discount: 29,
+    rating: 4.8,
+    reviews: 327,
+    sold: 4750,
+    gift: "Tặng: Khăn Lau Mặt",
+  },
+  {
+    id: 7,
+    image: product2,
+    name: "Son Môi Đỏ Quyến Rũ",
+    brand: "Maybelline",
+    price: "99.000",
+    originalPrice: "149.000",
+    discount: 34,
+    rating: 4.8,
+    reviews: 276,
+    sold: 4220,
+    gift: "Tặng: Son Dưỡng Mini",
+  },
+  {
+    id: 8,
+    image: product3,
+    name: "Kem Chống Nắng SPF 50+",
+    brand: "La Roche-Posay",
+    price: "195.000",
+    originalPrice: "250.000",
+    discount: 22,
+    rating: 4.7,
+    reviews: 315,
+    sold: 5890,
+    gift: "Tặng: Mặt Nạ Dưỡng Da",
+  },
+  {
+    id: 9,
+    image: product4,
+    name: "Dầu Gội Dưỡng Tóc Mềm Mượt",
+    brand: "TRESemmé",
+    price: "150.000",
+    originalPrice: "210.000",
+    discount: 28,
+    rating: 4.5,
+    reviews: 180,
+    sold: 2780,
+    gift: "Tặng: Dầu Xả 50ml",
+  },
+  {
+    id: 10,
+    image: product5,
+    name: "Nước Hoa Hồng Cân Bằng Da",
+    brand: "Innisfree",
+    price: "175.000",
+    originalPrice: "230.000",
+    discount: 24,
+    rating: 4.9,
+    reviews: 410,
+    sold: 6290,
+    gift: "Tặng: Bông Tẩy Trang",
+  },
+  {
+    id: 11,
+    image: product6,
+    name: "Tẩy Trang Dịu Nhẹ Cho Da Nhạy Cảm",
+    brand: "Bioderma",
+    price: "135.000",
+    originalPrice: "189.000",
+    discount: 29,
+    rating: 4.8,
+    reviews: 327,
+    sold: 4750,
+    gift: "Tặng: Khăn Lau Mặt",
+  },
+  {
+    id: 12,
+    image: product1,
+    name: "Sữa Rửa Mặt Trắng Da",
+    brand: "L'Oreal",
+    price: "120.000",
+    originalPrice: "180.000",
+    discount: 33,
+    rating: 4.6,
+    reviews: 198,
+    sold: 3560,
+    gift: "Tặng: Kem Dưỡng Ẩm",
+  },
+];
 function Home() {
-  const [form] = Form.useForm();
+  const [role, setRole] = useState("Guest");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
 
-  const handleFinish = (values) => {
-    // Xử lý gửi form (có thể call API, v.v.)
-    message.success("Your message has been sent!");
-    form.resetFields();
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Dữ liệu sản phẩm
-  const products = [
-    { id: 1, name: "Moisturizing Cream", price: "$25.99", image: product1 },
-    { id: 2, name: "Vitamin C Serum", price: "$30.99", image: product2 },
-    { id: 3, name: "Sunscreen SPF 50", price: "$19.99", image: product3 },
-    { id: 4, name: "Hydrating Toner", price: "$22.99", image: product4 },
-    { id: 5, name: "Anti-Aging Cream", price: "$35.99", image: product5 },
-    { id: 6, name: "Exfoliating Scrub", price: "$18.99", image: product6 },
-  ];
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert("Your message has been sent!");
+    setFormData({ name: "", email: "", message: "" });
+  };
 
   return (
-    <div>
-      <Header />
-      <div className="home-container">
-        {/* Hero Section */}
-        <div
-          className="hero"
-          style={{
-            marginTop: "50px",
-            backgroundImage: `url(${heroImage})`,
-            height: "250px",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-
-        {/* Product Section */}
-        <section className="product-section">
-          <h2>Featured Products</h2>
-          <Row gutter={[16, 16]}>
-            {products.map((product) => (
-              <Col xs={24} sm={12} md={8} lg={6} key={product.id}>
-                <Card
-                  hoverable
-                  cover={
-                    <img
-                      alt={product.name}
-                      src={product.image}
-                      style={{ height: "200px", objectFit: "cover" }}
-                    />
-                  }
-                >
-                  <Meta title={product.name} description={product.price} />
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </section>
-
-        {/* Contact Form Section */}
-        <section className="contact-section" style={{ background: "rgb(240 251 254)", padding: "40px 0" }}>
-          <h2 style={{ textAlign: "center", marginBottom: "24px" }}>Contact Us</h2>
-          <div className="contact-form-container" style={{ maxWidth: "600px", margin: "0 auto" }}>
-            <Form form={form} layout="vertical" onFinish={handleFinish}>
-              <Form.Item
-                name="name"
-                label="Your Name"
-                rules={[{ required: true, message: "Please enter your name!" }]}
-              >
-                <Input placeholder="Enter your name" prefix={<UserOutlined />} />
-              </Form.Item>
-              <Form.Item
-                name="email"
-                label="Your Email"
-                rules={[
-                  { required: true, message: "Please enter your email!" },
-                  { type: "email", message: "Invalid email format!" },
-                ]}
-              >
-                <Input placeholder="Enter your email" prefix={<MailOutlined />} />
-              </Form.Item>
-              <Form.Item
-                name="message"
-                label="Your Message"
-                rules={[{ required: true, message: "Please enter your message!" }]}
-              >
-                <TextArea rows={4} placeholder="Enter your message" />
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit" block>
-                  Send Message
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-        </section>
+    <div className="home-container">
+      <BannerSlider />
+      <CategoryList />
+      <div className="product__topsale">
+        <p className="product__title">Top sản phẩm bán chạy</p>
+        <div className="product-grid">
+          {productList?.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
       </div>
-      <Footer />
+      <div className="product__topsale">
+        <p className="product__title">Gợi ý dành cho bạn</p>
+        <div className="product-grid">
+          {productRecomment?.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </div>
+      <div className="product__topsale">
+        <p className="product__title">Danh sách sản phẩm</p>
+        <div className="product-grid">
+          {productRecomment?.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+        <button className="btn_Loadmore">
+          <PlusOutlined style={{ marginRight: "6px" }} />
+          Xem thêm
+        </button>
+      </div>
     </div>
   );
 }

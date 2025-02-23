@@ -1,14 +1,9 @@
 /* General Styling */
 .home-container {
-  font-family: "Arial", sans-serif;
   color: #333;
-  background: linear-gradient(135deg, #a8edea, #fed6e3);
-  margin: auto;
-
 }
 
 .navbar {
-  background-color: #fff;
   padding: 8px 20px;
   display: flex;
   justify-content: space-between;
@@ -29,7 +24,6 @@
 }
 
 .hero {
-
   background-size: cover;
   background-position: center;
   height: 250px;
@@ -37,8 +31,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  /* padding: 15px; */
-  width: 100%;
+  padding: 15px;
 }
 
 /* Product Section */
@@ -92,11 +85,11 @@
 
 .contact-form input,
 .contact-form textarea {
+  width: 90%;
   padding: 6px;
   margin: 6px 0;
   border: none;
   border-radius: 4px;
-  min-width: 100%;
 }
 
 .contact-form button {
@@ -118,22 +111,55 @@
   background: #f8f8f8;
   margin-top: 10px;
 }
-
-
-
-:where(.css-dev-only-do-not-override-1yacf91).ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-form-item-label,
-:where(.css-dev-only-do-not-override-1yacf91).ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-24.ant-form-item-label,
-:where(.css-dev-only-do-not-override-1yacf91).ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-xl-24.ant-form-item-label {
-  /* padding: 0 0 8px; */
-  margin: 0;
-  white-space: initial;
-  text-align: start;
+.product__topsale {
+  margin-top: 40px;
+}
+.product__title {
+  font-weight: 700;
+  font-size: 26px;
+  margin-bottom: 4px;
+}
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr); /* 6 sản phẩm trên một hàng */
+  gap: 16px; /* Khoảng cách giữa các sản phẩm */
+}
+.btn_Loadmore {
+  margin-top: 20px !important;
+  display: flex;
+  margin: 0 auto;
+  background-color: transparent !important;
+  color: black;
+  border: 1px solid #333;
+}
+.btn_Loadmore:hover {
+  background-color: #222 !important;
+  transition: all 0.3s ease-in-out;
+  color: #f8f8f8;
+}
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(
+      3,
+      1fr
+    ); /* 3 sản phẩm trên hàng khi màn hình nhỏ hơn 1200px */
+  }
 }
 
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* 2 sản phẩm trên hàng khi màn hình nhỏ hơn 768px */
+  }
+}
 
-
-:where(.css-dev-only-do-not-override-1yacf91).ant-btn.ant-btn-block {
-  justify-content: right;
-  width: auto;
-
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: repeat(
+      1,
+      1fr
+    ); /* 1 sản phẩm trên hàng khi màn hình nhỏ */
+  }
 }

@@ -1,0 +1,21 @@
+.banner_img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Màu của dots */
+.ant-carousel .slick-dots li button {
+  background-color: red !important; /* Màu dots mặc định */
+  opacity: 0.5; /* Làm mờ dots chưa active */
+}
+
+/* Màu của dot đang active */
+.ant-carousel .slick-dots .slick-active button {
+  background-color: red !important; /* Màu dots active */
+  opacity: 1;
+}
+.banner_container {
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}

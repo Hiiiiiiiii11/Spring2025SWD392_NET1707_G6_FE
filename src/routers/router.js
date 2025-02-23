@@ -2,12 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
 
 import Register from "../pages/Register/Register";
-import Home from "../pages/Home/Home";
 import ProductPage from "../pages/ProductPage/ProductPage";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import Manager from "../pages/ManageProduct/Manager";
 import Login from "../pages/Login/Login";
 import ProductDetail from "../pages/ProductDetail/ProductDetail";
+import CustomerLayout from "../layout/CustomerLayout/CustomerLayout";
+import Home from "../pages/Home/Home";
 
 const products = [ // Example products data
   { id: 1, name: 'Hydrating Serum', price: 29.99, rating: 4.5, image: 'https://via.placeholder.com/150' },
@@ -18,7 +19,7 @@ const products = [ // Example products data
 const AppRouter = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: <CustomerLayout />,
     children: [
       { path: "/", element: <Home /> },
       { path: "/manager", element: <Manager /> },
