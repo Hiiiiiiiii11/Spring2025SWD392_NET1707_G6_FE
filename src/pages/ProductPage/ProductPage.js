@@ -50,24 +50,7 @@ const ProductPage = () => {
             </div>
           ))}
         </div>
-        <footer className="footer">
-          <div className="footer-section">
-            <p>About Us: Radiant, healthy skin care.</p>
-          </div>
-          <div className="footer-section">
-            <h3>Follow Us</h3>
-            <div className="social-icons">
-              <a href="https://facebook.com" target="_blank"><FaFacebook /></a>
-              <a href="https://twitter.com" target="_blank"><FaTwitter /></a>
-              <a href="https://instagram.com" target="_blank"><FaInstagram /></a>
-              <a href="https://linkedin.com" target="_blank"><FaLinkedin /></a>
-            </div>
-          </div>
-          <div className="footer-section">
-            <p>Email: support@skincare.com</p>
-            <p>Phone: +1 800 123 4567</p>
-          </div>
-        </footer>
+        
       </div>
     </div>
   );
