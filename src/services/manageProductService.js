@@ -4,12 +4,12 @@ const API_URL = "http://localhost:8080";
 // Hàm lấy danh sách sản phẩm
 export const getAllProductAPI = async () => {
     try {
-        const token = sessionStorage.getItem("token");
-        console.log("Token:", token);
+        // const token = sessionStorage.getItem("token");
+        // console.log("Token:", token);
         const response = await axios.get(`${API_URL}/products`, {
             headers: {
                 Accept: "*/*",
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
             },
         });
         return response.data;

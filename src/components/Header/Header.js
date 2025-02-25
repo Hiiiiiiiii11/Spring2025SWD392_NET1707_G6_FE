@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, Dropdown } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, DownOutlined } from "@ant-design/icons";
 import { jwtDecode } from "jwt-decode";
 import "./Header.css";
 
@@ -53,7 +53,7 @@ function Header() {
   } else if (role === "guest") {
     menuItems = [
       { label: "Home", path: "/" },
-      { label: "Products", path: "/products" },
+
     ];
   }
 
@@ -112,10 +112,9 @@ function Header() {
             // For logged-in users, show a user icon with dropdown and optionally display user name
             <Dropdown overlay={userMenu} trigger={["click"]}>
               <span className="user-icon-sub">
-
-
                 <span><UserOutlined /></span>
                 <span className="span-user-sub">{userInfo && userInfo.sub}</span>
+
               </span>
             </Dropdown>
           )}
