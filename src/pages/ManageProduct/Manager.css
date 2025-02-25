@@ -26,16 +26,6 @@
 }
 
 /* Đảm bảo nội dung không bị tràn ra ngoài nền */
-body,
-html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  /* Đảm bảo body và html cũng full height */
-  width: 100%;
-  overflow-x: hidden;
-  /* Ngăn tràn ngang */
-}
 
 h2 {
   color: #333;

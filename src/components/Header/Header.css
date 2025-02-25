@@ -2,6 +2,10 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   width: 100%;
   padding: 8px 0;
+  position: fixed;
+  z-index: 2000;
+  background-color: #f5f5f5;
+
   /* Bạn có thể thêm background hoặc các thuộc tính khác nếu cần */
 }
 

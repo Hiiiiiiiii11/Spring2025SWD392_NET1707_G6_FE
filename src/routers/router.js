@@ -9,6 +9,8 @@ import Login from "../pages/Login/Login";
 import ProductDetail from "../pages/ProductDetail/ProductDetail";
 import CustomerLayout from "../layout/CustomerLayout/CustomerLayout";
 import Home from "../pages/Home/Home";
+import CartPage from "../pages/Cart/CartPage";
+
 
 
 
@@ -21,11 +23,9 @@ const AppRouter = createBrowserRouter([
       { path: "/manager", element: <Manager /> },
       { path: "/products", element: <ProductPage /> },
       { path: "/forgot-password", element: <ForgotPassword /> },
-      {
-        path: "/product/:id",
-        element: <ProductDetail />,
+      { path: "/product/:id", element: <ProductDetail /> },
+      { path: "/cart", element: <CartPage /> },
 
-      },
     ],
   },
   { path: "/login", element: <Login /> },
