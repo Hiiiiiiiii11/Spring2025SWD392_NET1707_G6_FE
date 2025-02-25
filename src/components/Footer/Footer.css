@@ -1,48 +1,55 @@
 .footer {
-    background: linear-gradient(135deg, #a8edea, #fed6e3);
-    color: #333;
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 20px;
-    border-top: 3px solid #ff69b4;
+    background-color: #f8f9fa;
+    padding: 40px 20px;
+    border-top: 1px solid #ddd;
 }
 
 .footer-content {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
-    padding: 20px;
+    gap: 30px;
+    /* Khoảng cách cố định giữa các section */
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .footer-section {
-    max-width: 300px;
-    margin: 10px;
+    flex: 1;
+    min-width: 250px;
+    /* Đảm bảo mỗi section có độ rộng tối thiểu */
 }
 
 .footer-section h3 {
-    color: #ff69b4;
     margin-bottom: 10px;
+    color: #333;
 }
 
 .footer-section p {
-    font-size: 14px;
-    color: #555;
+    margin: 5px 0;
+    color: #666;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    /* Khoảng cách giữa các icon */
 }
 
 .social-icons a {
-    color: #ff69b4;
-    font-size: 20px;
-    margin: 0 10px;
-    transition: 0.3s;
+    color: #333;
+    font-size: 24px;
+    transition: color 0.3s ease;
 }
 
 .social-icons a:hover {
-    color: #d1478c;
+    color: #3498db;
 }
 
 .footer-bottom {
-    background: rgba(0, 0, 0, 0.1);
-    padding: 10px 0;
+    text-align: center;
+    margin-top: 20px;
+    color: #777;
     font-size: 14px;
 }

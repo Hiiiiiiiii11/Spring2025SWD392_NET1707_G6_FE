@@ -1,41 +1,51 @@
-import { useState } from "react";
 import "./Header.css";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Header() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log("Searching for:", searchQuery);
+  // Nếu location.pathname là "/" thì mặc định active Home
+  const currentPath = location.pathname === "/" ? "/" : location.pathname;
+
+  const handleNavigateHome = () => {
+    navigate('/');
   };
+
+  const handleNavigateLogin = () => {
+    navigate('/login');
+  }
+
+  const handleNavigateProduct = () => {
+    navigate('/products');
+  };
+  const handleNavigateRegister = () => {
+    navigate('/register')
+  }
 
   return (
     <div className="topnav_container">
       <div className="nav__container">
         <div className="nav-link">
-          <a className="active" href="#home">
+          <a
+            className={currentPath === '/' ? 'active' : ''}
+            onClick={handleNavigateHome}
+          >
             Home
           </a>
-          <a href="#products">Products</a>
-          <a href="#contact">Contact</a>
-          <a href="#about">About</a>
+          <a
+            className={currentPath === '/products' ? 'active' : ''}
+            onClick={handleNavigateProduct}
+          >
+            Products
+          </a>
         </div>
 
-        <form className="search__box" onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Search for skincare..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button type="submit">🔍</button>
-        </form>
-
         <div className="auth-link">
-          <a href="/login" className="btn_login">
+          <a onClick={handleNavigateLogin} className="btn_login">
             Login
           </a>
-          <a href="/register" className="btn_register">
+          <a onClick={handleNavigateRegister} className="btn_register">
             Register
           </a>
         </div>

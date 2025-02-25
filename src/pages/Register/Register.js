@@ -3,6 +3,8 @@ import "./Register.css";
 import registerImage from "../../assets/skincare.jpg";
 import { notification } from "antd";
 import { registerAPI } from "../../services/authService";// Import API service
+import { useNavigate } from "react-router-dom";
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +16,7 @@ const Register = () => {
     address: "",
   });
 
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -29,6 +32,9 @@ const Register = () => {
   // Kiểm tra số điện thoại hợp lệ (9-11 số)
   const validatePhone = (phone) => /^[0-9]{9,11}$/.test(phone);
 
+  const handleBackToLogin = () => {
+    navigate('/login');
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -102,6 +108,10 @@ const Register = () => {
             {errors.address && <p className="error-message">{errors.address}</p>}
 
             <button type="submit">Register</button>
+
+            <p className="register-back">
+              Already have an account?  <a className="back-to-login" onClick={() => { handleBackToLogin() }} >Login </a>
+            </p>
           </form>
         </div>
       </div>

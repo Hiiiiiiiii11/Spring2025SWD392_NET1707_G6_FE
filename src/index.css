@@ -7,16 +7,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
-/* Reset margin, padding, và border */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+
+
 
 /* Đảm bảo thẻ HTML và body chiếm toàn bộ viewport */
 html,
@@ -39,29 +31,16 @@ a {
   color: inherit;
 }
 
-/* Đảm bảo hình ảnh không bị vỡ layout */
+
 img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* Đảm bảo thẻ button không bị style mặc định */
+
 button {
   border: none;
   background: none;
   cursor: pointer;
-}
-
-/* Reset font size cho input và button để đồng nhất */
-input,
-button,
-textarea,
-select {
-  font: inherit;
-}
-
-.main_container {
-  width: 1400px;
-  margin: 0 auto;
 }
