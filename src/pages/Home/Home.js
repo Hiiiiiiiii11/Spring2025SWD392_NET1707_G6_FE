@@ -1,86 +1,102 @@
-import React, { useState } from "react";
-import { Card, Row, Col, Button } from "antd";
-import product1 from "../../assets/product1.jpg";
-import product2 from "../../assets/product2.jpg";
-import product3 from "../../assets/product3.jpg";
-import product4 from "../../assets/product4.jpg";
-import product5 from "../../assets/product5.jpg";
-import product6 from "../../assets/product6.jpg";
+import React, { useState, useEffect } from "react";
+import { Card, Row, Col } from "antd";
 import BannerSlider from "../../components/BannerSlider/BannerSlider";
 import Footer from "../../components/Footer/Footer";
-import "./Home.css";
 import Header from "../../components/Header/Header";
+import "./Home.css";
+import { getAllProductAPI } from "../../services/manageProductService";
 
-// Danh sách sản phẩm
-const productList = [
-  { id: 1, image: product1, name: "Sữa Rửa Mặt Trắng Da", brand: "L'Oreal", price: "120.000", originalPrice: "180.000", discount: 33, rating: 4.6, reviews: 198, sold: 3560, gift: "Tặng: Kem Dưỡng Ẩm" },
-  { id: 2, image: product2, name: "Son Môi Đỏ Quyến Rũ", brand: "Maybelline", price: "99.000", originalPrice: "149.000", discount: 34, rating: 4.8, reviews: 276, sold: 4220, gift: "Tặng: Son Dưỡng Mini" },
-  { id: 3, image: product3, name: "Kem Chống Nắng SPF 50+", brand: "La Roche-Posay", price: "195.000", originalPrice: "250.000", discount: 22, rating: 4.7, reviews: 315, sold: 5890, gift: "Tặng: Mặt Nạ Dưỡng Da" },
-  { id: 4, image: product4, name: "Dầu Gội Dưỡng Tóc Mềm Mượt", brand: "TRESemmé", price: "150.000", originalPrice: "210.000", discount: 28, rating: 4.5, reviews: 180, sold: 2780, gift: "Tặng: Dầu Xả 50ml" },
-  { id: 5, image: product5, name: "Nước Hoa Hồng Cân Bằng Da", brand: "Innisfree", price: "175.000", originalPrice: "230.000", discount: 24, rating: 4.9, reviews: 410, sold: 6290, gift: "Tặng: Bông Tẩy Trang" },
-  { id: 6, image: product6, name: "Tẩy Trang Dịu Nhẹ Cho Da Nhạy Cảm", brand: "Bioderma", price: "135.000", originalPrice: "189.000", discount: 29, rating: 4.8, reviews: 327, sold: 4750, gift: "Tặng: Khăn Lau Mặt" },
-];
+const { Meta } = Card;
 
-// Component hiển thị sản phẩm
+// ProductCard component that displays a product from API
 const ProductCard = ({ product }) => (
   <Card
     hoverable
-    cover={<img alt={product.name} src={product.image} style={{ height: "200px", objectFit: "cover" }} />}
+    cover={
+      <img
+        alt={product.productName}
+        src={product.imageURL || "https://via.placeholder.com/200x200?text=No+Image"}
+        style={{ height: "200px", objectFit: "cover" }}
+      />
+    }
   >
-    <p style={{ fontWeight: "bold", fontSize: "16px" }}>{product.name}</p>
-    <p>Thương hiệu: {product.brand}</p>
-    <p style={{ color: "red", fontSize: "18px", fontWeight: "bold" }}>{product.price}đ</p>
-    <p style={{ textDecoration: "line-through", color: "gray" }}>{product.originalPrice}đ</p>
-    <p>Giảm: {product.discount}%</p>
-    <p>⭐ {product.rating} ({product.reviews} đánh giá) - Đã bán {product.sold}</p>
-    <p style={{ fontSize: "14px", color: "#ff4500" }}>{product.gift}</p>
+    <p style={{ fontWeight: "bold", fontSize: "16px" }}>
+      {product.productName}
+    </p>
+    <p>Category: {product.category}</p>
+    <p style={{ color: "green", fontSize: "18px", fontWeight: "bold" }}>
+      ${product.price}
+    </p>
+    <p
+      style={{
+        fontSize: "14px",
+        color: "#555",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+      }}
+    >
+      {product.description}
+    </p>
+    <p style={{ fontSize: "12px", color: "#999", height: "30px" }}>
+      Skin Type: {product.skinTypeCompatibility}
+    </p>
   </Card>
 );
 
 function Home() {
+  const [products, setProducts] = useState([]);
+
+  // Fetch products from API when component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const data = await getAllProductAPI();
+      if (data) setProducts(data);
+    };
+    fetchProducts();
+  }, []);
+
   return (
     <div className="home-page">
       <Header />
       <div className="home-container">
         <BannerSlider />
 
-        {/* Top sản phẩm bán chạy */}
+        {/* Top Selling Products Section */}
         <div className="product__topsale">
-          <p className="product__title">Top sản phẩm bán chạy</p>
+          <p className="product__title">Top Selling Products</p>
           <Row gutter={[16, 16]}>
-            {productList.map((product) => (
-              <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
+            {products.map((product) => (
+              <Col key={product.productID} xs={24} sm={12} md={8} lg={6}>
                 <ProductCard product={product} />
               </Col>
             ))}
           </Row>
         </div>
 
-        {/* Gợi ý sản phẩm */}
+        {/* Recommended Products Section */}
         <div className="product__topsale">
-          <p className="product__title">Gợi ý dành cho bạn</p>
+          <p className="product__title">Recommended For You</p>
           <Row gutter={[16, 16]}>
-            {productList.map((product) => (
-              <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
+            {products.map((product) => (
+              <Col key={product.productID} xs={24} sm={12} md={8} lg={6}>
                 <ProductCard product={product} />
               </Col>
             ))}
           </Row>
         </div>
 
-        {/* Danh sách sản phẩm */}
+        {/* All Products Section */}
         <div className="product__topsale">
-          <p className="product__title">Danh sách sản phẩm</p>
+          <p className="product__title">All Products</p>
           <Row gutter={[16, 16]}>
-            {productList.map((product) => (
-              <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
+            {products.map((product) => (
+              <Col key={product.productID} xs={24} sm={12} md={8} lg={6}>
                 <ProductCard product={product} />
               </Col>
             ))}
           </Row>
         </div>
-
-
       </div>
       <Footer />
     </div>

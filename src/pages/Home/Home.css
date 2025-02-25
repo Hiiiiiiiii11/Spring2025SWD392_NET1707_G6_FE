@@ -175,3 +175,8 @@
 .ant-row.css-dev-only-do-not-override-1yacf91 {
   padding: 10px;
 }
+
+:where(.css-dev-only-do-not-override-1yacf91).ant-card .ant-card-body {
+  padding: 24px;
+  border-radius: 0 0 8px 8px;
+}
