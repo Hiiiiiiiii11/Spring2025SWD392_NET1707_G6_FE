@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, Dropdown } from "antd";
-import { UserOutlined, DownOutlined } from "@ant-design/icons";
+import { ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import { jwtDecode } from "jwt-decode";
 import "./Header.css";
 
@@ -109,14 +109,21 @@ function Header() {
               </a>
             </>
           ) : (
-            // For logged-in users, show a user icon with dropdown and optionally display user name
-            <Dropdown overlay={userMenu} trigger={["click"]}>
-              <span className="user-icon-sub">
-                <span><UserOutlined /></span>
-                <span className="span-user-sub">{userInfo && userInfo.sub}</span>
+            <span className="cart-user-icon-sub">
+              <span className="cart-icon" onClick={() => handleNavigate("/cart")}><ShoppingCartOutlined /></span>
 
-              </span>
-            </Dropdown>
+              <Dropdown overlay={userMenu} trigger={["click"]}>
+
+                <span className="user-icon-sub">
+
+
+                  <span><UserOutlined /></span>
+                  <span className="span-user-sub">{userInfo && userInfo.sub}</span>
+
+                </span>
+
+              </Dropdown>
+            </span>
           )}
         </div>
       </div>
