@@ -1,64 +1,120 @@
-import React from 'react';
-import { Card, Row, Col, Button } from 'antd';
-import Footer from '../../components/Footer/Footer';
-import product1 from "../../assets/product1.jpg";
-import product2 from "../../assets/product2.jpg";
-import product3 from "../../assets/product3.jpg";
-import product4 from "../../assets/product4.jpg";
-import product5 from "../../assets/product5.jpg";
-import product6 from "../../assets/product6.jpg";
-import '../Cart/CartPage.css';
-import { useNavigate } from 'react-router-dom';
-
-const productsInCart = [
-    { id: 1, name: 'Sữa Rửa Mặt Trắng Da', price: 120000, rating: 4.6, image: product1, brand: "L'Oreal", quantity: 1 },
-    { id: 2, name: 'Son Môi Đỏ Quyến Rũ', price: 99000, rating: 4.8, image: product2, brand: "Maybelline", quantity: 2 },
-    { id: 3, name: 'Kem Chống Nắng SPF 50+', price: 195000, rating: 4.7, image: product3, brand: "La Roche-Posay", quantity: 1 },
-];
-
-
+import { Button, Card } from "antd";
+import React, { useEffect, useState } from "react";
+import { PlusOutlined, MinusOutlined, DeleteOutlined } from "@ant-design/icons";
+import "../Cart/CartPage.css";
+import Header from "../../components/Header/Header";
+import Footer from "../../components/Footer/Footer";
+import { Link } from "react-router-dom";
 
 const CartPage = () => {
-    const navigate = useNavigate();
+  const [cart, setCart] = useState([]);
 
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCart(storedCart);
+  }, []);
 
+  const updateCart = (newCart) => {
+    setCart(newCart);
+    localStorage.setItem("cart", JSON.stringify(newCart));
+  };
 
-    const handleBackToProductPage = () => {
-        navigate('/products')
-    }
-    return (
-        <div>
-            <div className="cart-page">
-                <div className="cartpage-info">
-                    <button className="back-to-product" onClick={() => handleBackToProductPage()}>Back to Products Page</button>
-                    <div className='h1-content'>
-                        <h1>Giỏ hàng của bạn</h1>
-                    </div>
-                </div>
-                {productsInCart.map(product => (
-                    <Card key={product.id} className="cart-card" hoverable>
-                        <div className="cart-card-content">
-                            <img
-                                src={product.image}
-                                alt={product.name}
-                                className="cart-card-image"
-                            />
-                            <div className="cart-card-info">
-                                <h2>{product.name}</h2>
-                                <p>Thương hiệu: {product.brand}</p>
-                                <p className="price">
-                                    {product.price.toLocaleString()}đ
-                                </p>
-                                <p>Số lượng: {product.quantity}</p>
-                                <Button type="primary">Cập nhật</Button>
-                            </div>
-                        </div>
-                    </Card>
-                ))}
-            </div>
-            <Footer />
-        </div>
+  const increaseQuantity = (id) => {
+    const newCart = cart.map((product) =>
+      product.id === id
+        ? { ...product, quantity: product.quantity + 1 }
+        : product
     );
+    updateCart(newCart);
+  };
+
+  const decreaseQuantity = (id) => {
+    const newCart = cart.map((product) =>
+      product.id === id && product.quantity > 1
+        ? { ...product, quantity: product.quantity - 1 }
+        : product
+    );
+    updateCart(newCart);
+  };
+
+  const removeItem = (id) => {
+    const newCart = cart.filter((product) => product.id !== id);
+    updateCart(newCart);
+  };
+
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  console.log("cart", cart);
+  return (
+    <layout className="layout">
+      <Header />
+      <div className="cart-container">
+        {cart.length > 0 ? (
+          <>
+            <h1 className="cart-title">Giỏ Hàng</h1>
+            {cart.map((product) => (
+              <div key={product.id} className="cart-item">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="cart-item-image"
+                />
+                <div className="cart-item-info">
+                  <h2 className="cart-item-name">{product.name}</h2>
+                  <p className="cart-item-price">Giá: {product.price}</p>
+                </div>
+                <div className="cart-item-quantity">
+                  <Button
+                    icon={<MinusOutlined />}
+                    onClick={() => decreaseQuantity(product.id)}
+                    disabled={product.quantity <= 1}
+                  />
+                  <span className="cart-item-qty">{product.quantity}</span>
+                  <Button
+                    icon={<PlusOutlined />}
+                    onClick={() => increaseQuantity(product.id)}
+                  />
+                </div>
+                <p className="cart-item-price">
+                  {product.price.toLocaleString()} đ
+                </p>
+                <Button
+                  type="primary"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => removeItem(product.id)}
+                />
+              </div>
+            ))}
+
+            <div className="cart-summary">
+              <div className="cart-total">
+                <span>Tổng tiền:</span>
+                <strong>{totalPrice.toLocaleString()} đ</strong>
+              </div>
+              <Button type="default" className="order-btn">
+                Đặt Hàng
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="empty-cart-container">
+            <p className="empty-cart-text">
+              Giỏ hàng của bạn đang trống. Hãy thêm sản phẩm vào giỏ ngay!
+            </p>
+            <Link to="/">
+              <Button type="primary" className="continue-shopping-btn">
+                Tiếp tục mua sắm
+              </Button>
+            </Link>
+          </div>
+        )}
+      </div>
+      <Footer />
+    </layout>
+  );
 };
 
 export default CartPage;

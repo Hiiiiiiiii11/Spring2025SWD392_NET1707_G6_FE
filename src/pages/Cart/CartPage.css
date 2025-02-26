@@ -1,68 +1,107 @@
-.cart-page {
-    margin: 0px 20px;
-    padding: 0 20px;
+.cart-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  padding-top: 80px;
+  min-height: 80vh;
 }
 
-.cart-page h1 {
-    display: flex;
-    text-align: center;
-    /* margin: 30px 0px; */
-    color: #333;
-    justify-content: center;
+.cart-title {
+  font-size: 24px;
+  font-weight: bold;
 }
 
-.cart-card {
-    margin-bottom: 20px;
+.empty-cart {
+  text-align: center;
+  font-size: 18px;
+  color: gray;
 }
 
-.cart-card-content {
-    display: flex;
-    align-items: center;
+.cart-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding: 15px 0;
 }
 
-.cart-card-image {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    margin-right: 20px;
-    border-radius: 5px;
+.cart-item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  margin-right: 15px;
+  border-radius: 4px;
 }
 
-.cart-card-info {
-    flex: 1;
+.cart-item-info {
+  flex: 1;
 }
 
-.cart-card-info h2 {
-    margin: 0 0 10px;
-    color: #2c3e50;
-    display: flex
+.cart-item-name {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: start;
 }
 
-.cart-card-info p {
-    margin: 5px 0;
-    color: #555;
+.cart-item-size {
+  font-size: 14px;
+  color: gray;
 }
 
-.cart-card-info .price {
-    color: #e74c3c;
-    font-weight: bold;
-    font-size: 1.2em;
+.cart-item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.cartpage-info {
-    display: flex;
+.cart-item-qty {
+  font-size: 16px;
+  font-weight: bold;
 }
 
-.back-to-product {
-    margin-top: 20px;
-    display: flex;
-    font-size: 12px;
-    width: 200px;
-    height: 50px;
-    text-align: center;
-    align-items: center;
+.cart-item-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #e63946;
 }
 
-.h1-content {
-    width: 100%;
+.cart-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+}
+
+.checkout-btn {
+  background-color: #1677ff;
+  color: white;
+}
+
+.cart-total {
+  font-size: 18px;
+}
+
+.order-btn {
+  color: #ddd;
+  background-color: #1677ff;
+}
+.empty-cart-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.empty-cart-image {
+  width: 250px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.empty-cart-text {
+  font-size: 18px;
+  color: gray;
+  margin-bottom: 20px;
+}
+
+.continue-shopping-btn {
+  background-color: #1677ff;
+  color: white;
 }
