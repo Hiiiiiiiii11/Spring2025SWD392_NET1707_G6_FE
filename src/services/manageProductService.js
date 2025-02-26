@@ -4,12 +4,12 @@ const API_URL = "http://localhost:8080";
 // Hàm lấy danh sách sản phẩm
 export const getAllProductAPI = async () => {
     try {
-        const token = sessionStorage.getItem("token");
-        console.log("Token:", token);
+        // const token = sessionStorage.getItem("token");
+        // console.log("Token:", token);
         const response = await axios.get(`${API_URL}/products`, {
             headers: {
                 Accept: "*/*",
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
             },
         });
         return response.data;
@@ -43,7 +43,7 @@ export const uploadToCloudinary = async (file) => {
 export const createNewProductAPI = async (productData) => {
     try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.post(`${API_URL}/products/add`, productData, {
+        const response = await axios.post(`${API_URL}/products`, productData, {
             headers: {
                 Accept: "*/*",
                 Authorization: `Bearer ${token}`,
@@ -85,7 +85,7 @@ export const editProductAPI = async (id, productData) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error creating product:", error);
+        console.error("Error editing product:", error);
         throw error;
     }
 };

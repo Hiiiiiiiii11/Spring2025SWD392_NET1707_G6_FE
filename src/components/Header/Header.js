@@ -1,19 +1,35 @@
-import "./Header.css";
+import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Menu, Dropdown } from "antd";
+import { UserOutlined, DownOutlined } from "@ant-design/icons";
+import { jwtDecode } from "jwt-decode";
+import "./Header.css";
 
-function Header({ userInfo }) {
+function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Nếu location.pathname là "/" thì mặc định active Home
+  // If location.pathname is "/" then set active to Home
   const currentPath = location.pathname === "/" ? "/" : location.pathname;
+  const token = sessionStorage.getItem("token");
 
-  // Các hàm điều hướng
-  const handleNavigate = (path) => {
-    navigate(path);
-  };
-  const role = "guest"
-  // Định nghĩa các menu theo role
+  // Default role and user info
+  let role = "guest";
+  let userInfo = null;
+
+  // If token exists, decode it to get user info and role
+  if (token) {
+    try {
+      userInfo = jwtDecode(token);
+      // Assume the decoded token contains a field "role"
+      role = userInfo.role;
+    } catch (error) {
+      console.error("Token decode error:", error);
+      role = "guest";
+    }
+  }
+
+  // Define main menu items based on role
   let menuItems = [];
   if (role === "manager") {
     menuItems = [
@@ -29,7 +45,7 @@ function Header({ userInfo }) {
       { label: "Products", path: "/products" },
       { label: "View Order", path: "/view-order" },
     ];
-  } else if (role === "customer") {
+  } else if (role === "CUSTOMER") {
     menuItems = [
       { label: "Home", path: "/" },
       { label: "Products", path: "/products" },
@@ -37,9 +53,35 @@ function Header({ userInfo }) {
   } else if (role === "guest") {
     menuItems = [
       { label: "Home", path: "/" },
-      { label: "Products", path: "/products" },
+
     ];
   }
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  // User dropdown menu items (only for logged-in users)
+  const userMenuItems = [
+    { key: "profile", label: "Profile", onClick: () => navigate("/profile") },
+    {
+      key: "logout",
+      label: "Logout",
+      onClick: () => {
+        sessionStorage.removeItem("token");
+        navigate("/login");
+      },
+    },
+  ];
+
+  const userMenu = (
+    <Menu
+      items={userMenuItems}
+      onClick={(e) => {
+        // Optional: Additional onClick logic here
+      }}
+    />
+  );
 
   return (
     <div className="topnav_container">
@@ -57,7 +99,7 @@ function Header({ userInfo }) {
         </div>
 
         <div className="auth-link">
-          {role === "guest" && (
+          {role === "guest" ? (
             <>
               <a onClick={() => handleNavigate("/login")} className="btn_login">
                 Login
@@ -66,9 +108,15 @@ function Header({ userInfo }) {
                 Sign up
               </a>
             </>
+          ) : (
+            // For logged-in users, show a user icon with dropdown and optionally display user name
+            <Dropdown overlay={userMenu} trigger={["click"]}>
+              <span className="user-icon-sub">
+                <span><UserOutlined /></span>
+                <span className="span-user-sub">{userInfo && userInfo.sub}</span>
 
-
-
+              </span>
+            </Dropdown>
           )}
         </div>
       </div>

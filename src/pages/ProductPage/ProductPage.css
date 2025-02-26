@@ -128,3 +128,15 @@
 .social-icons a:hover {
   color: #3498db;
 }
+
+:where(.css-dev-only-do-not-override-1yacf91).ant-card .ant-card-actions>li>span a:not(.ant-card-btn),
+:where(.css-dev-only-do-not-override-1yacf91).ant-card .ant-card-actions>li>span>.anticon {
+  display: flex;
+  margin-top: 15px;
+  /* height: 100%; */
+  justify-content: center;
+  width: 100%;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 22px;
+  transition: color 0.2s;
+}

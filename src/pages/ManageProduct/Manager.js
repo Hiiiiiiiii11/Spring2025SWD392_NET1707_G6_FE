@@ -2,14 +2,20 @@ import React, { useState, useEffect } from "react";
 import { Table, Input, Button, Form, Modal, Upload, message } from "antd";
 import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
 import "../ManageProduct/Manager.css";
-import { createNewProductAPI, deleteProductAPI, getAllProductAPI, uploadToCloudinary } from "../../services/manageProductService";
+import {
+  createNewProductAPI,
+  deleteProductAPI,
+  editProductAPI,
+  getAllProductAPI,
+  uploadToCloudinary,
+} from "../../services/manageProductService";
 
 function Manager() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [editingProductId, setEditingProductId] = useState(null);
+  const [editingProductID, setEditingProductID] = useState(null);
   const [form] = Form.useForm();
   const [file, setFile] = useState(null);
 
@@ -30,41 +36,67 @@ function Manager() {
 
   const handleEditProduct = (record) => {
     setEditMode(true);
-    setEditingProductId(record.id);
+    // Lấy productID từ record thay vì record.id
+    setEditingProductID(record.productID);
     form.setFieldsValue(record);
     setIsModalVisible(true);
   };
 
   const handleDeleteProduct = async (id) => {
-    Modal.confirm({
-      title: "Are you sure you want to delete this product?",
-      onOk: async () => {
-        try {
-          await deleteProductAPI(id);
-          setProducts(products.filter((p) => p.id !== id));
-          message.success("Product deleted successfully!");
-        } catch (error) {
-          message.error("Failed to delete product. Please try again.");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+    if (confirmDelete) {
+      try {
+        await deleteProductAPI(id);
+        message.success("Product deleted successfully!");
+        const data = await getAllProductAPI();
+        if (data) { setProducts(data) }
+        else {
+          window.location.reload();
         }
+      } catch (error) {
+        console.error("Delete error:", error);
+        message.error("Failed to delete product. Please try again.");
       }
-    });
+    }
   };
-
 
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
+
+      // Nếu có file được upload, lấy URL từ Cloudinary
       if (file) {
         const imageURL = await uploadToCloudinary(file);
         values.imageURL = imageURL;
       }
-      await createNewProductAPI(values);
-      message.success("Product added successfully!");
+      console.log(values)
+
+      if (editMode) {
+        // Chế độ chỉnh sửa: Gọi API cập nhật sản phẩm
+        await editProductAPI(editingProductID, values);
+        message.success("Product updated successfully!");
+        const data = await getAllProductAPI();
+        if (data) setProducts(data);
+      } else {
+        // Chế độ thêm mới: Gọi API tạo sản phẩm mới
+        await createNewProductAPI(values);
+        message.success("Product added successfully!");
+        const data = await getAllProductAPI();
+        if (data) setProducts(data);
+      }
+
       setIsModalVisible(false);
       form.resetFields();
       setFile(null);
+
+      // Cập nhật lại danh sách sản phẩm sau khi thêm/chỉnh sửa
+      const data = await getAllProductAPI();
+      if (data) setProducts(data);
     } catch (error) {
-      message.error("Error creating product!");
+      console.error("Modal OK error:", error);
+      message.error("Error processing product. Please try again.");
     }
   };
 
@@ -73,28 +105,28 @@ function Manager() {
       title: "Name",
       dataIndex: "productName",
       key: "productName",
-      sorter: (a, b) => a.productName.localeCompare(b.productName)
+      sorter: (a, b) => a.productName.localeCompare(b.productName),
     },
     {
       title: "Description",
       dataIndex: "description",
-      key: "description"
+      key: "description",
     },
     {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      sorter: (a, b) => a.price - b.price
+      sorter: (a, b) => a.price - b.price,
     },
     {
       title: "Category",
       dataIndex: "category",
-      key: "category"
+      key: "category",
     },
     {
       title: "Skin Type",
       dataIndex: "skinTypeCompatibility",
-      key: "skinTypeCompatibility"
+      key: "skinTypeCompatibility",
     },
     {
       title: "Image",
@@ -103,7 +135,7 @@ function Manager() {
       render: (text, record) =>
         record.imageURL ? (
           <img src={record.imageURL} alt="Product" style={{ maxWidth: "100px" }} />
-        ) : null
+        ) : null,
     },
     {
       title: "Actions",
@@ -113,19 +145,29 @@ function Manager() {
           <Button type="link" onClick={() => handleEditProduct(record)}>
             Edit
           </Button>
-          <Button type="link" danger onClick={() => handleDeleteProduct(record.id)}>
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDeleteProduct(record.productID)}
+          >
             Delete
           </Button>
         </>
-      )
-    }
+      ),
+    },
   ];
 
   return (
     <div className="manager-page">
       <div className="manager-container">
         <h2>Manager Products</h2>
-        <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between" }}>
+        <div
+          style={{
+            marginBottom: "16px",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
           <Input
             style={{ width: "400px", height: "40px" }}
             placeholder="Search product..."
@@ -136,7 +178,8 @@ function Manager() {
             + Add new product
           </Button>
         </div>
-        <Table dataSource={products} columns={columns} rowKey="id" />
+        {/* Dùng productID làm rowKey */}
+        <Table dataSource={products} columns={columns} rowKey="productID" />
 
         <Modal
           title={editMode ? "Edit Product" : "Add Product"}

@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import { Card, Row, Col, Button } from "antd";
-import product1 from "../../assets/product1.jpg";
-import product2 from "../../assets/product2.jpg";
-import product3 from "../../assets/product3.jpg";
-import product4 from "../../assets/product4.jpg";
-import product5 from "../../assets/product5.jpg";
-import product6 from "../../assets/product6.jpg";
+import React, { useState, useEffect } from "react";
+import { Card, Row, Col } from "antd";
 import BannerSlider from "../../components/BannerSlider/BannerSlider";
 import Footer from "../../components/Footer/Footer";
-import "./Home.css";
 import Header from "../../components/Header/Header";
 import { useNavigate } from "react-router-dom";
 import ProductCard from "../../components/ProductCard/ProductCard";
@@ -98,42 +91,53 @@ const productList = [
 // Component hiển thị sản phẩm
 
 function Home() {
+  const [products, setProducts] = useState([]);
+
+  // Fetch products from API when component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const data = await getAllProductAPI();
+      if (data) setProducts(data);
+    };
+    fetchProducts();
+  }, []);
+
   return (
     <div className="home-page">
       <Header />
       <div className="home-container">
         <BannerSlider />
 
-        {/* Top sản phẩm bán chạy */}
+        {/* Top Selling Products Section */}
         <div className="product__topsale">
-          <p className="product__title">Top sản phẩm bán chạy</p>
+          <p className="product__title">Top Selling Products</p>
           <Row gutter={[16, 16]}>
-            {productList.map((product) => (
-              <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
+            {products.map((product) => (
+              <Col key={product.productID} xs={24} sm={12} md={8} lg={6}>
                 <ProductCard product={product} />
               </Col>
             ))}
           </Row>
         </div>
 
-        {/* Gợi ý sản phẩm */}
+        {/* Recommended Products Section */}
         <div className="product__topsale">
-          <p className="product__title">Gợi ý dành cho bạn</p>
+          <p className="product__title">Recommended For You</p>
           <Row gutter={[16, 16]}>
-            {productList.map((product) => (
-              <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
+            {products.map((product) => (
+              <Col key={product.productID} xs={24} sm={12} md={8} lg={6}>
                 <ProductCard product={product} />
               </Col>
             ))}
           </Row>
         </div>
 
-        {/* Danh sách sản phẩm */}
+        {/* All Products Section */}
         <div className="product__topsale">
-          <p className="product__title">Danh sách sản phẩm</p>
+          <p className="product__title">All Products</p>
           <Row gutter={[16, 16]}>
-            {productList.map((product) => (
-              <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
+            {products.map((product) => (
+              <Col key={product.productID} xs={24} sm={12} md={8} lg={6}>
                 <ProductCard product={product} />
               </Col>
             ))}
