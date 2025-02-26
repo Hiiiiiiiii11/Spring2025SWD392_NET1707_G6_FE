@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Card, Row, Col } from "antd";
+import { Col, Row } from "antd";
+import React, { useEffect, useState } from "react";
+import product1 from "../../assets/product1.jpg";
+import product2 from "../../assets/product2.jpg";
+import product3 from "../../assets/product3.jpg";
+import product4 from "../../assets/product4.jpg";
+import product5 from "../../assets/product5.jpg";
+import product6 from "../../assets/product6.jpg";
 import BannerSlider from "../../components/BannerSlider/BannerSlider";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
-import { useNavigate } from "react-router-dom";
 import ProductCard from "../../components/ProductCard/ProductCard";
-
 // Danh sách sản phẩm
 const productList = [
   {
