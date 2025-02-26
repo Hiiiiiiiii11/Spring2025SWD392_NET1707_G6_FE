@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
+
 import Register from "../pages/Register/Register";
 import ProductPage from "../pages/ProductPage/ProductPage";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
@@ -9,7 +10,9 @@ import ProductDetail from "../pages/ProductDetail/ProductDetail";
 import CustomerLayout from "../layout/CustomerLayout/CustomerLayout";
 import Home from "../pages/Home/Home";
 import CartPage from "../pages/Cart/CartPage";
-import ManagerStaff from "../pages/ManagerStaff/ManagerStaff";
+
+
+
 
 const AppRouter = createBrowserRouter([
   {
@@ -18,11 +21,11 @@ const AppRouter = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/manager", element: <Manager /> },
-      { path: "/manager-staff", element: <ManagerStaff /> },
       { path: "/products", element: <ProductPage /> },
       { path: "/forgot-password", element: <ForgotPassword /> },
       { path: "/product/:id", element: <ProductDetail /> },
       { path: "/cart", element: <CartPage /> },
+
     ],
   },
   { path: "/login", element: <Login /> },
