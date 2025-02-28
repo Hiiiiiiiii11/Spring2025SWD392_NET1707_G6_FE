@@ -10,6 +10,7 @@ import ProductDetail from "../pages/ProductDetail/ProductDetail";
 import CustomerLayout from "../layout/CustomerLayout/CustomerLayout";
 import Home from "../pages/Home/Home";
 import CartPage from "../pages/Cart/CartPage";
+import ManagerStaff from "../pages/ManagerStaff/ManagerStaff";
 
 
 
@@ -22,6 +23,7 @@ const AppRouter = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/manager", element: <Manager /> },
       { path: "/products", element: <ProductPage /> },
+      { path: "/manager-staff", element: <ManagerStaff/>},
       { path: "/forgot-password", element: <ForgotPassword /> },
       { path: "/products/:id", element: <ProductDetail /> },
       { path: "/cart", element: <CartPage /> },
