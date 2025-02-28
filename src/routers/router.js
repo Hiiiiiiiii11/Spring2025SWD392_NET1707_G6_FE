@@ -11,7 +11,7 @@ import CustomerLayout from "../layout/CustomerLayout/CustomerLayout";
 import Home from "../pages/Home/Home";
 import CartPage from "../pages/Cart/CartPage";
 import ManagerStaff from "../pages/ManagerStaff/ManagerStaff";
-
+import PrivateRoute from "./privateRouter";
 
 
 
@@ -21,15 +21,27 @@ const AppRouter = createBrowserRouter([
     element: <CustomerLayout />,
     children: [
       { path: "/", element: <Home /> },
-      { path: "/manager", element: <Manager /> },
+      {
+        path: "/manage_product",
+        element: <PrivateRoute element={<Manager />} allowedRoles={["MANAGER"]} />
+      },
       { path: "/products", element: <ProductPage /> },
-      { path: "/manager-staff", element: <ManagerStaff/>},
-      { path: "/forgot-password", element: <ForgotPassword /> },
+      {
+        path: "/manage-staff",
+        element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} />
+      },
+      {
+        path: "/forgot-password",
+        element: <PrivateRoute element={<ForgotPassword />} allowedRoles={["GUEST"]} />
+      },
       { path: "/products/:id", element: <ProductDetail /> },
-      { path: "/cart", element: <CartPage /> },
-
+      {
+        path: "/cart",
+        element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER_STAFF", "MANAGER"]} />
+      },
     ],
   },
+
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
 ]);

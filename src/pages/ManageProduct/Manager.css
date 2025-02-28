@@ -15,11 +15,8 @@
   width: 100%;
 }
 
-/* Các phần tử con sẽ không che phủ nền */
-.manager-page,
-.manager-container>* {
-  width: 100%;
-}
+
+
 
 .search-product-manage {
   max-width: 400px;
@@ -28,6 +25,7 @@
 /* Đảm bảo nội dung không bị tràn ra ngoài nền */
 
 h2 {
+  margin-top: 50px;
   color: #333;
   margin-bottom: 20px;
   font-size: 2rem;

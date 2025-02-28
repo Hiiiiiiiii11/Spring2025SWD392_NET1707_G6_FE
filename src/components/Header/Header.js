@@ -23,20 +23,20 @@ function Header() {
       userInfo = jwtDecode(token);
       // Assume the decoded token contains a field "role"
       role = userInfo.role;
+      sessionStorage.setItem("role", role);
     } catch (error) {
-      console.error("Token decode error:", error);
       role = "guest";
     }
   }
 
   // Define main menu items based on role
   let menuItems = [];
-  if (role === "manager") {
+  if (role === "MANAGER") {
     menuItems = [
       { label: "Home", path: "/" },
       { label: "Products", path: "/products" },
-      { label: "Manage Product", path: "/manage-product" },
-      { label: "Manage Employee", path: "/manage-employee" },
+      { label: "Manage Product", path: "/manage_product" },
+      { label: "Manage Employee", path: "/manage-staff" },
       { label: "View Order", path: "/view-order" },
     ];
   } else if (role === "CUSTOMER_STAFF") {

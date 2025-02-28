@@ -9,6 +9,7 @@ import {
   getAllProductAPI,
   uploadToCloudinary,
 } from "../../services/manageProductService";
+import Header from "../../components/Header/Header";
 
 function Manager() {
   const [products, setProducts] = useState([]);
@@ -158,73 +159,76 @@ function Manager() {
   ];
 
   return (
-    <div className="manager-page">
-      <div className="manager-container">
-        <h2>Manager Products</h2>
-        <div
-          style={{
-            marginBottom: "16px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Input
-            style={{ width: "400px", height: "40px" }}
-            placeholder="Search product..."
-            onChange={(e) => setSearch(e.target.value)}
-            suffix={<SearchOutlined />}
-          />
-          <Button type="primary" onClick={handleAddNewProduct}>
-            + Add new product
-          </Button>
-        </div>
-        {/* Dùng productID làm rowKey */}
-        <Table dataSource={products} columns={columns} rowKey="productID" />
+    <div>
+      <Header />
+      <div className="manager-page">
+        <div className="manager-container">
+          <h2>Manager Products</h2>
+          <div
+            style={{
+              marginBottom: "16px",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Input
+              style={{ width: "400px", height: "40px" }}
+              placeholder="Search product..."
+              onChange={(e) => setSearch(e.target.value)}
+              suffix={<SearchOutlined />}
+            />
+            <Button type="primary" onClick={handleAddNewProduct}>
+              + Add new product
+            </Button>
+          </div>
+          {/* Dùng productID làm rowKey */}
+          <Table dataSource={products} columns={columns} rowKey="productID" />
 
-        <Modal
-          title={editMode ? "Edit Product" : "Add Product"}
-          visible={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={() => setIsModalVisible(false)}
-          okText={editMode ? "Save Changes" : "Add Product"}
-        >
-          <Form form={form} layout="vertical">
-            <Form.Item
-              name="productName"
-              label="Product Name"
-              rules={[{ required: true, message: "Product name is required!" }]}
-            >
-              <Input placeholder="Product Name" />
-            </Form.Item>
-            <Form.Item
-              name="price"
-              label="Price"
-              rules={[{ required: true, message: "Price is required!" }]}
-            >
-              <Input placeholder="Price" />
-            </Form.Item>
-            <Form.Item name="category" label="Category">
-              <Input placeholder="Category" />
-            </Form.Item>
-            <Form.Item name="skinTypeCompatibility" label="Skin Type">
-              <Input placeholder="Skin Type" />
-            </Form.Item>
-            <Form.Item name="description" label="Description">
-              <Input.TextArea placeholder="Description" />
-            </Form.Item>
-            <Form.Item name="imageURL" label="Image">
-              <Upload
-                beforeUpload={(file) => {
-                  setFile(file);
-                  return false;
-                }}
-                maxCount={1}
+          <Modal
+            title={editMode ? "Edit Product" : "Add Product"}
+            visible={isModalVisible}
+            onOk={handleModalOk}
+            onCancel={() => setIsModalVisible(false)}
+            okText={editMode ? "Save Changes" : "Add Product"}
+          >
+            <Form form={form} layout="vertical">
+              <Form.Item
+                name="productName"
+                label="Product Name"
+                rules={[{ required: true, message: "Product name is required!" }]}
               >
-                <Button icon={<UploadOutlined />}>Upload Image</Button>
-              </Upload>
-            </Form.Item>
-          </Form>
-        </Modal>
+                <Input placeholder="Product Name" />
+              </Form.Item>
+              <Form.Item
+                name="price"
+                label="Price"
+                rules={[{ required: true, message: "Price is required!" }]}
+              >
+                <Input placeholder="Price" />
+              </Form.Item>
+              <Form.Item name="category" label="Category">
+                <Input placeholder="Category" />
+              </Form.Item>
+              <Form.Item name="skinTypeCompatibility" label="Skin Type">
+                <Input placeholder="Skin Type" />
+              </Form.Item>
+              <Form.Item name="description" label="Description">
+                <Input.TextArea placeholder="Description" />
+              </Form.Item>
+              <Form.Item name="imageURL" label="Image">
+                <Upload
+                  beforeUpload={(file) => {
+                    setFile(file);
+                    return false;
+                  }}
+                  maxCount={1}
+                >
+                  <Button icon={<UploadOutlined />}>Upload Image</Button>
+                </Upload>
+              </Form.Item>
+            </Form>
+          </Modal>
+        </div>
       </div>
     </div>
   );
