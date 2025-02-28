@@ -1,6 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-
-
 import Register from "../pages/Register/Register";
 import ProductPage from "../pages/ProductPage/ProductPage";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
@@ -11,6 +9,10 @@ import CustomerLayout from "../layout/CustomerLayout/CustomerLayout";
 import Home from "../pages/Home/Home";
 import CartPage from "../pages/Cart/CartPage";
 import ManagerStaff from "../pages/ManagerStaff/ManagerStaff";
+import CustomerOrders from "../pages/CustomerOrders";
+import StaffOrders from "../pages/StaffOrders";
+import ManagerOrders from "../pages/ManagerOrders";
+import PaymentPage from "../pages/Payment/PaymentPage";
 import PrivateRoute from "./privateRouter";
 
 
@@ -26,6 +28,10 @@ const AppRouter = createBrowserRouter([
         element: <PrivateRoute element={<Manager />} allowedRoles={["MANAGER"]} />
       },
       { path: "/products", element: <ProductPage /> },
+      { path: "/product/:id", element: <ProductDetail /> },
+      { path: "/cart", element: <CartPage /> },
+      { path: "/customer/orders", element: <CustomerOrders /> },
+      { path: "/payment", element: <PaymentPage /> },
       {
         path: "/manage-staff",
         element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} />
@@ -44,6 +50,29 @@ const AppRouter = createBrowserRouter([
 
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
+  { path: "/forgot-password", element: <ForgotPassword /> },
+  {
+    path: "/manager",
+    element: <Manager />,
+    children: [
+      { path: "orders", element: <ManagerOrders /> },
+    ],
+  },
+  {
+    path: "/manager-staff",
+    element: <ManagerStaff />,
+    children: [
+      { path: "orders", element: <StaffOrders /> },
+    ],
+  },
+  {
+    path: "/manager-orders",
+    element: <ManagerOrders />,
+  },
+  {
+    path: "/staff-orders",
+    element: <StaffOrders />,
+  },
 ]);
 
 export default AppRouter;
