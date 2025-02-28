@@ -12,6 +12,7 @@ import ManagerStaff from "../pages/ManagerStaff/ManagerStaff";
 import CustomerOrders from "../pages/CustomerOrders";
 import StaffOrders from "../pages/StaffOrders";
 import ManagerOrders from "../pages/ManagerOrders";
+import PaymentPage from "../pages/Payment/PaymentPage";
 
 const AppRouter = createBrowserRouter([
   {
@@ -22,42 +23,34 @@ const AppRouter = createBrowserRouter([
       { path: "/products", element: <ProductPage /> },
       { path: "/product/:id", element: <ProductDetail /> },
       { path: "/cart", element: <CartPage /> },
-      // Route cho khách hàng xem đơn hàng
       { path: "/customer/orders", element: <CustomerOrders /> },
+      { path: "/payment", element: <PaymentPage /> }, // Thêm trang thanh toán
     ],
   },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
+  { path: "/forgot-password", element: <ForgotPassword /> },
   {
     path: "/manager",
-    element: <Manager />, // Trang quản lý sản phẩm cho manager
+    element: <Manager />, 
     children: [
-      { path: "orders", element: <ManagerOrders /> }, // Manager xem và quản lý đơn hàng
+      { path: "orders", element: <ManagerOrders /> },
     ],
   },
   {
     path: "/manager-staff",
-    element: <ManagerStaff />, // Trang cho nhân viên
+    element: <ManagerStaff />, 
     children: [
-      { path: "orders", element: <StaffOrders /> }, // Nhân viên xem và xử lý đơn hàng
+      { path: "orders", element: <StaffOrders /> },
     ],
   },
-  { path: "/forgot-password", element: <ForgotPassword /> },
   {
-    path: "/staff-orders", // Đường dẫn riêng để xem StaffOrders
-    element: <StaffOrders />, // Chỉ hiển thị StaffOrders
+    path: "/manager-orders",
+    element: <ManagerOrders />,
   },
   {
-    path: "/", // Đường dẫn mặc định (root) cũng redirect đến StaffOrders
-    element: <StaffOrders />, // Chỉ hiển thị StaffOrders
-  },
-  {
-    path: "/manager-orders", // Đường dẫn riêng để xem ManagerOrders
-    element: <ManagerOrders />, // Chỉ hiển thị ManagerOrders
-  },
-  {
-    path: "/", // Đường dẫn mặc định (root) cũng redirect đến ManagerOrders
-    element: <ManagerOrders />, // Chỉ hiển thị ManagerOrders
+    path: "/staff-orders",
+    element: <StaffOrders />,
   },
 ]);
 
