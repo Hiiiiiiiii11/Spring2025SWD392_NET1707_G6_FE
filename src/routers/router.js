@@ -23,7 +23,7 @@ const AppRouter = createBrowserRouter([
       { path: "/manager", element: <Manager /> },
       { path: "/products", element: <ProductPage /> },
       { path: "/forgot-password", element: <ForgotPassword /> },
-      { path: "/product/:id", element: <ProductDetail /> },
+      { path: "/products/:id", element: <ProductDetail /> },
       { path: "/cart", element: <CartPage /> },
 
     ],

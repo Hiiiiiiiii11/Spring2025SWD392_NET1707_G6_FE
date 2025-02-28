@@ -17,6 +17,21 @@ export const getAllProductAPI = async () => {
         console.error("Error fetching products:", error);
     }
 };
+export const getProductByIdAPI = async (id) => {
+    try {
+        // const token = sessionStorage.getItem("token");
+        // console.log("Token:", token);
+        const response = await axios.get(`${API_URL}/products/${id}`, {
+            headers: {
+                Accept: "*/*",
+                // Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+    }
+};
 
 // Hàm upload ảnh lên Imgur và trả về URL ảnh
 export const uploadToCloudinary = async (file) => {

@@ -67,7 +67,7 @@ const ProductPage = () => {
                   >
                     Add to Cart
                   </Button>,
-                  <Link to={`/product/${product.productID}`}>View Details</Link>,
+                  <Link to={`/products/${product.productID}`}>View Details</Link>,
                 ]}
               >
                 <Meta
