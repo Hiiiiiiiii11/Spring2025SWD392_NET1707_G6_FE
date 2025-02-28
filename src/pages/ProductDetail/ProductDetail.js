@@ -1,32 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import './ProductDetail.css'; // Corrected path
+import { useNavigate } from 'react-router-dom';
 
-const ProductDetail = ({ products }) => {
+import './ProductDetail.css';
+import { getProductByIdAPI } from '../../services/manageProductService';
+
+const ProductDetail = () => {
   const { id } = useParams();
-  const product = products.find(p => p.id === parseInt(id));
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  if (!product) {
-    return <div>Product not found!</div>;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const data = await getProductByIdAPI(id); // Gọi API
+        setProduct(data);
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+
+  if (loading) return <div>Loading...</div>;
+  if (!product) return <div>Product not found!</div>;
+
+  const handleBacktoProduct = () => {
+    navigate('/products')
   }
 
   return (
     <div className="product-detail-container">
+      <button className="back-to-products" onClick={() => handleBacktoProduct()}>Back to Product</button>
       <div className="product-detail">
         <div className="product-image">
-          <img src={product.image} alt={product.name} />
+          <img src={product.imageURL || "https://via.placeholder.com/300"} alt={product.productName} />
         </div>
         <div className="product-info">
-          <h1>{product.name}</h1>
-          <p className="price">${product.price.toFixed(2)}</p>
-          <p className="rating">⭐ {product.rating} / 5</p>
-          <p className="description">
-            Discover the benefits of {product.name}! This product hydrates, rejuvenates, and protects your skin with natural ingredients. Perfect for daily use.
+          <h1>{product.productName}</h1>
+          <p className="price">
+            {product.price > 1000 ? `${product.price.toLocaleString()}đ` : `$${product.price.toFixed(2)}`}
           </p>
-          <button className="add-to-cart" onClick={() => alert(`✅ Đã thêm "${product.name}" vào giỏ hàng!`)}>
-            Thêm vào giỏ hàng
-          </button>
-          <a href="/products" className="back-to-products">Quay lại danh sách sản phẩm</a>
+          <p className="description">{product.description}</p>
+          <p className="description">Category: {product.category}</p>
+          <p className="description">Skin Type: {product.skinTypeCompatibility}</p>
+          <div className='btn-add-to-cart'>
+            <button className="add-to-cart" onClick={() => alert(`✅ Add "${product.productName}" to Cart!`)}>
+              Add to Cart
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

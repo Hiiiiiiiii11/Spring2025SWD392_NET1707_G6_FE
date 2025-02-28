@@ -9,6 +9,7 @@ import product5 from "../../assets/product5.jpg";
 import product6 from "../../assets/product6.jpg";
 import '../Cart/CartPage.css';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeftOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 
 const productsInCart = [
     { id: 1, name: 'Sữa Rửa Mặt Trắng Da', price: 120000, rating: 4.6, image: product1, brand: "L'Oreal", quantity: 1 },
@@ -30,9 +31,9 @@ const CartPage = () => {
         <div>
             <div className="cart-page">
                 <div className="cartpage-info">
-                    <button className="back-to-product" onClick={() => handleBackToProductPage()}>Back to Products Page</button>
+                    <button className="back-to-product" onClick={() => handleBackToProductPage()}><ArrowLeftOutlined />Products Page</button>
                     <div className='h1-content'>
-                        <h1>Giỏ hàng của bạn</h1>
+                        <h1><ShoppingCartOutlined />&nbsp;Your Cart </h1>
                     </div>
                 </div>
                 {productsInCart.map(product => (

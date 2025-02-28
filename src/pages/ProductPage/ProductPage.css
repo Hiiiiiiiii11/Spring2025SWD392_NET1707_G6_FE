@@ -10,7 +10,7 @@
 
 .product-page h1 {
   text-align: center;
-  color: #333;
+  color: #eea7a7;
   margin-bottom: 20px;
   margin-top: 50px;
 }
@@ -18,10 +18,10 @@
 .search-bar {
   width: 80%;
   max-width: 400px;
-  padding: 10px;
+  padding: 5px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   font-size: 1em;
 }
 

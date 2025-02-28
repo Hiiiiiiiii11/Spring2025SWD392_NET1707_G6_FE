@@ -1,7 +1,6 @@
 .product-detail-container {
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 30px 20px;
   font-family: 'Arial', sans-serif;
   background-color: #f9f9f9;
 }
@@ -35,7 +34,7 @@
 
 .product-info .price {
   font-size: 1.8rem;
-  color: #e74c3c;
+  color: #28a745;
   font-weight: bold;
   margin: 10px 0;
 }
@@ -69,15 +68,16 @@
 }
 
 .back-to-products {
+  margin-bottom: 20px;
   display: inline-block;
   margin-top: 15px;
-  color: #3498db;
+
   text-decoration: none;
   font-size: 1rem;
 }
 
 .back-to-products:hover {
-  text-decoration: underline;
+  color: aqua;
 }
 
 @media (max-width: 768px) {
@@ -90,4 +90,10 @@
     width: 100%;
     height: auto;
   }
+}
+
+.btn-add-to-cart {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 }
