@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Chart } from 'react-chartjs-2';
+import React, { useState, useEffect, useRef } from 'react';
+import { Chart } from 'chart.js/auto';
 import { Card, Table, Statistic, Typography, Button } from 'antd';
 const { Title } = Typography;
 
 const ManagerOrders = () => {
-  // Dữ liệu mẫu (mock data) thay cho API
+  const chartRef = useRef(null); // Thêm useRef để quản lý Chart instance
+
   const [orders, setOrders] = useState([
     {
       orderId: 'ORD001',
@@ -35,56 +36,34 @@ const ManagerOrders = () => {
     paymentStats: { 'Credit Card': 1, 'Cash on Delivery': 1, 'E-Wallet': 1 },
   });
 
-  const handleManageOrder = (orderId) => {
-    setOrders(orders.map(order => 
-      order.orderId === orderId ? { ...order, status: 'Processed' } : order
-    ));
-  };
+  useEffect(() => {
+    if (chartRef.current) {
+      chartRef.current.destroy(); // Phá hủy biểu đồ cũ trước khi tạo mới
+    }
 
-  const paymentChartData = {
-    labels: Object.keys(stats.paymentStats || {}),
-    datasets: [{
-      label: 'Payment Methods Usage',
-      data: Object.values(stats.paymentStats || {}),
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(54, 162, 235, 0.2)',
-        'rgba(255, 206, 86, 0.2)',
-      ],
-      borderColor: [
-        'rgba(255, 99, 132, 1)',
-        'rgba(54, 162, 235, 1)',
-        'rgba(255, 206, 86, 1)',
-      ],
-      borderWidth: 1
-    }]
-  };
+    const ctx = document.getElementById('paymentChart'); 
+    chartRef.current = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(stats.paymentStats || {}),
+        datasets: [
+          {
+            label: 'Payment Methods Usage',
+            data: Object.values(stats.paymentStats || {}),
+            backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+            borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+            borderWidth: 1,
+          },
+        ],
+      },
+    });
 
-  const columns = [
-    { title: 'Order ID', dataIndex: 'orderId', key: 'orderId' },
-    { title: 'Customer', dataIndex: 'customerName', key: 'customerName' },
-    { title: 'Payment Method', dataIndex: 'paymentMethod', key: 'paymentMethod' },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (text) => (
-        <span style={{ color: text === 'Delivered' ? '#27ae60' : '#e67e22', fontWeight: 'bold' }}>
-          {text}
-        </span>
-      ),
-    },
-    { title: 'Total', dataIndex: 'total', key: 'total', render: (text) => `$${text}` },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
-        <Button type="primary" onClick={() => handleManageOrder(record.orderId)}>
-          Manage
-        </Button>
-      ),
-    },
-  ];
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy(); // Phá hủy biểu đồ khi component bị unmount
+      }
+    };
+  }, [stats]);
 
   return (
     <div style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
@@ -98,9 +77,33 @@ const ManagerOrders = () => {
         </Card>
       </div>
       <Card title="Payment Methods Statistics" style={{ marginBottom: 16 }}>
-        <Chart type="pie" data={paymentChartData} />
+        <canvas id="paymentChart"></canvas> {/* Thay Chart component bằng canvas */}
       </Card>
-      <Table columns={columns} dataSource={orders} rowKey="orderId" />
+      <Table
+        columns={[
+          { title: 'Order ID', dataIndex: 'orderId', key: 'orderId' },
+          { title: 'Customer', dataIndex: 'customerName', key: 'customerName' },
+          { title: 'Payment Method', dataIndex: 'paymentMethod', key: 'paymentMethod' },
+          {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (text) => <span style={{ color: text === 'Delivered' ? '#27ae60' : '#e67e22', fontWeight: 'bold' }}>{text}</span>,
+          },
+          { title: 'Total', dataIndex: 'total', key: 'total', render: (text) => `$${text}` },
+          {
+            title: 'Actions',
+            key: 'actions',
+            render: (_, record) => (
+              <Button type="primary" onClick={() => setOrders(orders.map(order => order.orderId === record.orderId ? { ...order, status: 'Processed' } : order))}>
+                Manage
+              </Button>
+            ),
+          },
+        ]}
+        dataSource={orders}
+        rowKey="orderId"
+      />
     </div>
   );
 };
