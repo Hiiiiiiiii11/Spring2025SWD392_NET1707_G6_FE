@@ -24,7 +24,7 @@ const AppRouter = createBrowserRouter([
       { path: "/product/:id", element: <ProductDetail /> },
       { path: "/cart", element: <CartPage /> },
       { path: "/customer/orders", element: <CustomerOrders /> },
-      { path: "/payment", element: <PaymentPage /> }, // Thêm trang thanh toán
+      { path: "/payment", element: <PaymentPage /> }, 
     ],
   },
   { path: "/login", element: <Login /> },
