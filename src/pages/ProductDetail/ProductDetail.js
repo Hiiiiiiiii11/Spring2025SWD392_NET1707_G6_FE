@@ -58,8 +58,13 @@ const ProductDetail = () => {
     if (!selectedProduct) return;
 
     try {
+      if (quantity > selectedProduct.stockQuantity) {
+        alert("Product stock is not available!");
+        return;
+      }
+
       const response = await AddProductToCartAPI({
-        productId: selectedProduct.productID,
+        product: selectedProduct, // Đúng tên biến theo API yêu cầu
         quantity,
       });
 
@@ -72,9 +77,9 @@ const ProductDetail = () => {
       console.error("Error adding product to cart:", error);
       alert("❌ Error adding product to cart!");
     }
-
     setIsModalVisible(false);
   };
+
 
   return (
     <div className="product-detail-container">

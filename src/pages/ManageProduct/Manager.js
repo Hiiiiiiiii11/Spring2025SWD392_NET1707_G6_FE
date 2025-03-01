@@ -130,6 +130,11 @@ function Manager() {
       key: "skinTypeCompatibility",
     },
     {
+      title: "Stock Quantity",
+      dataIndex: "stockQuantity",
+      key: "stockQuantity",
+    },
+    {
       title: "Image",
       dataIndex: "imageURL",
       key: "imageURL",

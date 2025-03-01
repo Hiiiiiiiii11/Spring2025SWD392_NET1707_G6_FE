@@ -3,7 +3,7 @@ import { Card, Button, Spin, message, Modal, InputNumber } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import Footer from "../../components/Footer/Footer";
-import { GetAllProductCartAPI, UpdateQuantityProductAPI } from "../../services/cartService";
+import { GetAllProductCartAPI, UpdateQuantityProductAPI, RemoveProductFromCartAPI } from "../../services/cartService";
 import "../Cart/CartPage.css";
 
 const CartPage = () => {
@@ -12,65 +12,81 @@ const CartPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [newQuantity, setNewQuantity] = useState(1);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false); // State cho modal xác nhận xóa
+    const [productToRemove, setProductToRemove] = useState(null); // Lưu sản phẩm cần xóa
     const navigate = useNavigate();
 
-    // Fetch cart data from API
     useEffect(() => {
-        const fetchCart = async () => {
-            try {
-                const data = await GetAllProductCartAPI();
-                console.log("check data", data);
-
-                // Chuyển đổi dữ liệu: lấy ra `product` và thêm `quantity`
-                const formattedCart = data.map((item) => ({
-                    ...item.product, // Lấy tất cả thông tin trong `product`
-                    quantity: item.quantity, // Thêm `quantity` từ bên ngoài vào
-                }));
-
-                setCartProducts(formattedCart);
-                console.log("cartProducts after set:", formattedCart);
-            } catch (error) {
-                message.error("❌ Failed to fetch cart items!");
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchCart();
     }, []);
 
-    // Mở modal chỉnh sửa số lượng
+    const fetchCart = async () => {
+        try {
+            setLoading(true);
+            const data = await GetAllProductCartAPI();
+            const formattedCart = data.map((item) => ({
+                ...item.product,
+                quantity: item.quantity,
+            }));
+            setCartProducts(formattedCart);
+        } catch (error) {
+            message.error("❌ Failed to fetch cart items!");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Hiển thị modal cập nhật số lượng
     const showUpdateModal = (product) => {
         setSelectedProduct(product);
-        setNewQuantity(product.quantity); // Set số lượng hiện tại
+        setNewQuantity(product.quantity);
         setIsModalOpen(true);
     };
 
-    // Đóng modal
+    // Đóng modal cập nhật số lượng
     const handleCancel = () => {
         setIsModalOpen(false);
         setSelectedProduct(null);
     };
 
-    // Gửi API cập nhật số lượng
+    // Cập nhật số lượng sản phẩm
     const handleUpdateQuantity = async () => {
         if (!selectedProduct) return;
 
         try {
             await UpdateQuantityProductAPI(selectedProduct.productID, newQuantity);
-            alert("✅ Quantity updated successfully!");
-
-            // Cập nhật lại giỏ hàng sau khi chỉnh sửa
+            message.success("✅ Quantity updated successfully!");
             setCartProducts((prevCart) =>
                 prevCart.map((item) =>
                     item.productID === selectedProduct.productID ? { ...item, quantity: newQuantity } : item
                 )
             );
+            handleCancel();
+        } catch (error) {
+            message.error("❌ Failed to update quantity!");
+        }
+    };
 
-            handleCancel(); // Đóng modal
+    // Hiển thị modal xác nhận xóa
+    const showConfirmRemove = (product) => {
+        setProductToRemove(product);
+        setIsConfirmOpen(true);
+    };
+
+    // Xóa sản phẩm khỏi giỏ hàng
+    const handleRemoveProduct = async () => {
+        if (!productToRemove) return;
+
+        try {
+            await RemoveProductFromCartAPI(productToRemove.productID);
+            message.success("✅ Product removed from cart!");
+            setCartProducts((prevCart) => prevCart.filter((item) => item.productID !== productToRemove.productID));
             GetAllProductCartAPI();
         } catch (error) {
-            alert("❌ Failed to update quantity!");
+            message.error("❌ Failed to remove product!");
+        } finally {
+            setIsConfirmOpen(false); // Đóng modal sau khi thực hiện xong
+            setProductToRemove(null);
         }
     };
 
@@ -96,37 +112,26 @@ const CartPage = () => {
                     cartProducts.map((product) => (
                         <Card key={product.productID} className="cart-card" hoverable>
                             <div className="cart-card-content">
-                                {/* Hình ảnh sản phẩm */}
                                 <img
                                     src={product.imageURL || "https://via.placeholder.com/150"}
                                     alt={product.productName}
                                     className="cart-card-image"
                                 />
 
-                                {/* Thông tin sản phẩm */}
                                 <div className="cart-card-info">
                                     <h2>{product.productName}</h2>
-                                    <p>
-                                        <strong>Category:</strong> {product.category}
-                                    </p>
-                                    <p>
-                                        <strong>For Skin Type:</strong> {product.skinTypeCompatibility}
-                                    </p>
-                                    <p className="price">
-                                        <strong>Price:</strong> {product.price ? product.price.toLocaleString() + "$" : "N/A"}
-                                    </p>
-                                    <p>
-                                        <strong>Description:</strong> {product.description}
-                                    </p>
-                                    <p>
-                                        <strong>Quantity:</strong> {product.quantity}
-                                    </p>
+                                    <p><strong>Category:</strong> {product.category}</p>
+                                    <p><strong>For Skin Type:</strong> {product.skinTypeCompatibility}</p>
+                                    <p className="price"><strong>Price:</strong> {product.price ? product.price.toLocaleString() + "$" : "N/A"}</p>
+                                    <p><strong>Description:</strong> {product.description}</p>
+                                    <p><strong>Quantity:</strong> {product.quantity}</p>
+                                    <p className="price" style={{ fontSize: "20px" }}><strong>Total:</strong> {product.price * product.quantity}$</p>
 
                                     <div className="cart-actions">
                                         <Button type="primary" onClick={() => showUpdateModal(product)}>
                                             Update Quantity
                                         </Button>
-                                        <Button type="default" danger>
+                                        <Button type="default" danger onClick={() => showConfirmRemove(product)}>
                                             Remove
                                         </Button>
                                     </div>
@@ -147,16 +152,26 @@ const CartPage = () => {
                 okText="Save"
                 cancelText="Cancel"
             >
-                <p>
-                    <strong>Product:</strong> {selectedProduct?.productName}
-                </p>
+                <p><strong>Product:</strong> {selectedProduct?.productName}</p>
                 Quantity: &nbsp;
                 <InputNumber
                     min={1}
-                    max={selectedProduct?.stockQuantity || 100} // Giới hạn số lượng theo tồn kho
+                    max={selectedProduct?.stockQuantity || 100}
                     value={newQuantity}
                     onChange={(value) => setNewQuantity(value)}
                 />
+            </Modal>
+
+            {/* Modal xác nhận xóa sản phẩm */}
+            <Modal
+                title="Confirm Remove"
+                open={isConfirmOpen}
+                onOk={handleRemoveProduct}
+                onCancel={() => setIsConfirmOpen(false)}
+                okText="Yes"
+                cancelText="No"
+            >
+                <p>Do you want to remove <strong>{productToRemove?.productName}</strong> from your cart?</p>
             </Modal>
         </div>
     );

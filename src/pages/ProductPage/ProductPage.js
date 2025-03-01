@@ -39,11 +39,19 @@ const ProductPage = () => {
 
   const handleAddToCart = async () => {
     if (!selectedProduct) return;
-    console.log(selectedProduct);
+
     try {
+      if (quantity > selectedProduct.stockQuantity) {
+        alert("Product stock is not available!");
+        return;
+      }
+
       const response = await AddProductToCartAPI({
-        selectedProduct, quantity
+        product: selectedProduct, // Đúng tên biến theo API yêu cầu
+        quantity,
       });
+      console.log(response)
+
       if (response) {
         alert(`✅ Added "${selectedProduct.productName}" x${quantity} to cart!`);
       } else {
@@ -55,6 +63,7 @@ const ProductPage = () => {
     }
     setIsModalVisible(false);
   };
+
 
   return (
     <div>
