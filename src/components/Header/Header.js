@@ -24,10 +24,12 @@ function Header() {
       // Assume the decoded token contains a field "role"
       role = userInfo.role;
       sessionStorage.setItem("role", role);
+
     } catch (error) {
       role = "guest";
     }
   }
+  console.log(role);
 
   // Define main menu items based on role
   let menuItems = [];

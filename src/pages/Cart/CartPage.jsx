@@ -1,61 +1,75 @@
-import React from 'react';
-import { Card, Row, Col, Button } from 'antd';
-import Footer from '../../components/Footer/Footer';
-import product1 from "../../assets/product1.jpg";
-import product2 from "../../assets/product2.jpg";
-import product3 from "../../assets/product3.jpg";
-import product4 from "../../assets/product4.jpg";
-import product5 from "../../assets/product5.jpg";
-import product6 from "../../assets/product6.jpg";
-import '../Cart/CartPage.css';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeftOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-
-const productsInCart = [
-    { id: 1, name: 'Sữa Rửa Mặt Trắng Da', price: 120000, rating: 4.6, image: product1, brand: "L'Oreal", quantity: 1 },
-    { id: 2, name: 'Son Môi Đỏ Quyến Rũ', price: 99000, rating: 4.8, image: product2, brand: "Maybelline", quantity: 2 },
-    { id: 3, name: 'Kem Chống Nắng SPF 50+', price: 195000, rating: 4.7, image: product3, brand: "La Roche-Posay", quantity: 1 },
-];
-
-
+import React, { useState, useEffect } from "react";
+import { Card, Button, Spin, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import Footer from "../../components/Footer/Footer";
+import { GetAllProductCartAPI } from "../../services/cartService";
+import "../Cart/CartPage.css";
 
 const CartPage = () => {
+    const [cartProducts, setCartProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    // Fetch cart data from API
+    useEffect(() => {
+        const fetchCart = async () => {
+            try {
+                const data = await GetAllProductCartAPI();
+                console.log(data)
+                setCartProducts(data || []);
+            } catch (error) {
+                message.error("❌ Failed to fetch cart items!");
+            } finally {
+                setLoading(false);
+            }
+        };
 
+        fetchCart();
+    }, []);
 
     const handleBackToProductPage = () => {
-        navigate('/products')
-    }
+        navigate("/products");
+    };
+
     return (
         <div>
             <div className="cart-page">
                 <div className="cartpage-info">
-                    <button className="back-to-product" onClick={() => handleBackToProductPage()}><ArrowLeftOutlined />Products Page</button>
-                    <div className='h1-content'>
-                        <h1><ShoppingCartOutlined />&nbsp;Your Cart </h1>
+                    <button className="back-to-product" onClick={handleBackToProductPage}>
+                        <ArrowLeftOutlined /> Products Page
+                    </button>
+                    <div className="h1-content">
+                        <h1>
+                            <ShoppingCartOutlined />&nbsp;Your Cart{" "}
+                        </h1>
                     </div>
                 </div>
-                {productsInCart.map(product => (
-                    <Card key={product.id} className="cart-card" hoverable>
-                        <div className="cart-card-content">
-                            <img
-                                src={product.image}
-                                alt={product.name}
-                                className="cart-card-image"
-                            />
-                            <div className="cart-card-info">
-                                <h2>{product.name}</h2>
-                                <p>Thương hiệu: {product.brand}</p>
-                                <p className="price">
-                                    {product.price.toLocaleString()}đ
-                                </p>
-                                <p>Số lượng: {product.quantity}</p>
-                                <Button type="primary">Cập nhật</Button>
+
+                {loading ? (
+                    <Spin size="large" />
+                ) : cartProducts.length === 0 ? (
+                    <p>Your cart is empty.</p>
+                ) : (
+                    cartProducts.map((product) => (
+                        <Card key={product.productId} className="cart-card" hoverable>
+                            <div className="cart-card-content">
+                                <img
+                                    src={product.imageURL || "https://via.placeholder.com/150"}
+                                    alt={product.productName}
+                                    className="cart-card-image"
+                                />
+                                <div className="cart-card-info">
+                                    <h2>{product.productName}</h2>
+                                    <p>Thương hiệu: {product.brand || "N/A"}</p>
+                                    <p className="price">{product.price.toLocaleString()}đ</p>
+                                    <p>Số lượng: {product.quantity}</p>
+                                    <Button type="primary">Cập nhật</Button>
+                                </div>
                             </div>
-                        </div>
-                    </Card>
-                ))}
+                        </Card>
+                    ))
+                )}
             </div>
             <Footer />
         </div>
