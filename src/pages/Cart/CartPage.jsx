@@ -61,9 +61,9 @@ const CartPage = () => {
                                 />
                                 <div className="cart-card-info">
                                     <h2>{product.productName}</h2>
-                                    <p>Thương hiệu: {product.brand || "N/A"}</p>
-                                    <p className="price">{product.price.toLocaleString()}đ</p>
-                                    <p>Số lượng: {product.quantity}</p>
+
+                                    <p className="price">{product.price ? product.price.toLocaleString() + "$" : "N/A"}</p>
+                                    <p>Quantity: {product.quantity}</p>
                                     <Button type="primary">Cập nhật</Button>
                                 </div>
                             </div>

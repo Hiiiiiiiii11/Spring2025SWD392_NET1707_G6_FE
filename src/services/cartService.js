@@ -7,6 +7,7 @@ export const GetAllProductCartAPI = async () => {
     try {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(`${API_URL}/cart/view`, {
+            withCredentials: true,
             headers: {
                 Accept: "*/*",
                 "Content-Type": "application/json",
@@ -25,6 +26,7 @@ export const AddProductToCartAPI = async ({ productId, quantity }) => {
         const token = sessionStorage.getItem("token");
         const response = await axios.post(`${API_URL}/cart/add`, { productId, quantity },
             {
+                withCredentials: true,
                 headers: {
                     Accept: "*/*",
                     "Content-Type": "application/json",

@@ -29,7 +29,6 @@ function Header() {
       role = "guest";
     }
   }
-  console.log(role);
 
   // Define main menu items based on role
   let menuItems = [];
@@ -71,6 +70,7 @@ function Header() {
       label: "Logout",
       onClick: () => {
         sessionStorage.removeItem("token");
+        sessionStorage.removeItem("role");
         navigate("/login");
       },
     },
