@@ -7,10 +7,9 @@ export const GetAllProductCartAPI = async () => {
     try {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(`${API_URL}/cart/view`, {
-            withCredentials: true,
             headers: {
+                token,
                 Accept: "*/*",
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
         });
@@ -21,12 +20,11 @@ export const GetAllProductCartAPI = async () => {
     }
 };
 
-export const AddProductToCartAPI = async ({ productId, quantity }) => {
+export const AddProductToCartAPI = async ({ product }) => {
     try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.post(`${API_URL}/cart/add`, { productId, quantity },
+        const response = await axios.post(`${API_URL}/cart/add`, token, { product },
             {
-                withCredentials: true,
                 headers: {
                     Accept: "*/*",
                     "Content-Type": "application/json",

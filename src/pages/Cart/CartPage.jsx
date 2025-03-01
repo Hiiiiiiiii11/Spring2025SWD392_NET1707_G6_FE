@@ -37,7 +37,7 @@ const CartPage = () => {
             <div className="cart-page">
                 <div className="cartpage-info">
                     <button className="back-to-product" onClick={handleBackToProductPage}>
-                        <ArrowLeftOutlined /> Products Page
+                        <ArrowLeftOutlined /> &nbsp;Products Page
                     </button>
                     <div className="h1-content">
                         <h1>
@@ -64,7 +64,7 @@ const CartPage = () => {
 
                                     <p className="price">{product.price ? product.price.toLocaleString() + "$" : "N/A"}</p>
                                     <p>Quantity: {product.quantity}</p>
-                                    <Button type="primary">Cập nhật</Button>
+                                    <Button type="primary">Update Quantity</Button>
                                 </div>
                             </div>
                         </Card>

@@ -91,7 +91,7 @@ function Home() {
           <p className="product__title">All Products</p>
           <Row gutter={[16, 16]}>
             {products.map((product) => (
-              <Col key={product.productID} xs={24} sm={12} md={8} lg={6}>
+              <Col key={product.productID} xs={24} sm={12} md={6} lg={6} xl={6}>
                 <ProductCard product={product} />
               </Col>
             ))}

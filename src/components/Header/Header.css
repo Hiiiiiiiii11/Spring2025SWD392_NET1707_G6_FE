@@ -3,10 +3,9 @@
   width: 100%;
   padding: 8px 0;
   position: fixed;
+  top: 0;
   z-index: 2000;
   background-color: #f5f5f5;
-
-  /* Bạn có thể thêm background hoặc các thuộc tính khác nếu cần */
 }
 
 .nav__container {
@@ -15,8 +14,6 @@
   /* Điều chỉnh phần tử con cách đều nhau */
   align-items: center;
   width: 100%;
-  /* Giới hạn chiều rộng tối đa */
-  margin: 0 auto;
   /* Canh giữa container */
   padding: 0 20px;
   /* Padding bên trái và phải nếu cần */
@@ -110,4 +107,9 @@
 .cart-icon:hover {
   color: #00bbff;
   ;
+}
+
+ul.ant-dropdown-menu.ant-dropdown-menu-root.ant-dropdown-menu-vertical.ant-dropdown-menu-light.css-dev-only-do-not-override-1v613y0 {
+  margin-top: 22px;
+  z-index: 3000 !important;
 }

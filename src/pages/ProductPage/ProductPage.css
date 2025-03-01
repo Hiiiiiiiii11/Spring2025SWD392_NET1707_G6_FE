@@ -140,3 +140,9 @@
   line-height: 22px;
   transition: color 0.2s;
 }
+
+.li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

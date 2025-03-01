@@ -16,39 +16,34 @@ const ProductPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  // Fetch products from API when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       const data = await getAllProductAPI();
       if (data) setProductData(data);
+      console.log(data)
     };
     fetchProducts();
   }, []);
 
-  // Filter products only if a search term is provided; otherwise show all products
   const filteredProducts = searchTerm
     ? productData.filter((product) =>
       product?.productName?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     : productData;
 
-  // Mở Modal chọn số lượng
   const openQuantityModal = (product) => {
     setSelectedProduct(product);
-    setQuantity(1); // Reset số lượng về 1
+    setQuantity(1);
     setIsModalVisible(true);
   };
 
-  // Xử lý thêm vào giỏ hàng sau khi chọn số lượng
   const handleAddToCart = async () => {
     if (!selectedProduct) return;
-
+    console.log(selectedProduct);
     try {
       const response = await AddProductToCartAPI({
-        productId: selectedProduct.productID,
-        quantity,
+        selectedProduct, quantity
       });
-
       if (response) {
         alert(`✅ Added "${selectedProduct.productName}" x${quantity} to cart!`);
       } else {
@@ -58,7 +53,6 @@ const ProductPage = () => {
       console.error("Error adding product to cart:", error);
       alert("❌ Error adding product to cart!");
     }
-
     setIsModalVisible(false);
   };
 
@@ -74,9 +68,9 @@ const ProductPage = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ marginBottom: "20px", maxWidth: "400px" }}
         />
-        <Row gutter={[16, 16]}>
+        <Row gutter={[16, 16]} style={{ width: "100%" }}>
           {filteredProducts.map((product) => (
-            <Col key={product.productID} xs={24} sm={12} md={8} lg={6}>
+            <Col key={product.productID} xs={24} sm={12} md={6} lg={6} xl={6}>
               <Card
                 hoverable
                 cover={
@@ -121,7 +115,6 @@ const ProductPage = () => {
       </div>
       <Footer />
 
-      {/* Modal chọn số lượng */}
       <Modal
         title="Select Quantity"
         open={isModalVisible}
@@ -139,7 +132,7 @@ const ProductPage = () => {
               max={99}
               value={quantity}
               onChange={setQuantity}
-              style={{ width: "200px", height: "40px", fontSize: "15px", display: "flex", alignItems: "center" }}
+              style={{ width: "200px", height: "40px", fontSize: "15px" }}
             />
           </>
         )}
