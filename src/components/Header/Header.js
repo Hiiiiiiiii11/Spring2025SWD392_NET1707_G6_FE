@@ -24,6 +24,7 @@ function Header() {
       // Assume the decoded token contains a field "role"
       role = userInfo.role;
       sessionStorage.setItem("role", role);
+
     } catch (error) {
       role = "guest";
     }
@@ -69,6 +70,7 @@ function Header() {
       label: "Logout",
       onClick: () => {
         sessionStorage.removeItem("token");
+        sessionStorage.removeItem("role");
         navigate("/login");
       },
     },

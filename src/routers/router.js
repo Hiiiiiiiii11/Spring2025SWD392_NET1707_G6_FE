@@ -27,9 +27,9 @@ const AppRouter = createBrowserRouter([
         path: "/manage_product",
         element: <PrivateRoute element={<Manager />} allowedRoles={["MANAGER"]} />
       },
-      { path: "/products", element: <ProductPage /> },
+      { path: "/products", element: <PrivateRoute element={<ProductPage />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/product/:id", element: <ProductDetail /> },
-      { path: "/cart", element: <CartPage /> },
+      { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/customer/orders", element: <CustomerOrders /> },
       { path: "/payment", element: <PaymentPage /> },
       {
@@ -40,7 +40,7 @@ const AppRouter = createBrowserRouter([
         path: "/forgot-password",
         element: <PrivateRoute element={<ForgotPassword />} allowedRoles={["GUEST"]} />
       },
-      { path: "/products/:id", element: <ProductDetail /> },
+      { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       {
         path: "/cart",
         element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER_STAFF", "MANAGER"]} />

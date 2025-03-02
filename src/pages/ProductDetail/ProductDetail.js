@@ -4,17 +4,23 @@ import { useNavigate } from 'react-router-dom';
 
 import './ProductDetail.css';
 import { getProductByIdAPI } from '../../services/manageProductService';
+import { InputNumber, Modal } from 'antd';
+import { AddProductToCartAPI } from '../../services/cartService';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const navigate = useNavigate();
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const data = await getProductByIdAPI(id); // Gọi API
+        const data = await getProductByIdAPI(id);
+        console.log(data)// Gọi API
         setProduct(data);
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -24,6 +30,7 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
+
   }, [id]);
 
 
@@ -33,6 +40,36 @@ const ProductDetail = () => {
   const handleBacktoProduct = () => {
     navigate('/products')
   }
+
+  const openQuantityModal = (product) => {
+    setSelectedProduct(product);
+    setQuantity(1); // Reset số lượng về 1
+    setIsModalVisible(true);
+  };
+
+  const handleAddProductToCart = async () => {
+    if (!selectedProduct) return;
+    console.log(selectedProduct);
+
+    try {
+      const response = await AddProductToCartAPI({
+        productId: selectedProduct.productID,
+        quantity,
+      });
+
+      if (response) {
+        alert(`✅ Added "${selectedProduct.productName}" x${quantity} to cart!`);
+      } else {
+        alert("❌ Failed to add product to cart!");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      alert("❌ Error adding product to cart!");
+    }
+
+    setIsModalVisible(false);
+  }
+
 
   return (
     <div className="product-detail-container">
@@ -50,10 +87,32 @@ const ProductDetail = () => {
           <p className="description">Category: {product.category}</p>
           <p className="description">Skin Type: {product.skinTypeCompatibility}</p>
           <div className='btn-add-to-cart'>
-            <button className="add-to-cart" onClick={() => alert(`✅ Add "${product.productName}" to Cart!`)}>
+            <button className="add-to-cart" onClick={() => openQuantityModal(product)}>
               Add to Cart
             </button>
           </div>
+          <Modal
+            title="Select Quantity"
+            open={isModalVisible}
+            onOk={handleAddProductToCart}
+            onCancel={() => setIsModalVisible(false)}
+            okText="Add to Cart"
+          >
+            {selectedProduct && (
+              <>
+                <p>
+                  Adding: <strong>{selectedProduct.productName}</strong>
+                </p>
+                <InputNumber
+                  min={1}
+                  max={99}
+                  value={quantity}
+                  onChange={setQuantity}
+                  style={{ width: "200px", height: "40px", fontSize: "15px", display: "flex", alignItems: "center" }}
+                />
+              </>
+            )}
+          </Modal>
 
         </div>
       </div>
