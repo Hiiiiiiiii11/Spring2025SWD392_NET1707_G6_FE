@@ -70,3 +70,8 @@
 .h1-content {
     width: 100%;
 }
+
+.cart-actions {
+    display: flex;
+    gap: 15px;
+}
