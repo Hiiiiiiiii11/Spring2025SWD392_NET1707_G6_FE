@@ -20,6 +20,7 @@ import Promotion from "../pages/Promotion";
 import Blog from "../pages/Blog";
 import News from "../pages/News";
 import FAQ from "../pages/FAQ";
+import ProfileDetail from "../pages/ProfileDetail";
 
 const AppRouter = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ const AppRouter = createBrowserRouter([
       { path: "/blog", element: <Blog/>},
       { path: "/news", element: <News/>},
       { path: "/faq", element: <FAQ/>},
+      { path: "/profile", element: <ProfileDetail/>},
       
       {
         path: "/manage-staff",
