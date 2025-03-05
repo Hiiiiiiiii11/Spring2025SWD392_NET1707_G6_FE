@@ -19,7 +19,7 @@ import CompareProducts from "../pages/CompareProducts";
 import Promotion from "../pages/Promotion";
 import Blog from "../pages/Blog";
 import News from "../pages/News";
-
+import FAQ from "../pages/FAQ";
 
 const AppRouter = createBrowserRouter([
   {
@@ -40,7 +40,8 @@ const AppRouter = createBrowserRouter([
       { path: "/skin-type-quiz", element: <SkinTypeQuiz/>},
       { path: "/compare-products", element: <CompareProducts/>},
       { path: "/blog", element: <Blog/>},
-      
+      { path: "/news", element: <News/>},
+      { path: "/faq", element: <FAQ/>},
       
       {
         path: "/manage-staff",
