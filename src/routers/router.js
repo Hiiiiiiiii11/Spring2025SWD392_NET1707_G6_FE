@@ -14,8 +14,10 @@ import StaffOrders from "../pages/StaffOrders";
 import ManagerOrders from "../pages/ManagerOrders";
 import PaymentPage from "../pages/Payment/PaymentPage";
 import PrivateRoute from "./privateRouter";
-import Promotion from "../pages/Promotion";
 import SkinTypeQuiz from "../pages/SkinTypeQuiz";
+import CompareProducts from "../pages/CompareProducts";
+import Promotion from "../pages/Promotion";
+
 
 
 
@@ -36,6 +38,7 @@ const AppRouter = createBrowserRouter([
       { path: "/payment", element: <PaymentPage /> },
       { path: "/promotion", element: <Promotion/>},
       { path: "/skin-type-quiz", element: <SkinTypeQuiz/>},
+      { path: "/compare-products", element: <CompareProducts/>},
       
       {
         path: "/manage-staff",
