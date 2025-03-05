@@ -17,8 +17,8 @@ import PrivateRoute from "./privateRouter";
 import SkinTypeQuiz from "../pages/SkinTypeQuiz";
 import CompareProducts from "../pages/CompareProducts";
 import Promotion from "../pages/Promotion";
-
-
+import Blog from "../pages/Blog";
+import News from "../pages/News";
 
 
 const AppRouter = createBrowserRouter([
@@ -39,6 +39,8 @@ const AppRouter = createBrowserRouter([
       { path: "/promotion", element: <Promotion/>},
       { path: "/skin-type-quiz", element: <SkinTypeQuiz/>},
       { path: "/compare-products", element: <CompareProducts/>},
+      { path: "/blog", element: <Blog/>},
+      
       
       {
         path: "/manage-staff",
