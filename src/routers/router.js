@@ -14,6 +14,8 @@ import StaffOrders from "../pages/StaffOrders";
 import ManagerOrders from "../pages/ManagerOrders";
 import PaymentPage from "../pages/Payment/PaymentPage";
 import PrivateRoute from "./privateRouter";
+import Promotion from "../pages/Promotion";
+import SkinTypeQuiz from "../pages/SkinTypeQuiz";
 
 
 
@@ -32,6 +34,9 @@ const AppRouter = createBrowserRouter([
       { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/customer/orders", element: <CustomerOrders /> },
       { path: "/payment", element: <PaymentPage /> },
+      { path: "/promotion", element: <Promotion/>},
+      { path: "/skin-type-quiz", element: <SkinTypeQuiz/>},
+      
       {
         path: "/manage-staff",
         element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} />
