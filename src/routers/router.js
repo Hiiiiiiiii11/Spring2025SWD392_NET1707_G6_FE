@@ -23,6 +23,7 @@ import Blog from "../pages/Blog";
 import News from "../pages/News";
 import FAQ from "../pages/FAQ";
 import ProfileDetail from "../pages/ProfileDetail";
+import InventoryManagement from "../pages/InventoryManagement";
 
 const AppRouter = createBrowserRouter([
   {
@@ -46,6 +47,7 @@ const AppRouter = createBrowserRouter([
       { path: "/news", element: <News/>},
       { path: "/faq", element: <FAQ/>},
       { path: "/profile", element: <ProfileDetail/>},
+      { path: "/inventory", element: <InventoryManagement/>},
       
       {
         path: "/manage-staff",
