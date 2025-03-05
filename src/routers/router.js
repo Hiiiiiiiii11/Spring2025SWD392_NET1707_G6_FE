@@ -16,6 +16,8 @@ import PaymentPage from "../pages/Payment/PaymentPage";
 import PrivateRoute from "./privateRouter";
 import SkinTypeQuiz from "../pages/SkinTypeQuiz";
 import CompareProducts from "../pages/CompareProducts";
+import CustomerManagement from "../pages/CustomerManagement";
+import FeedbackManagement from "../pages/FeedbackManagement";
 import Promotion from "../pages/Promotion";
 import Blog from "../pages/Blog";
 import News from "../pages/News";
