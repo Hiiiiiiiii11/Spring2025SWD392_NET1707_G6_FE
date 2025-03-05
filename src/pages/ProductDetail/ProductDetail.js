@@ -16,6 +16,7 @@ const ProductDetail = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const role = sessionStorage.getItem("role");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,9 +106,12 @@ const ProductDetail = () => {
           <p className="description">{product.description}</p>
           <p className="description">Category: {product.category}</p>
           <p className="description">Skin Type: {product.skinTypeCompatibility}</p>
-          <button className="add-to-cart" onClick={() => openQuantityModal(product)}>
-            Add to Cart
-          </button>
+          <p className="description">✅Available Product: {product.stockQuantity}</p>
+          {role === "CUSTOMER" && (
+            <button className="add-to-cart" onClick={() => openQuantityModal(product)}>
+              Add to Cart
+            </button>
+          )}
         </div>
       </div>
 
@@ -127,9 +131,14 @@ const ProductDetail = () => {
                   />
                 }
                 actions={[
-                  <Button type="primary" onClick={() => openQuantityModal(item)}>
+                  <Button
+                    type="primary"
+                    onClick={() => openQuantityModal(product)}
+                    disabled={role !== "CUSTOMER"} // Chỉ CUSTOMER mới có thể nhấn
+                  >
                     Add to Cart
-                  </Button>,
+                  </Button>
+                  ,
                   <Link to={`/products/${item.productID}`}>View Details</Link>,
                 ]}
               >

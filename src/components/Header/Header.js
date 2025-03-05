@@ -38,6 +38,7 @@ function Header() {
       { label: "Products", path: "/products" },
       { label: "Manage Product", path: "/manage_product" },
       { label: "Manage Employee", path: "/manage-staff" },
+      // { label: "Manage Batch", path: "/batch" },
       { label: "View Order", path: "/view-order" },
     ];
   } else if (role === "CUSTOMER_STAFF") {
@@ -112,7 +113,9 @@ function Header() {
             </>
           ) : (
             <span className="cart-user-icon-sub">
-              <span className="cart-icon" onClick={() => handleNavigate("/cart")}><ShoppingCartOutlined /></span>
+              {role === "CUSTOMER" && (
+                <span className="cart-icon" onClick={() => handleNavigate("/cart")}><ShoppingCartOutlined /></span>
+              )}
 
               <Dropdown overlay={userMenu} trigger={["click"]}>
 

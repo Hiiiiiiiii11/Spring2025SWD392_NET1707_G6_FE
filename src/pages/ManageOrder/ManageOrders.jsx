@@ -3,7 +3,7 @@ import { Chart } from 'chart.js/auto';
 import { Card, Table, Statistic, Typography, Button } from 'antd';
 const { Title } = Typography;
 
-const ManagerOrders = () => {
+const ManageOrders = () => {
   const chartRef = useRef(null); // Thêm useRef để quản lý Chart instance
 
   const [orders, setOrders] = useState([
@@ -41,7 +41,7 @@ const ManagerOrders = () => {
       chartRef.current.destroy(); // Phá hủy biểu đồ cũ trước khi tạo mới
     }
 
-    const ctx = document.getElementById('paymentChart'); 
+    const ctx = document.getElementById('paymentChart');
     chartRef.current = new Chart(ctx, {
       type: 'pie',
       data: {
@@ -108,4 +108,4 @@ const ManagerOrders = () => {
   );
 };
 
-export default ManagerOrders;
+export default ManageOrders;

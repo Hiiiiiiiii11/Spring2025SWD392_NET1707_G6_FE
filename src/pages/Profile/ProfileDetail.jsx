@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Descriptions, Button, Typography, Avatar, Input, Form, Modal } from 'antd';
 const { Title, Text } = Typography;
 
-const ProfileDetail = () => {
+const UserProfile = () => {
   // Dữ liệu mẫu (mock data) cho thông tin hồ sơ, tùy thuộc vào vai trò
   const [profile, setProfile] = useState({
     role: sessionStorage.getItem("role") || "GUEST", // Lấy vai trò từ sessionStorage
@@ -112,4 +112,4 @@ const ProfileDetail = () => {
   );
 };
 
-export default ProfileDetail;
+export default UserProfile;

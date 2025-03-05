@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { List, Card, Button, Typography } from 'antd';
 const { Title, Text } = Typography;
 
-const CustomerOrders = () => {
+const OrderPage = () => {
   // Dữ liệu mẫu (mock data) thay cho API
   const [orders, setOrders] = useState([
     {
@@ -45,7 +45,7 @@ const CustomerOrders = () => {
               <Card title={`Order #${order.orderId}`} style={{ width: '100%' }}>
                 <p>Date: {new Date(order.orderDate).toLocaleDateString()}</p>
                 <p>
-                  Status: 
+                  Status:
                   <Text type={getStatusColor(order.status)} strong>
                     {order.status}
                   </Text>
@@ -74,4 +74,4 @@ const CustomerOrders = () => {
   );
 };
 
-export default CustomerOrders;
+export default OrderPage;

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Table, Input, Button, Form, Modal, Upload, message } from "antd";
+import { Table, Input, Button, Form, Modal, Upload, message, Select } from "antd";
 import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
 import "../ManageProduct/Manager.css";
+import { useNavigate } from "react-router-dom";
 import {
   createNewProductAPI,
   deleteProductAPI,
@@ -19,11 +20,16 @@ function Manager() {
   const [editingProductID, setEditingProductID] = useState(null);
   const [form] = Form.useForm();
   const [file, setFile] = useState(null);
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState(["Cleanser", "Toner", "Serum", "Moisturizer", "Sunscreen", "Night Cream", "Scrub"]);
+  const [fileList, setFileList] = useState([]);
+
 
   useEffect(() => {
     const fetchProducts = async () => {
       const data = await getAllProductAPI();
       if (data) setProducts(data);
+
     };
     fetchProducts();
   }, []);
@@ -37,68 +43,84 @@ function Manager() {
 
   const handleEditProduct = (record) => {
     setEditMode(true);
-    // Lấy productID từ record thay vì record.id
     setEditingProductID(record.productID);
-    form.setFieldsValue(record);
+
+    form.setFieldsValue({
+      ...record,
+      imageURL: record.imageURL || "", // Giữ nguyên đường link ảnh
+    });
+
+    // Nếu có ảnh, đặt vào fileList để hiển thị trên Upload
+    setFileList(record.imageURL ? [{ uid: "-1", url: record.imageURL, name: "Current Image" }] : []);
+
     setIsModalVisible(true);
   };
 
+
+
+
   const handleDeleteProduct = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-    if (confirmDelete) {
-      try {
-        await deleteProductAPI(id);
-        message.success("Product deleted successfully!");
-        const data = await getAllProductAPI();
-        if (data) { setProducts(data) }
-        else {
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error("Delete error:", error);
-        message.error("Failed to delete product. Please try again.");
-      }
+    const product = products.find((p) => p.productID === id);
+
+    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
+    if (!confirmDelete) return;
+
+    if (product && product.stockQuantity > 0) {
+      alert("Cannot delete product with stock remaining!");
+      return;
+    }
+
+    try {
+      await deleteProductAPI(id);
+      alert("Product deleted successfully!");
+      const data = await getAllProductAPI();
+      if (data) setProducts(data);
+    } catch (error) {
+      alert("Failed to delete product. Please try again.");
     }
   };
+
 
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
 
-      // Nếu có file được upload, lấy URL từ Cloudinary
+      let imageURL = values.imageURL; // Giữ nguyên ảnh cũ nếu không có ảnh mới
+
+      // Nếu có file mới được upload, tải ảnh lên Cloudinary
       if (file) {
-        const imageURL = await uploadToCloudinary(file);
-        values.imageURL = imageURL;
+        imageURL = await uploadToCloudinary(file);
       }
-      console.log(values)
+
+      // Gán lại URL ảnh mới (nếu có)
+      values.imageURL = imageURL;
 
       if (editMode) {
-        // Chế độ chỉnh sửa: Gọi API cập nhật sản phẩm
+        // Chế độ chỉnh sửa
         await editProductAPI(editingProductID, values);
-        message.success("Product updated successfully!");
-        const data = await getAllProductAPI();
-        if (data) setProducts(data);
+        alert("Product updated successfully!");
       } else {
-        // Chế độ thêm mới: Gọi API tạo sản phẩm mới
+        // Chế độ thêm mới
         await createNewProductAPI(values);
-        message.success("Product added successfully!");
-        const data = await getAllProductAPI();
-        if (data) setProducts(data);
+        alert("Product added successfully!");
       }
+
+      // Cập nhật lại danh sách sản phẩm sau khi chỉnh sửa/thêm mới
+      const data = await getAllProductAPI();
+      if (data) setProducts(data);
 
       setIsModalVisible(false);
       form.resetFields();
       setFile(null);
+      setFileList([]); // Reset fileList sau khi thành công
 
-      // Cập nhật lại danh sách sản phẩm sau khi thêm/chỉnh sửa
-      const data = await getAllProductAPI();
-      if (data) setProducts(data);
     } catch (error) {
-      console.error("Modal OK error:", error);
       message.error("Error processing product. Please try again.");
     }
+  };
+
+  const handleGoToBatch = (productID) => {
+    navigate(`/manage-batch/${productID}`); // Điều hướng đến trang ManageBatch
   };
 
   const columns = [
@@ -158,6 +180,8 @@ function Manager() {
           >
             Delete
           </Button>
+
+          <Button type="link" onClick={() => handleGoToBatch(record.productID)}>Batch</Button>
         </>
       ),
     },
@@ -211,8 +235,12 @@ function Manager() {
               >
                 <Input placeholder="Price" />
               </Form.Item>
-              <Form.Item name="category" label="Category">
-                <Input placeholder="Category" />
+              <Form.Item name="category" label="Category" rules={[{ required: true, message: "Please select a category" }]}>
+                <Select placeholder="Select category">
+                  {categories.map((cat) => (
+                    <Select.Option key={cat} value={cat}>{cat}</Select.Option>  // ✅ Đúng cách
+                  ))}
+                </Select>
               </Form.Item>
               <Form.Item name="skinTypeCompatibility" label="Skin Type">
                 <Input placeholder="Skin Type" />
@@ -222,15 +250,23 @@ function Manager() {
               </Form.Item>
               <Form.Item name="imageURL" label="Image">
                 <Upload
+                  listType="picture-card"
+                  fileList={fileList}
                   beforeUpload={(file) => {
                     setFile(file);
-                    return false;
+                    setFileList([{ uid: "-1", url: URL.createObjectURL(file), name: file.name }]);
+                    return false; // Không upload ngay, chỉ lưu vào state
                   }}
-                  maxCount={1}
+                  onRemove={() => {
+                    setFile(null);
+                    setFileList([]);
+                  }}
                 >
-                  <Button icon={<UploadOutlined />}>Upload Image</Button>
+                  {fileList.length >= 1 ? null : <Button icon={<UploadOutlined />}>Upload Image</Button>}
                 </Upload>
               </Form.Item>
+
+
             </Form>
           </Modal>
         </div>

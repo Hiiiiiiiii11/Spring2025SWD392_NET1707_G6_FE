@@ -1,0 +1,148 @@
+import React, { useState, useEffect } from "react";
+import { Table, Button, Modal, Form, InputNumber, DatePicker, message, Space } from "antd";
+import { useParams } from "react-router-dom";
+import { createNewBatchAPI, deleteBatchAPI, editBatchAPI, getAllBatchAPI, getBatchByIdAPI } from "../../services/manageBatchService";
+import moment from "moment";
+import { getProductByIdAPI } from "../../services/manageProductService";
+import Header from "../../components/Header/Header";
+import "../ManageBatch/BatchManagement.css";
+
+const BatchManagement = () => {
+  const { productID } = useParams();
+  const [batches, setBatches] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingBatch, setEditingBatch] = useState(null);
+  const [form] = Form.useForm();
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    fetchBatchById();
+  }, [productID]);
+
+
+  const fetchBatchById = async () => {
+    try {
+      const getAllProductIdBatches = await getBatchByIdAPI(productID);
+
+      setBatches(getAllProductIdBatches);
+    } catch (error) {
+      console.error("Failed to fetch batches");
+    }
+  };
+
+  const handleEdit = (batch) => {
+    setIsEditMode(true);
+    setEditingBatch(batch);
+    form.setFieldsValue({
+      quantity: batch.quantity,
+      importDate: moment(batch.importDate),
+      expireDate: moment(batch.expireDate),
+    });
+    setIsModalVisible(true);
+  };
+
+  const handleDelete = async (batchId) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this batch?",
+      okText: "Yes",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await deleteBatchAPI(batchId);
+          message.success("Batch deleted successfully");
+          fetchBatchById();
+        } catch (error) {
+          message.error("Failed to delete batch");
+        }
+      },
+    });
+  };
+
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields();
+      const formattedValues = {
+        ...values,
+        importDate: values.importDate.format("YYYY-MM-DD"),
+        expireDate: values.expireDate.format("YYYY-MM-DD"),
+        productId: productID,
+      };
+
+      if (isEditMode) {
+        await editBatchAPI(editingBatch.batchId, formattedValues);
+        message.success("Batch updated successfully");
+      } else {
+        await createNewBatchAPI(formattedValues);
+        message.success("Batch added successfully");
+      }
+
+      setIsModalVisible(false);
+      form.resetFields();
+      fetchBatchById();
+    } catch (error) {
+      message.error("Failed to save batch");
+    }
+  };
+
+  const columns = [
+    { title: "Quantity", dataIndex: "quantity", key: "quantity" },
+    {
+      title: "Import Date",
+      dataIndex: "importDate",
+      key: "importDate",
+      render: (text) => moment(text).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Expire Date",
+      dataIndex: "expireDate",
+      key: "expireDate",
+      render: (text) => moment(text).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (text, record) => (
+        <Space>
+          <Button type="link" onClick={() => handleEdit(record)}>Edit</Button>
+          <Button type="link" danger onClick={() => handleDelete(record.batchId)}>Delete</Button>
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <div>
+      <Header />
+      <div className="batch-page">
+        <h2 className="batch-header-conte">Manage Batch for {product?.productName || "Product"}</h2>
+        <Button type="primary" onClick={() => { setIsModalVisible(true); setIsEditMode(false); form.resetFields(); }}>
+          Add New Batch
+        </Button>
+        <Table columns={columns} dataSource={batches} rowKey="batchId" />
+
+        <Modal
+          title={isEditMode ? "Edit Batch" : "Add Batch"}
+          open={isModalVisible}
+          onCancel={() => setIsModalVisible(false)}
+          onOk={handleSave}
+          okText="Save"
+        >
+          <Form form={form} layout="vertical">
+            <Form.Item name="quantity" label="Quantity" rules={[{ required: true, message: "Please enter quantity" }]}>
+              <InputNumber min={1} style={{ width: "100%" }} />
+            </Form.Item>
+            <Form.Item name="importDate" label="Import Date" rules={[{ required: true, message: "Please select import date" }]}>
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+            <Form.Item name="expireDate" label="Expire Date" rules={[{ required: true, message: "Please select expire date" }]}>
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
+    </div>
+  );
+};
+
+export default BatchManagement;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Input, Button, Form, Modal, message } from "antd";
+import { Table, Input, Button, Form, Modal, Select, } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import "./ManagerStaff.css";
 import { CreateEmployeeAPI, GetAllEmployeeAPI } from "../../services/manageEmployeeService";
@@ -12,19 +12,24 @@ function ManagerStaff() {
   const [editMode, setEditMode] = useState(false);
   const [editingStaffId, setEditingStaffId] = useState(null);
   const [form] = Form.useForm();
+  const [roles] = useState(["CUSTOMER_STAFF", "MANAGER"]);
 
-  // Gọi API lấy danh sách nhân viên khi component được mount
   useEffect(() => {
-    const fetchEmployees = async () => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
       const employees = await GetAllEmployeeAPI();
       if (employees) {
         setStaffs(employees);
       } else {
-        message.error("Failed to fetch employees!");
+        alert("Failed to load employees!");
       }
-    };
-    fetchEmployees();
-  }, []);
+    } catch (error) {
+      alert("Error fetching employees!");
+    }
+  };
 
   const handleAddNewStaff = () => {
     setEditMode(false);
@@ -54,13 +59,20 @@ function ManagerStaff() {
       const values = await form.validateFields();
 
       if (editMode) {
-        setStaffs((prev) =>
-          prev.map((s) => (s.id === editingStaffId ? { ...s, ...values } : s))
-        );
-        alert("Staff updated successfully!");
+        // 🔹 Gọi API cập nhật nhân viên nếu có
+        // const updatedEmployee = await UpdateEmployeeAPI(editingStaffId, values);
+        // if (updatedEmployee) {
+        //   setStaffs((prev) =>
+        //     prev.map((s) => (s.id === editingStaffId ? updatedEmployee : s))
+        //   );
+        //   alert("Staff updated successfully!");
+        // } else {
+        //   alert("Failed to update staff!");
+        // }
       } else {
+        // Thêm nhân viên mới
         const newEmployeeData = {
-          fullname: values.name,
+          fullname: values.fullname,
           email: values.email,
           phone: values.phone,
           role: values.role.toUpperCase(),
@@ -71,7 +83,6 @@ function ManagerStaff() {
         if (newEmployee) {
           setStaffs((prev) => [...prev, { id: newEmployee.id, ...newEmployeeData }]);
           alert("Staff added successfully!");
-          GetAllEmployeeAPI();
         } else {
           alert("Failed to add staff!");
         }
@@ -84,7 +95,6 @@ function ManagerStaff() {
     }
   };
 
-  // Tránh lỗi filter khi `staffs` là null hoặc undefined
   const filteredStaffs = staffs
     ? staffs.filter((s) => s.fullname.toLowerCase().includes(search.toLowerCase()))
     : [];
@@ -114,7 +124,6 @@ function ManagerStaff() {
   return (
     <div>
       <Header />
-
       <div className="manager-staff-page">
         <div className="manager-container">
           <h2>Manager Staff</h2>
@@ -139,14 +148,14 @@ function ManagerStaff() {
 
           <Modal
             title={editMode ? "Edit Staff" : "Add Staff"}
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleModalOk}
             onCancel={() => setIsModalVisible(false)}
             okText={editMode ? "Save Changes" : "Add Staff"}
           >
             <Form form={form} layout="vertical">
               <Form.Item
-                name="name"
+                name="fullname"
                 label="Full Name"
                 rules={[{ required: true, message: "Name is required!" }]}
               >
@@ -156,11 +165,7 @@ function ManagerStaff() {
                 name="email"
                 label="Email"
                 rules={[
-                  {
-                    required: true,
-                    type: "email",
-                    message: "Email is required!",
-                  },
+                  { required: true, type: "email", message: "Email is required!" },
                 ]}
               >
                 <Input placeholder="Email" />
@@ -175,17 +180,23 @@ function ManagerStaff() {
               <Form.Item
                 name="role"
                 label="Role"
-                rules={[{ required: true, message: "Role is required!" }]}
+                rules={[{ required: true, message: "Please select a role" }]}
               >
-                <Input placeholder="Role" />
+                <Select placeholder="Select role">
+                  {roles.map((rol) => (
+                    <Select.Option key={rol} value={rol}>{rol}</Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
-              <Form.Item
-                name="password"
-                label="Password"
-                rules={[{ required: true, message: "Password is required!" }]}
-              >
-                <Input placeholder="Password" />
-              </Form.Item>
+              {!editMode && (
+                <Form.Item
+                  name="password"
+                  label="Password"
+                  rules={[{ required: true, message: "Password is required!" }]}
+                >
+                  <Input placeholder="Password" />
+                </Form.Item>
+              )}
             </Form>
           </Modal>
         </div>
