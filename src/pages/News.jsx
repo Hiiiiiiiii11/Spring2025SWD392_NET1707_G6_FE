@@ -9,13 +9,13 @@ const News = () => {
       id: "N001",
       title: "New Skincare Trends in 2025",
       content: "Discover the latest skincare trends for this year...",
-      image: "https://source.unsplash.com/400x250/?skincare,beauty",
+      image: "https://i.imgur.com/OIWOaxV.jpeg",
     },
     {
       id: "N002",
       title: "Launch of New Moisturizer Line",
       content: "Our new moisturizer line is now available...",
-      image: "https://source.unsplash.com/400x250/?cosmetics,cream",
+      image: "https://i.imgur.com/OIWOaxV.jpeg",
     },
   ];
 
