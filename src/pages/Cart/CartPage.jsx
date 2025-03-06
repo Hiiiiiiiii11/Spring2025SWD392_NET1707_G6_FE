@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Button, Spin, message, Modal, InputNumber, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom"; // Thêm import Link để điều hướng
 import Footer from "../../components/Footer/Footer";
 import { GetAllProductCartAPI, UpdateQuantityProductAPI, RemoveProductFromCartAPI } from "../../services/cartService";
 import "../Cart/CartPage.css";

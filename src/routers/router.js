@@ -22,6 +22,10 @@ import CompareProducts from "../components/CompareProduct/CompareProducts";
 
 import ManageOrders from "../pages/ManageOrder/ManageOrders";
 import UserProfile from "../pages/Profile/ProfileDetail";
+import PromotionManage from "../pages/PromotionManage";
+import ViewOrderDetail from "../pages/ViewOrderDetail";
+import HistoryOrder from "../pages/HistoryOrder";
+import ViewCartProductDetail from "../pages/ViewCartProductDetail";
 import HistoryOrder from "../pages/HistoryOrder/HistoryOrder";
 
 
@@ -38,6 +42,8 @@ const AppRouter = createBrowserRouter([
       { path: "/products", element: <PrivateRoute element={<ProductPage />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/product/:id", element: <PrivateRoute element={<ProfileDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER"]} /> },
+      { path: "/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
+      { path: "/customer/history", element: <HistoryOrder /> },
       // { path: "/cart/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/historyorders", element: <PrivateRoute element={<HistoryOrder />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/payment", element: <PaymentPage /> },
@@ -48,8 +54,10 @@ const AppRouter = createBrowserRouter([
       { path: "/news", element: <News /> },
       { path: "/faq", element: <FAQ /> },
       { path: "/profile", element: <UserProfile /> },
+      { path: "/view-order-detail", element: <ViewOrderDetail /> },
+      { path: "/promotions", element: <PromotionManage /> },
       { path: "/manage-batch/:productID", element: <PrivateRoute element={<BatchManagement />} allowedRoles={["MANAGER"]} /> },
-
+      { path: "/view-cart-product-detail", element: <ViewCartProductDetail /> },
       {
         path: "/manage-staff",
         element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} />
