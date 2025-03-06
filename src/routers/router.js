@@ -22,6 +22,7 @@ import CompareProducts from "../components/CompareProduct/CompareProducts";
 import OrderPage from "../pages/OrderPage/CustomerOrders";
 import ManageOrders from "../pages/ManageOrder/ManageOrders";
 import UserProfile from "../pages/Profile/ProfileDetail";
+import PromotionManage from "../pages/PromotionManage";
 
 
 const AppRouter = createBrowserRouter([
@@ -46,6 +47,7 @@ const AppRouter = createBrowserRouter([
       { path: "/news", element: <News /> },
       { path: "/faq", element: <FAQ /> },
       { path: "/profile", element: <UserProfile /> },
+      { path: "promotions", element: <PromotionManage/>},
       { path: "/manage-batch/:productID", element: <PrivateRoute element={<BatchManagement />} allowedRoles={["MANAGER"]} /> },
 
       {
