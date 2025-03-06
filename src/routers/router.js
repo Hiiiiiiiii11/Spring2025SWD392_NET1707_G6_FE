@@ -25,6 +25,7 @@ import UserProfile from "../pages/Profile/ProfileDetail";
 import PromotionManage from "../pages/PromotionManage";
 import ViewOrderDetail from "../pages/ViewOrderDetail";
 import HistoryOrder from "../pages/HistoryOrder";
+import ViewCartProductDetail from "../pages/ViewCartProductDetail";
 
 const AppRouter = createBrowserRouter([
   {
@@ -52,6 +53,7 @@ const AppRouter = createBrowserRouter([
       { path: "/view-order-detail", element: <ViewOrderDetail/>},
       { path: "/promotions", element: <PromotionManage/>},
       { path: "/manage-batch/:productID", element: <PrivateRoute element={<BatchManagement />} allowedRoles={["MANAGER"]} /> },
+      { path: "/view-cart-product-detail", element: <ViewCartProductDetail/>},
       {
         path: "/manage-staff",
         element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} />
