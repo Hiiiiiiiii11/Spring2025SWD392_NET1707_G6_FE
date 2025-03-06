@@ -24,6 +24,7 @@ import ManageOrders from "../pages/ManageOrder/ManageOrders";
 import UserProfile from "../pages/Profile/ProfileDetail";
 import PromotionManage from "../pages/PromotionManage";
 import ViewOrderDetail from "../pages/ViewOrderDetail";
+import HistoryOrder from "../pages/HistoryOrder";
 
 const AppRouter = createBrowserRouter([
   {
@@ -39,6 +40,7 @@ const AppRouter = createBrowserRouter([
       { path: "/product/:id", element: <PrivateRoute element={<ProfileDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
+      { path: "/customer/history", element: <HistoryOrder/>},
       { path: "/payment", element: <PaymentPage /> },
       { path: "/promotion", element: <Promotion /> },
       { path: "/skin-type-quiz", element: <SkinTypeQuiz /> },
@@ -50,7 +52,6 @@ const AppRouter = createBrowserRouter([
       { path: "/view-order-detail", element: <ViewOrderDetail/>},
       { path: "/promotions", element: <PromotionManage/>},
       { path: "/manage-batch/:productID", element: <PrivateRoute element={<BatchManagement />} allowedRoles={["MANAGER"]} /> },
-
       {
         path: "/manage-staff",
         element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} />
