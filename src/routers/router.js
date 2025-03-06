@@ -47,7 +47,7 @@ const AppRouter = createBrowserRouter([
       { path: "/news", element: <News /> },
       { path: "/faq", element: <FAQ /> },
       { path: "/profile", element: <UserProfile /> },
-      { path: "promotions", element: <PromotionManage/>},
+      { path: "/promotions", element: <PromotionManage/>},
       { path: "/manage-batch/:productID", element: <PrivateRoute element={<BatchManagement />} allowedRoles={["MANAGER"]} /> },
 
       {
