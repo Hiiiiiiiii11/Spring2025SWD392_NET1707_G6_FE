@@ -16,17 +16,14 @@ import Blog from "../components/Blog/Blog";
 import News from "../components/News/News";
 import FAQ from "../components/FAQ/FAQ";
 import ProfileDetail from "../pages/Profile/ProfileDetail";
-import Promotion from "../pages/ManagePromotion/Promotion";
 import SkinTypeQuiz from "../components/SkinTypeQuiz/SkinTypeQuiz";
 import CompareProducts from "../components/CompareProduct/CompareProducts";
-
 import ManageOrders from "../pages/ManageOrder/ManageOrders";
 import UserProfile from "../pages/Profile/ProfileDetail";
-import PromotionManage from "../pages/PromotionManage";
 import ViewOrderDetail from "../pages/ViewOrderDetail";
-import HistoryOrder from "../pages/HistoryOrder";
-import ViewCartProductDetail from "../pages/ViewCartProductDetail";
-import HistoryOrder from "../pages/HistoryOrder/HistoryOrder";
+import ManagePromotion from "../pages/ManagePromotion/ManagePromotion";
+import CustomerHistoryOrder from "../pages/CustomerHistoryOrder/CustomerHistoryOrder";
+import ViewCartProductDetail from "../pages/CartDetail/ViewCartProductDetail";
 
 
 const AppRouter = createBrowserRouter([
@@ -35,19 +32,14 @@ const AppRouter = createBrowserRouter([
     element: <CustomerLayout />,
     children: [
       { path: "/", element: <Home /> },
-      {
-        path: "/manage_product",
-        element: <PrivateRoute element={<Manager />} allowedRoles={["MANAGER"]} />
-      },
+      { path: "/manage_product", element: <PrivateRoute element={<Manager />} allowedRoles={["MANAGER"]} /> },
       { path: "/products", element: <PrivateRoute element={<ProductPage />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/product/:id", element: <PrivateRoute element={<ProfileDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER"]} /> },
-      { path: "/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
-      { path: "/customer/history", element: <HistoryOrder /> },
-      // { path: "/cart/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
-      { path: "/historyorders", element: <PrivateRoute element={<HistoryOrder />} allowedRoles={["CUSTOMER"]} /> },
+      // { path: "/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
+      { path: "/historyorders", element: <PrivateRoute element={<CustomerHistoryOrder />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/payment", element: <PaymentPage /> },
-      { path: "/promotion", element: <Promotion /> },
+      { path: "/promotion", element: <ManagePromotion /> },
       { path: "/skin-type-quiz", element: <SkinTypeQuiz /> },
       { path: "/compare-products", element: <CompareProducts /> },
       { path: "/blog", element: <Blog /> },
@@ -55,32 +47,18 @@ const AppRouter = createBrowserRouter([
       { path: "/faq", element: <FAQ /> },
       { path: "/profile", element: <UserProfile /> },
       { path: "/view-order-detail", element: <ViewOrderDetail /> },
-      { path: "/promotions", element: <PromotionManage /> },
       { path: "/manage-batch/:productID", element: <PrivateRoute element={<BatchManagement />} allowedRoles={["MANAGER"]} /> },
       { path: "/view-cart-product-detail", element: <ViewCartProductDetail /> },
-      {
-        path: "/manage-staff",
-        element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} />
-      },
-      {
-        path: "/manager-orders",
-        element: <ManageOrders />,
-      },
-      {
-        path: "/forgot-password",
-        element: <PrivateRoute element={<ForgotPassword />} allowedRoles={["GUEST"]} />
-      },
+      { path: "/manage-staff", element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} /> },
+      { path: "/manager-orders", element: <ManageOrders />, },
+      { path: "/forgot-password", element: <PrivateRoute element={<ForgotPassword />} allowedRoles={["GUEST"]} /> },
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
-      {
-        path: "/cart",
-        element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER_STAFF", "MANAGER"]} />
-      },
+      { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER_STAFF", "MANAGER"]} /> },
     ],
   },
 
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
-  { path: "/forgot-password", element: <ForgotPassword /> },
 
 ]);
 

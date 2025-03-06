@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { List, Card, Button, Typography, Radio, Modal, Space } from 'antd';
 const { Title, Text } = Typography;
 
-const HistoryOrder = () => {
+const CustomerHistoryOrder = () => {
   // Dữ liệu mẫu (mock data) thay cho API
   const [orders, setOrders] = useState([
     {
@@ -145,4 +145,4 @@ const HistoryOrder = () => {
   );
 };
 
-export default HistoryOrder;
+export default CustomerHistoryOrder;

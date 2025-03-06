@@ -37,7 +37,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 800, margin: '0 auto' }}>
+    <div style={{ padding: 24, margin: '0 auto' }}>
       <Title level={2}>Profile Details</Title>
       <Card>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>

@@ -39,7 +39,7 @@ function Header() {
       { label: "Manage Product", path: "/manage_product" },
       { label: "Manage Employee", path: "/manage-staff" },
       { label: "Manage Promotion", path: "/promotion" },
-      { label: "View Order", path: "/view-order" },
+      { label: "View Order", path: "/manager-orders" },
     ];
   } else if (role === "CUSTOMER_STAFF") {
     menuItems = [
