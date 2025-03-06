@@ -19,9 +19,10 @@ import ProfileDetail from "../pages/Profile/ProfileDetail";
 import Promotion from "../pages/ManagePromotion/Promotion";
 import SkinTypeQuiz from "../components/SkinTypeQuiz/SkinTypeQuiz";
 import CompareProducts from "../components/CompareProduct/CompareProducts";
-import OrderPage from "../pages/OrderPage/CustomerOrders";
+
 import ManageOrders from "../pages/ManageOrder/ManageOrders";
 import UserProfile from "../pages/Profile/ProfileDetail";
+import HistoryOrder from "../pages/HistoryOrder/HistoryOrder";
 
 
 const AppRouter = createBrowserRouter([
@@ -37,7 +38,8 @@ const AppRouter = createBrowserRouter([
       { path: "/products", element: <PrivateRoute element={<ProductPage />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/product/:id", element: <PrivateRoute element={<ProfileDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER"]} /> },
-      { path: "/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
+      // { path: "/cart/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
+      { path: "/historyorders", element: <PrivateRoute element={<HistoryOrder />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/payment", element: <PaymentPage /> },
       { path: "/promotion", element: <Promotion /> },
       { path: "/skin-type-quiz", element: <SkinTypeQuiz /> },

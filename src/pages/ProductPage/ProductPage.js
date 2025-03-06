@@ -5,7 +5,7 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import "./ProductPage.css";
 import { getAllProductAPI } from "../../services/manageProductService";
-import { AddProductToCartAPI } from "../../services/cartService";
+import { AddProductToCartAPI, GetAllProductCartAPI } from "../../services/cartService";
 
 const { Meta } = Card;
 
@@ -21,7 +21,6 @@ const ProductPage = () => {
     const fetchProducts = async () => {
       const data = await getAllProductAPI();
       if (data) setProductData(data);
-      console.log(data)
     };
     fetchProducts();
   }, []);
@@ -42,16 +41,27 @@ const ProductPage = () => {
     if (!selectedProduct) return;
 
     try {
-      if (quantity > selectedProduct.stockQuantity) {
-        alert("Product stock is not available!");
+      // Lấy danh sách sản phẩm trong giỏ hàng
+      let cartItems = await GetAllProductCartAPI();
+
+      // Kiểm tra nếu cartItems không phải là mảng, đặt giá trị mặc định []
+      cartItems = Array.isArray(cartItems) ? cartItems : [];
+
+      // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
+      const existingItem = cartItems.find(item => item.product.productID === selectedProduct.productID);
+      const currentCartQuantity = existingItem ? existingItem.quantity : 0;
+
+      // Kiểm tra tổng số lượng đã có trong giỏ hàng
+      if (currentCartQuantity + quantity > selectedProduct.stockQuantity) {
+        alert("❌ You cannot add more of this product. Stock limit reached!");
         return;
       }
 
+      // Gọi API thêm sản phẩm vào giỏ hàng
       const response = await AddProductToCartAPI({
-        product: selectedProduct, // Đúng tên biến theo API yêu cầu
+        product: selectedProduct,
         quantity,
       });
-      console.log(response)
 
       if (response) {
         alert(`✅ Added "${selectedProduct.productName}" x${quantity} to cart!`);
@@ -59,11 +69,13 @@ const ProductPage = () => {
         alert("❌ Failed to add product to cart!");
       }
     } catch (error) {
-      console.error("Error adding product to cart:", error);
-      alert("❌ Error adding product to cart!");
+      alert("❌ Error adding product to cart! Session Time Out!!!");
     }
+
     setIsModalVisible(false);
   };
+
+
 
 
   return (

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getProductByIdAPI, getAllProductAPI } from "../../services/manageProductService";
 import { InputNumber, Modal, Card, Row, Col, Button } from "antd";
-import { AddProductToCartAPI } from "../../services/cartService";
+import { AddProductToCartAPI, GetAllProductCartAPI } from "../../services/cartService";
 import "./ProductDetail.css";
 
 const { Meta } = Card;
@@ -59,13 +59,25 @@ const ProductDetail = () => {
     if (!selectedProduct) return;
 
     try {
-      if (quantity > selectedProduct.stockQuantity) {
-        alert("Product stock is not available!");
+      // Lấy danh sách sản phẩm trong giỏ hàng
+      let cartItems = await GetAllProductCartAPI();
+
+      // Kiểm tra nếu cartItems không phải là mảng, đặt giá trị mặc định []
+      cartItems = Array.isArray(cartItems) ? cartItems : [];
+
+      // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
+      const existingItem = cartItems.find(item => item.product.productID === selectedProduct.productID);
+      const currentCartQuantity = existingItem ? existingItem.quantity : 0;
+
+      // Kiểm tra tổng số lượng đã có trong giỏ hàng
+      if (currentCartQuantity + quantity > selectedProduct.stockQuantity) {
+        alert("❌ You cannot add more of this product. Stock limit reached!");
         return;
       }
 
+      // Gọi API thêm sản phẩm vào giỏ hàng
       const response = await AddProductToCartAPI({
-        product: selectedProduct, // Đúng tên biến theo API yêu cầu
+        product: selectedProduct,
         quantity,
       });
 
@@ -76,10 +88,12 @@ const ProductDetail = () => {
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
-      alert("❌ Error adding product to cart!");
+      alert("❌ Error adding product to cart! Session Time Out!!!");
     }
+
     setIsModalVisible(false);
   };
+
 
 
   return (
@@ -152,6 +166,7 @@ const ProductDetail = () => {
                           : "$" + item.price.toFixed(2)}
                       </p>
                       {item.category && <p className="brand">Category: {item.category}</p>}
+                      <p className="available-product">✅Available Product: {product.stockQuantity}</p>
                     </>
                   }
                 />

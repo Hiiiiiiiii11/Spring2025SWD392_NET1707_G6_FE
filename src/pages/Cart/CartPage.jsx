@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Spin, message, Modal, InputNumber } from "antd";
+import { Card, Button, Spin, message, Modal, InputNumber, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import Footer from "../../components/Footer/Footer";
@@ -12,8 +12,9 @@ const CartPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [newQuantity, setNewQuantity] = useState(1);
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false); // State cho modal xác nhận xóa
-    const [productToRemove, setProductToRemove] = useState(null); // Lưu sản phẩm cần xóa
+    const [selectedProducts, setSelectedProducts] = useState([]); // Danh sách sản phẩm được chọn
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [productToRemove, setProductToRemove] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,32 +31,31 @@ const CartPage = () => {
             }));
             setCartProducts(formattedCart);
         } catch (error) {
-            message.error("❌ Failed to fetch cart items!");
         } finally {
             setLoading(false);
         }
     };
 
-    // Hiển thị modal cập nhật số lượng
     const showUpdateModal = (product) => {
         setSelectedProduct(product);
         setNewQuantity(product.quantity);
         setIsModalOpen(true);
     };
 
-    // Đóng modal cập nhật số lượng
     const handleCancel = () => {
         setIsModalOpen(false);
         setSelectedProduct(null);
     };
+    const handleOrderProduct = () => {
+        navigate('customer/orders');
+    }
 
-    // Cập nhật số lượng sản phẩm
     const handleUpdateQuantity = async () => {
         if (!selectedProduct) return;
 
         try {
             await UpdateQuantityProductAPI(selectedProduct.productID, newQuantity);
-            message.success("✅ Quantity updated successfully!");
+            alert("✅ Quantity updated successfully!");
             setCartProducts((prevCart) =>
                 prevCart.map((item) =>
                     item.productID === selectedProduct.productID ? { ...item, quantity: newQuantity } : item
@@ -63,30 +63,51 @@ const CartPage = () => {
             );
             handleCancel();
         } catch (error) {
-            message.error("❌ Failed to update quantity!");
+            alert("❌ Failed to update quantity!");
         }
     };
 
-    // Hiển thị modal xác nhận xóa
     const showConfirmRemove = (product) => {
         setProductToRemove(product);
         setIsConfirmOpen(true);
     };
 
-    // Xóa sản phẩm khỏi giỏ hàng
     const handleRemoveProduct = async () => {
         if (!productToRemove) return;
 
         try {
             await RemoveProductFromCartAPI(productToRemove.productID);
-            message.success("✅ Product removed from cart!");
+            alert("✅ Product removed from cart!");
             setCartProducts((prevCart) => prevCart.filter((item) => item.productID !== productToRemove.productID));
-            GetAllProductCartAPI();
         } catch (error) {
-            message.error("❌ Failed to remove product!");
+            alert("❌ Failed to remove product!");
         } finally {
-            setIsConfirmOpen(false); // Đóng modal sau khi thực hiện xong
+            setIsConfirmOpen(false);
             setProductToRemove(null);
+        }
+    };
+
+    // Xử lý chọn/bỏ chọn sản phẩm
+    const handleSelectProduct = (productID, checked) => {
+        setSelectedProducts((prevSelected) =>
+            checked ? [...prevSelected, productID] : prevSelected.filter((id) => id !== productID)
+        );
+    };
+
+    // Xóa nhiều sản phẩm đã chọn
+    const handleRemoveSelectedProducts = async () => {
+        if (selectedProducts.length === 0) {
+            alert("⚠️ Please select at least one product!");
+            return;
+        }
+
+        try {
+            await Promise.all(selectedProducts.map((productID) => RemoveProductFromCartAPI(productID)));
+            alert("✅ Selected products removed!");
+            setCartProducts((prevCart) => prevCart.filter((item) => !selectedProducts.includes(item.productID)));
+            setSelectedProducts([]);
+        } catch (error) {
+            alert("❌ Failed to remove selected products!");
         }
     };
 
@@ -104,46 +125,67 @@ const CartPage = () => {
                     </div>
                 </div>
 
+
                 {loading ? (
                     <Spin size="large" />
                 ) : cartProducts.length === 0 ? (
                     <p>Your cart is empty.</p>
                 ) : (
-                    cartProducts.map((product) => (
-                        <Card key={product.productID} className="cart-card" hoverable>
-                            <div className="cart-card-content">
-                                <img
-                                    src={product.imageURL || "https://via.placeholder.com/150"}
-                                    alt={product.productName}
-                                    className="cart-card-image"
-                                />
+                    <>
+                        <Button
+                            type="primary"
+                            danger
+                            onClick={handleRemoveSelectedProducts}
+                            disabled={selectedProducts.length === 0}
+                            style={{ marginBottom: "10px" }}
+                        >
+                            Remove Selected
+                        </Button>
 
-                                <div className="cart-card-info">
-                                    <h2>{product.productName}</h2>
-                                    <p><strong>Category:</strong> {product.category}</p>
-                                    <p><strong>For Skin Type:</strong> {product.skinTypeCompatibility}</p>
-                                    <p className="price"><strong>Price:</strong> {product.price ? product.price.toLocaleString() + "$" : "N/A"}</p>
-                                    <p><strong>Description:</strong> {product.description}</p>
-                                    <p><strong>Quantity:</strong> {product.quantity}</p>
-                                    <p className="price" style={{ fontSize: "20px" }}><strong>Total:</strong> {product.price * product.quantity}$</p>
+                        {cartProducts.map((product) => (
+                            <Card key={product.productID} className="cart-card" hoverable>
+                                <div className="cart-card-content">
+                                    <Checkbox
+                                        checked={selectedProducts.includes(product.productID)}
+                                        onChange={(e) => handleSelectProduct(product.productID, e.target.checked)}
+                                        style={{ marginRight: "10px" }}
+                                    />
+                                    <img
+                                        src={product.imageURL || "https://via.placeholder.com/150"}
+                                        alt={product.productName}
+                                        className="cart-card-image"
+                                    />
+                                    <div className="cart-card-info">
+                                        <h2>{product.productName}</h2>
+                                        <p><strong>Category:</strong> {product.category}</p>
+                                        <p><strong>For Skin Type:</strong> {product.skinTypeCompatibility}</p>
+                                        <p className="price"><strong>Price:</strong> {product.price ? product.price.toLocaleString() + "$" : "N/A"}</p>
+                                        <p><strong>Description:</strong> {product.description}</p>
+                                        <p><strong>Quantity:</strong> {product.quantity}</p>
+                                        <p className="price" style={{ fontSize: "20px" }}><strong>Total:</strong> {product.price * product.quantity}$</p>
 
-                                    <div className="cart-actions">
-                                        <Button type="primary" onClick={() => showUpdateModal(product)}>
-                                            Update Quantity
-                                        </Button>
-                                        <Button type="default" danger onClick={() => showConfirmRemove(product)}>
-                                            Remove
-                                        </Button>
+                                        <div className="cart-actions">
+                                            <Button type="primary" onClick={() => showUpdateModal(product)}>
+                                                Update Quantity
+                                            </Button>
+                                            <Button type="default" danger onClick={() => showConfirmRemove(product)}>
+                                                Remove
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Card>
-                    ))
+                            </Card>
+                        ))}
+                    </>
                 )}
+                <div className="order-btn">
+                    <button className="order-products" onClick={() => handleOrderProduct()}>Order Products
+
+                    </button>
+                </div>
             </div>
             <Footer />
 
-            {/* Modal chỉnh sửa số lượng */}
             <Modal
                 title="Update Quantity"
                 open={isModalOpen}
@@ -162,7 +204,6 @@ const CartPage = () => {
                 />
             </Modal>
 
-            {/* Modal xác nhận xóa sản phẩm */}
             <Modal
                 title="Confirm Remove"
                 open={isConfirmOpen}
@@ -173,6 +214,7 @@ const CartPage = () => {
             >
                 <p>Do you want to remove <strong>{productToRemove?.productName}</strong> from your cart?</p>
             </Modal>
+
         </div>
     );
 };

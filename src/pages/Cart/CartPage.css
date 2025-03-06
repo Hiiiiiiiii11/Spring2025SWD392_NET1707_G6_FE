@@ -75,3 +75,9 @@
     display: flex;
     gap: 15px;
 }
+
+.order-btn {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+}

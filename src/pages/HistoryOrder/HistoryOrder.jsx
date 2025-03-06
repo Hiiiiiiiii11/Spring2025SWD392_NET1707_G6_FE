@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { List, Card, Button, Typography } from 'antd';
 const { Title, Text } = Typography;
 
-const OrderPage = () => {
+const HistoryOrder = () => {
   // Dữ liệu mẫu (mock data) thay cho API
   const [orders, setOrders] = useState([
     {
@@ -33,8 +33,8 @@ const OrderPage = () => {
   };
 
   return (
-    <div style={{ padding: 24, maxWidth: 800, margin: '0 auto' }}>
-      <Title level={2}>My Orders</Title>
+    <div style={{ padding: 24, margin: '0 auto' }}>
+      <Title level={2}>History Order</Title>
       {orders.length === 0 ? (
         <Text type="secondary">No orders found.</Text>
       ) : (
@@ -51,16 +51,6 @@ const OrderPage = () => {
                   </Text>
                 </p>
                 <p>Payment Method: {order.paymentMethod}</p>
-                <List
-                  dataSource={order.items}
-                  renderItem={(item) => (
-                    <List.Item>
-                      {item.productName} - Quantity: {item.quantity} - Price: ${item.price}
-                    </List.Item>
-                  )}
-                  bordered
-                  size="small"
-                />
                 <p style={{ fontWeight: 'bold', marginTop: 10 }}>Total: ${order.total}</p>
                 <Button type="primary" style={{ marginTop: 10 }}>
                   View Details
@@ -74,4 +64,4 @@ const OrderPage = () => {
   );
 };
 
-export default OrderPage;
+export default HistoryOrder;

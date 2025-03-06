@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, InputNumber, DatePicker, message, Space } from "antd";
 import { useParams } from "react-router-dom";
-import { createNewBatchAPI, deleteBatchAPI, editBatchAPI, getAllBatchAPI, getBatchByIdAPI } from "../../services/manageBatchService";
+import { createNewBatchAPI, deleteBatchAPI, editBatchAPI, getAllBatchByProductIdAPI } from "../../services/manageBatchService";
 import moment from "moment";
-import { getProductByIdAPI } from "../../services/manageProductService";
+
 import Header from "../../components/Header/Header";
 import "../ManageBatch/BatchManagement.css";
 
@@ -23,13 +23,27 @@ const BatchManagement = () => {
 
   const fetchBatchById = async () => {
     try {
-      const getAllProductIdBatches = await getBatchByIdAPI(productID);
+      const getAllProductIdBatches = await getAllBatchByProductIdAPI(productID);
 
       setBatches(getAllProductIdBatches);
     } catch (error) {
       console.error("Failed to fetch batches");
     }
   };
+
+
+  const handleDelete = async (batchId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
+    if (!confirmDelete) return;
+    try {
+      await deleteBatchAPI(batchId);
+      alert("Batch deleted successfully");
+      fetchBatchById();
+    } catch (error) {
+      alert("Failed to delete batch");
+    }
+  }
+
 
   const handleEdit = (batch) => {
     setIsEditMode(true);
@@ -42,48 +56,30 @@ const BatchManagement = () => {
     setIsModalVisible(true);
   };
 
-  const handleDelete = async (batchId) => {
-    Modal.confirm({
-      title: "Are you sure you want to delete this batch?",
-      okText: "Yes",
-      cancelText: "No",
-      onOk: async () => {
-        try {
-          await deleteBatchAPI(batchId);
-          message.success("Batch deleted successfully");
-          fetchBatchById();
-        } catch (error) {
-          message.error("Failed to delete batch");
-        }
-      },
-    });
-  };
-
-  const handleSave = async () => {
+  const handleSaveEditBatch = async () => {
     try {
-      const values = await form.validateFields();
-      const formattedValues = {
-        ...values,
-        importDate: values.importDate.format("YYYY-MM-DD"),
-        expireDate: values.expireDate.format("YYYY-MM-DD"),
-        productId: productID,
+      const values = await form.validateFields(); // Lấy dữ liệu từ form
+
+      const updatedBatch = {
+        batchId: editingBatch.batchId,  // Sử dụng batchId thay vì batchID
+        productId: editingBatch.productId,  // API yêu cầu có productId
+        quantity: values.quantity,
+        importDate: values.importDate.toISOString(), // Chuyển đổi sang ISO-8601
+        expireDate: values.expireDate.toISOString(),
       };
 
-      if (isEditMode) {
-        await editBatchAPI(editingBatch.batchId, formattedValues);
-        message.success("Batch updated successfully");
-      } else {
-        await createNewBatchAPI(formattedValues);
-        message.success("Batch added successfully");
-      }
+      await editBatchAPI(editingBatch.batchId, updatedBatch);
+      alert("✅ Batch updated successfully!");
 
       setIsModalVisible(false);
-      form.resetFields();
-      fetchBatchById();
+      setIsEditMode(false);
+      fetchBatchById(); // Gọi lại danh sách để cập nhật UI
     } catch (error) {
-      message.error("Failed to save batch");
+      console.error("Error updating batch:", error);
+      alert("❌ Failed to update batch!");
     }
   };
+
 
   const columns = [
     { title: "Quantity", dataIndex: "quantity", key: "quantity" },
@@ -125,7 +121,7 @@ const BatchManagement = () => {
           title={isEditMode ? "Edit Batch" : "Add Batch"}
           open={isModalVisible}
           onCancel={() => setIsModalVisible(false)}
-          onOk={handleSave}
+          onOk={handleSaveEditBatch}
           okText="Save"
         >
           <Form form={form} layout="vertical">
@@ -143,6 +139,6 @@ const BatchManagement = () => {
       </div>
     </div>
   );
-};
+}
 
 export default BatchManagement;

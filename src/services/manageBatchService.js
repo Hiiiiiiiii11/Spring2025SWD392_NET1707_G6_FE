@@ -17,6 +17,21 @@ export const getAllBatchAPI = async () => {
         console.error("Error fetching products:", error);
     }
 };
+export const getAllBatchByProductIdAPI = async (productId) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        console.log("Token:", token);
+        const response = await axios.get(`${API_URL}/productBatch/product/${productId}`, {
+            headers: {
+                Accept: "*/*",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+    }
+};
 export const getBatchByIdAPI = async (batchId) => {
     try {
         const token = sessionStorage.getItem("token");
@@ -69,10 +84,10 @@ export const deleteBatchAPI = async (batchId) => {
     }
 };
 
-export const editBatchAPI = async (batchId, BatchData) => {
+export const editBatchAPI = async (batchId, batchData) => {
     try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.put(`${API_URL}/productBatch/${batchId}`, BatchData, {
+        const response = await axios.put(`${API_URL}/productBatch/${batchId}`, batchData, {
             headers: {
                 Accept: "*/*",
                 Authorization: `Bearer ${token}`,

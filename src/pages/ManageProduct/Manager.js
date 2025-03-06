@@ -181,7 +181,7 @@ function Manager() {
             Delete
           </Button>
 
-          <Button type="link" onClick={() => handleGoToBatch(record.productID)}>Batch</Button>
+          <Button type="link" onClick={() => handleGoToBatch(record.productID)}> Manage Batch</Button>
         </>
       ),
     },
