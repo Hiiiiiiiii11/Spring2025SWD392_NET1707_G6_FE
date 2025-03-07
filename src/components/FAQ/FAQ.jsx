@@ -9,7 +9,7 @@ const FAQ = () => {
   ];
 
   return (
-    <div style={{ padding: 24, maxWidth: 800, margin: '0 auto' }}>
+    <div style={{ padding: 24, margin: '0 auto' }}>
       <Title level={2}>Frequently Asked Questions</Title>
       <Collapse accordion>
         {faqs.map((faq, index) => (

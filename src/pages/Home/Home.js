@@ -5,6 +5,9 @@ import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import "./Home.css";
 import { getAllProductAPI } from "../../services/manageProductService";
+import Blog from "../../components/Blog/Blog";
+import FAQ from "../../components/FAQ/FAQ";
+import News from "../../components/News/News";
 
 const { Meta } = Card;
 
@@ -97,6 +100,10 @@ function Home() {
             ))}
           </Row>
         </div>
+        <Blog />
+        <News />
+        <FAQ />
+
       </div>
       <Footer />
     </div>
