@@ -69,7 +69,7 @@ const ManageOrders = () => {
   return (
     <div>
       <Header />
-      <div style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ padding: 24, margin: '0 auto' }}>
         <Title level={2}>Order Management Dashboard</Title>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 16 }}>
           <Card>

@@ -30,7 +30,7 @@ const ProductCard = ({ product }) => (
     <p style={{ color: "green", fontSize: "18px", fontWeight: "bold" }}>
       ${product.price}
     </p>
-    <p
+    {/* <p
       style={{
         fontSize: "14px",
         color: "#555",
@@ -40,7 +40,7 @@ const ProductCard = ({ product }) => (
       }}
     >
       {product.description}
-    </p>
+    </p> */}
     <p style={{ fontSize: "12px", color: "#999", height: "30px" }}>
       Skin Type: {product.skinTypeCompatibility}
     </p>

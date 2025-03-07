@@ -1,0 +1,39 @@
+h2.product-name-confirm {
+    margin: 0;
+}
+
+.card-order-content {
+    display: flex;
+    gap: 20px;
+}
+
+.place-order-submit {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+
+}
+
+
+.header-content-order {
+    display: flex;
+}
+
+.h2-content-order {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.order-create-page {
+    margin: 0px 20px;
+    padding: 0 20px;
+}
+
+button.back-to-cart {
+    margin-top: 30px;
+    display: flex;
+    height: 40px;
+    width: 200px;
+    justify-content: center;
+}

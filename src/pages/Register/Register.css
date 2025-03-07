@@ -9,6 +9,10 @@
     min-height: 100vh;
 }
 
+h2.register-text-h2 {
+    margin-top: 0;
+}
+
 /* ===== Chỉnh lại container chính để có bố cục 2 phần ===== */
 .register-container {
     margin-top: 50px;
@@ -92,7 +96,7 @@ h2 {
 
 /* ===== Nút đăng ký ===== */
 .register-form button {
-    width: 50%;
+    width: 100%;
     padding: 14px;
     background: linear-gradient(135deg, #ff758c, #ff7eb3);
     color: white;

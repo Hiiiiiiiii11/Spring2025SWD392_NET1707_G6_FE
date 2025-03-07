@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { List, Card, Button, Typography, Modal, Space } from 'antd';
 import Header from '../../components/Header/Header';
-import { GetAllHistoryOrderAPI } from '../../services/customerOrder';
+import { GetAllHistoryOrderAPI, GetAllHistoryOrderByIdAPI } from '../../services/customerOrder';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 const { Title, Text } = Typography;
 
 const CustomerHistoryOrder = () => {
@@ -10,7 +11,7 @@ const CustomerHistoryOrder = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const customerId = sessionStorage.getItem("customerId");
-  console.log("check id", customerId);
+
 
   const getStatusColor = (status) => {
     return status === 'Delivered' ? 'success' : 'warning';
@@ -20,7 +21,7 @@ const CustomerHistoryOrder = () => {
   }, [])
   const fetchCustomerHistoryOrder = async () => {
     try {
-      const historyOrder = await GetAllHistoryOrderAPI(customerId);
+      const historyOrder = await GetAllHistoryOrderByIdAPI(customerId);
       console.log(historyOrder)
       if (historyOrder) {
         setOrders(historyOrder);
@@ -41,6 +42,7 @@ const CustomerHistoryOrder = () => {
   return (
     <div>
       <Header />
+
       <div style={{ padding: 24, margin: '0 auto' }}>
         <Title level={2}>History Order</Title>
         {orders.length === 0 ? (

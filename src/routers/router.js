@@ -9,7 +9,6 @@ import CustomerLayout from "../layout/CustomerLayout/CustomerLayout";
 import Home from "../pages/Home/Home";
 import CartPage from "../pages/Cart/CartPage";
 import ManagerStaff from "../pages/ManagerStaff/ManagerStaff";
-import PaymentPage from "../pages/Payment/PaymentPage";
 import PrivateRoute from "./privateRouter";
 import BatchManagement from "../pages/ManageBatch/BatchManagement";
 import Blog from "../components/Blog/Blog";
@@ -24,7 +23,7 @@ import ViewOrderDetail from "../pages/ViewOrderDetail";
 import ManagePromotion from "../pages/ManagePromotion/ManagePromotion";
 import CustomerHistoryOrder from "../pages/CustomerHistoryOrder/CustomerHistoryOrder";
 import ViewCartProductDetail from "../pages/CartDetail/ViewCartProductDetail";
-import OrderConfirmationPage from "../pages/OrderConfirmationPage";
+import OrderConfirmationPage from "../pages/OrderConfirm/OrderConfirmationPage";
 
 
 const AppRouter = createBrowserRouter([
@@ -39,7 +38,6 @@ const AppRouter = createBrowserRouter([
       { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER"]} /> },
       // { path: "/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/historyorders", element: <PrivateRoute element={<CustomerHistoryOrder />} allowedRoles={["CUSTOMER"]} /> },
-      { path: "/payment", element: <PaymentPage /> },
       { path: "/promotion", element: <ManagePromotion /> },
       { path: "/skin-type-quiz", element: <SkinTypeQuiz /> },
       { path: "/compare-products", element: <CompareProducts /> },
@@ -50,12 +48,11 @@ const AppRouter = createBrowserRouter([
       { path: "/view-order-detail", element: <ViewOrderDetail /> },
       { path: "/manage-batch/:productID", element: <PrivateRoute element={<BatchManagement />} allowedRoles={["MANAGER"]} /> },
       { path: "/view-cart-product-detail", element: <ViewCartProductDetail /> },
-      { path: "/order-confirmation", element: <OrderConfirmationPage/>},
+      { path: "/order-confirmation", element: <PrivateRoute element={<OrderConfirmationPage />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/manage-staff", element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} /> },
       { path: "/manager-orders", element: <ManageOrders />, },
-      { path: "/forgot-password", element: <PrivateRoute element={<ForgotPassword />} allowedRoles={["GUEST"]} /> },
+      { path: "/forgot-password", element: <ForgotPassword /> },
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
-      { path: "/cart", element: <PrivateRoute element={<CartPage />} allowedRoles={["CUSTOMER_STAFF", "MANAGER"]} /> },
     ],
   },
 

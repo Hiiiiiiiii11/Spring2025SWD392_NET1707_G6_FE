@@ -87,7 +87,7 @@ const Register = () => {
         </div>
 
         <div className="register-form-container">
-          <h2>Create an Account</h2>
+          <h2 className="register-text-h2">Create an Account</h2>
           <form onSubmit={handleSubmit} className="register-form">
             <input type="text" name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleChange} />
             {errors.fullName && <p className="error-message">{errors.fullName}</p>}

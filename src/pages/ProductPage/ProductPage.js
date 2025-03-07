@@ -83,13 +83,15 @@ const ProductPage = () => {
       <Header />
       <div className="product-page">
         <h1>Skincare Products</h1>
-        <Input
-          placeholder="Search products..."
-          className="search-bar"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ marginBottom: "20px", maxWidth: "400px" }}
-        />
+        <div className="search-product-page">
+          <Input
+            placeholder="Search products..."
+            className="search-bar"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ marginBottom: "20px", maxWidth: "400px" }}
+          />
+        </div>
         <Row gutter={[16, 16]} style={{ width: "100%" }}>
           {filteredProducts.map((product) => (
             <Col key={product.productID} xs={24} sm={12} md={6} lg={6} xl={6}>

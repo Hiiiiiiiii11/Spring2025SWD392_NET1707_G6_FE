@@ -1,5 +1,5 @@
 .product-page {
-  background: linear-gradient(135deg, #a8edea, #fed6e3);
+
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -145,4 +145,11 @@ li {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.search-product-page {
+  width: 100%;
+  margin-right: 20px;
+  display: flex;
+  justify-content: right;
 }

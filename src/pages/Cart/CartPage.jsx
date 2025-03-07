@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Spin, message, Modal, InputNumber, Checkbox } from "antd";
+import { Card, Button, Spin, Modal, InputNumber, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -13,7 +13,7 @@ const CartPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [newQuantity, setNewQuantity] = useState(1);
-    const [selectedProducts, setSelectedProducts] = useState([]); // Danh sách sản phẩm được chọn (productID)
+    const [selectedProducts, setSelectedProducts] = useState([]);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [productToRemove, setProductToRemove] = useState(null);
     const navigate = useNavigate();
@@ -32,7 +32,7 @@ const CartPage = () => {
             }));
             setCartProducts(formattedCart);
         } catch (error) {
-            message.error("❌ Failed to fetch cart items!");
+            alert("❌ Failed to fetch cart items!");
         } finally {
             setLoading(false);
         }
@@ -52,7 +52,7 @@ const CartPage = () => {
     // Xử lý đặt hàng (chuyển đến OrderConfirmationPage với các sản phẩm được chọn)
     const handleOrderProduct = () => {
         if (selectedProducts.length === 0) {
-            message.warning("⚠️ Please select at least one product to order!");
+            alert("⚠️ Please select at least one product to order!");
             return;
         }
 
@@ -63,6 +63,7 @@ const CartPage = () => {
 
         // Điều hướng đến OrderConfirmationPage và truyền danh sách sản phẩm được chọn qua state
         navigate('/order-confirmation', { state: { selectedItems } });
+        console.log("check select product", selectedItems)
     };
 
     const handleUpdateQuantity = async () => {
@@ -70,7 +71,7 @@ const CartPage = () => {
 
         try {
             await UpdateQuantityProductAPI(selectedProduct.productID, newQuantity);
-            message.success("✅ Quantity updated successfully!");
+            alert("✅ Quantity updated successfully!");
             setCartProducts((prevCart) =>
                 prevCart.map((item) =>
                     item.productID === selectedProduct.productID ? { ...item, quantity: newQuantity } : item
@@ -78,7 +79,7 @@ const CartPage = () => {
             );
             handleCancel();
         } catch (error) {
-            message.error("❌ Failed to update quantity!");
+            alert("❌ Failed to update quantity!");
         }
     };
 
@@ -92,12 +93,12 @@ const CartPage = () => {
 
         try {
             await RemoveProductFromCartAPI(productToRemove.productID);
-            message.success("✅ Product removed from cart!");
+            alert("✅ Product removed from cart!");
             setCartProducts((prevCart) => prevCart.filter((item) => item.productID !== productToRemove.productID));
             setSelectedProducts((prevSelected) => prevSelected.filter((id) => id !== productToRemove.productID));
             fetchCart();
         } catch (error) {
-            message.error("❌ Failed to remove product!");
+            alert("❌ Failed to remove product!");
         } finally {
             setIsConfirmOpen(false);
             setProductToRemove(null);
@@ -114,18 +115,18 @@ const CartPage = () => {
     // Xóa nhiều sản phẩm đã chọn
     const handleRemoveSelectedProducts = async () => {
         if (selectedProducts.length === 0) {
-            message.warning("⚠️ Please select at least one product!");
+            alert("⚠️ Please select at least one product!");
             return;
         }
 
         try {
             await Promise.all(selectedProducts.map((productID) => RemoveProductFromCartAPI(productID)));
-            message.success("✅ Selected products removed!");
+            alert("✅ Selected products removed!");
             setCartProducts((prevCart) => prevCart.filter((item) => !selectedProducts.includes(item.productID)));
             setSelectedProducts([]);
             fetchCart();
         } catch (error) {
-            message.error("❌ Failed to remove selected products!");
+            alert("❌ Failed to remove selected products!");
         }
     };
 
@@ -134,7 +135,7 @@ const CartPage = () => {
             <div className="cart-page">
                 <div className="cartpage-info">
                     <button className="back-to-product" onClick={() => navigate("/products")}>
-                        <ArrowLeftOutlined /> Products Page
+                        <ArrowLeftOutlined /> &nbsp;Products Page
                     </button>
                     <div className="h1-content">
                         <h1>
@@ -198,23 +199,19 @@ const CartPage = () => {
                             </Card>
                         ))}
 
-                        <div className="order-btn">
-                            <button className="order-products" onClick={handleOrderProduct}>
-                                Order Selected Products
-                            </button>
-                        </div>
+                        {cartProducts.length > 0 && (
+                            <div className="order-btn">
+                                <button className="order-products" onClick={() => handleOrderProduct()}>Order Products
+
+                                </button>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
             <Footer />
 
-            {cartProducts.length > 0 && (
-                <div className="order-btn">
-                    <button className="order-products" onClick={() => handleOrderProduct()}>Order Products
 
-                    </button>
-                </div>
-            )}
 
             <Modal
                 title="Update Quantity"
