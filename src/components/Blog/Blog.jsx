@@ -9,25 +9,25 @@ const Blog = () => {
       id: "B001",
       title: "Top 10 Skincare Tips for Oily Skin",
       content: "Learn how to care for oily skin effectively...",
-      image: "https://source.unsplash.com/400x250/?skincare,beauty",
+      image: "https://i.imgur.com/OIWOaxV.jpeg",
     },
     {
       id: "B002",
       title: "Hydrating Masks for Dry Skin",
       content: "Discover the best hydrating masks for dry skin...",
-      image: "https://source.unsplash.com/400x250/?cosmetics,mask",
+      image: "https://i.imgur.com/OIWOaxV.jpeg",
     },
     {
       id: "B003",
       title: "The Benefits of Vitamin C for Your Skin",
       content: "Find out why Vitamin C is essential for healthy skin...",
-      image: "https://source.unsplash.com/400x250/?vitamin,skincare",
+      image: "https://i.imgur.com/OIWOaxV.jpeg",
     },
     {
       id: "B004",
       title: "Nighttime Routine for Glowing Skin",
       content: "Follow these steps for a glowing complexion...",
-      image: "https://source.unsplash.com/400x250/?night,beauty",
+      image: "https://i.imgur.com/OIWOaxV.jpeg",
     },
   ];
 
