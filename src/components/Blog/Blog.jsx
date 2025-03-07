@@ -32,9 +32,9 @@ const Blog = () => {
   ];
 
   return (
-    <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
+    <div style={{ padding: 24, margin: "0 auto" }}>
       <Title level={2} style={{ textAlign: "center", marginBottom: 30 }}>
-        Latest Skincare Blog
+        Skincare Blog
       </Title>
       <List
         grid={{ gutter: 16, column: 2 }}

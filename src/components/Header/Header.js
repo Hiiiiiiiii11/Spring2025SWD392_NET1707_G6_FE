@@ -14,6 +14,7 @@ function Header() {
   const token = sessionStorage.getItem("token");
 
   // Default role and user info
+  let customerId = "";
   let role = "guest";
   let userInfo = null;
 
@@ -24,6 +25,8 @@ function Header() {
       // Assume the decoded token contains a field "role"
       role = userInfo.role;
       sessionStorage.setItem("role", role);
+      customerId = userInfo.customerId;
+      sessionStorage.setItem("customerId", customerId);
 
     } catch (error) {
       role = "guest";

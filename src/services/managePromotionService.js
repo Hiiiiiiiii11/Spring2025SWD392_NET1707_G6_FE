@@ -17,6 +17,21 @@ export const getAllPromotionAPI = async () => {
         console.error("Error fetching products:", error);
     }
 };
+export const getAllPromotionByIdAPI = async (id) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        console.log("Token:", token);
+        const response = await axios.get(`${API_URL}/promotions/${id}`, {
+            headers: {
+                Accept: "*/*",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+    }
+};
 export const getPromotionByIdAPI = async (id) => {
     try {
         const token = sessionStorage.getItem("token");

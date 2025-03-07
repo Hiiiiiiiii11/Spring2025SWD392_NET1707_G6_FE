@@ -20,7 +20,7 @@ const News = () => {
   ];
 
   return (
-    <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
+    <div style={{ padding: 24, margin: "0 auto" }}>
       <Title level={2} style={{ textAlign: "center", marginBottom: 20 }}>
         Latest Skincare News
       </Title>

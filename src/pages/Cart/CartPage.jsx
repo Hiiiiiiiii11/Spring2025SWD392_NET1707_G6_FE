@@ -179,11 +179,13 @@ const CartPage = () => {
                         ))}
                     </>
                 )}
-                <div className="order-btn">
-                    <button className="order-products" onClick={() => handleOrderProduct()}>Order Products
+                {cartProducts.length > 0 && (
+                    <div className="order-btn">
+                        <button className="order-products" onClick={() => handleOrderProduct()}>Order Products
 
-                    </button>
-                </div>
+                        </button>
+                    </div>
+                )}
             </div>
             <Footer />
 
