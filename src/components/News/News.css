@@ -1,0 +1,130 @@
+/* Container chính */
+.news-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 40px;
+  }
+  
+  /* Tiêu đề chính */
+  .news-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #222;
+    text-align: center;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .news-title::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 3px;
+    background-color: #ff6f61;
+    margin: 10px auto;
+  }
+  
+  /* Card tin tức */
+  .news-card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Hình ảnh trong card */
+  .news-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+  
+  /* Tiêu đề trong card */
+  .news-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 10px 0 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Nội dung trong card */
+  .news-card-content {
+    font-size: 14px;
+    color: #777;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Nút Read More */
+  .news-card-button {
+    margin-top: 10px;
+    text-align: right;
+  }
+  
+  .news-card-button .ant-btn-primary {
+    background-color: #ff6f61;
+    border-color: #ff6f61;
+    border-radius: 5px;
+    padding: 5px 15px;
+    font-size: 14px;
+    height: auto;
+    transition: background-color 0.3s ease;
+  }
+  
+  .news-card-button .ant-btn-primary:hover {
+    background-color: #e65a50;
+    border-color: #e65a50;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .news-title {
+      font-size: 24px;
+    }
+  
+    .news-image {
+      height: 150px;
+    }
+  
+    .news-card-title {
+      font-size: 16px;
+    }
+  
+    .news-card-content {
+      font-size: 13px;
+    }
+  
+    .ant-list-grid {
+      grid-template-columns: 1fr; /* 1 cột trên mobile */
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .news-section {
+      padding: 10px;
+    }
+  
+    .news-title {
+      font-size: 20px;
+    }
+  
+    .news-image {
+      height: 120px;
+    }
+  }
