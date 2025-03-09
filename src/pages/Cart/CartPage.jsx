@@ -98,7 +98,6 @@ const CartPage = () => {
             setSelectedProducts((prevSelected) => prevSelected.filter((id) => id !== productToRemove.productID));
             fetchCart();
         } catch (error) {
-            alert("❌ Failed to remove product!");
         } finally {
             setIsConfirmOpen(false);
             setProductToRemove(null);

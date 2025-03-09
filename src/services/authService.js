@@ -21,3 +21,8 @@ export const registerAPI = async (formData) => {
         throw error.response?.data || "Registration failed";
     }
 };
+
+
+
+
+

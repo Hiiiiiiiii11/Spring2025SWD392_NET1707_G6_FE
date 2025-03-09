@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Input, Button, Form, Modal, Upload, message, Select } from "antd";
+import { Table, Input, Button, Form, Modal, Upload, message, Select, Checkbox } from "antd";
 import { SearchOutlined, UploadOutlined } from "@ant-design/icons";
 import "../ManageProduct/Manager.css";
 import { useNavigate } from "react-router-dom";
@@ -22,14 +22,13 @@ function Manager() {
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const [categories, setCategories] = useState(["Cleanser", "Toner", "Serum", "Moisturizer", "Sunscreen", "Night Cream", "Scrub"]);
+  const [skinTypes, setSkinTypes] = useState(["All Skin Types", "Normal", "Oily", "Dry", "Combination", "Sensitive"]);
   const [fileList, setFileList] = useState([]);
-
 
   useEffect(() => {
     const fetchProducts = async () => {
       const data = await getAllProductAPI();
       if (data) setProducts(data);
-
     };
     fetchProducts();
   }, []);
@@ -38,6 +37,7 @@ function Manager() {
     setEditMode(false);
     form.resetFields();
     setFile(null);
+    setFileList([]);
     setIsModalVisible(true);
   };
 
@@ -45,19 +45,21 @@ function Manager() {
     setEditMode(true);
     setEditingProductID(record.productID);
 
+    // Chuyển chuỗi skinTypeCompatibility thành mảng nếu có dữ liệu
+    const skinTypeArray = record.skinTypeCompatibility
+      ? record.skinTypeCompatibility.split(", ").filter(item => item)
+      : [];
+
     form.setFieldsValue({
       ...record,
-      imageURL: record.imageURL || "", // Giữ nguyên đường link ảnh
+      imageURL: record.imageURL || "",
+      skinTypeCompatibility: skinTypeArray,
     });
 
     // Nếu có ảnh, đặt vào fileList để hiển thị trên Upload
     setFileList(record.imageURL ? [{ uid: "-1", url: record.imageURL, name: "Current Image" }] : []);
-
     setIsModalVisible(true);
   };
-
-
-
 
   const handleDeleteProduct = async (id) => {
     const product = products.find((p) => p.productID === id);
@@ -80,7 +82,6 @@ function Manager() {
     }
   };
 
-
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
@@ -92,35 +93,36 @@ function Manager() {
         imageURL = await uploadToCloudinary(file);
       }
 
-      // Gán lại URL ảnh mới (nếu có)
       values.imageURL = imageURL;
 
+      // Nếu giá trị của skinTypeCompatibility là mảng (từ Checkbox.Group),
+      // chuyển thành chuỗi (các phần tử được nối với nhau bởi dấu phẩy)
+      if (Array.isArray(values.skinTypeCompatibility)) {
+        values.skinTypeCompatibility = values.skinTypeCompatibility.join(", ");
+      }
+
       if (editMode) {
-        // Chế độ chỉnh sửa
         await editProductAPI(editingProductID, values);
         alert("Product updated successfully!");
       } else {
-        // Chế độ thêm mới
         await createNewProductAPI(values);
         alert("Product added successfully!");
       }
 
-      // Cập nhật lại danh sách sản phẩm sau khi chỉnh sửa/thêm mới
       const data = await getAllProductAPI();
       if (data) setProducts(data);
 
       setIsModalVisible(false);
       form.resetFields();
       setFile(null);
-      setFileList([]); // Reset fileList sau khi thành công
-
+      setFileList([]);
     } catch (error) {
       message.error("Error processing product. Please try again.");
     }
   };
 
   const handleGoToBatch = (productID) => {
-    navigate(`/manage-batch/${productID}`); // Điều hướng đến trang ManageBatch
+    navigate(`/manage-batch/${productID}`);
   };
 
   const columns = [
@@ -173,15 +175,12 @@ function Manager() {
           <Button type="link" onClick={() => handleEditProduct(record)}>
             Edit
           </Button>
-          <Button
-            type="link"
-            danger
-            onClick={() => handleDeleteProduct(record.productID)}
-          >
+          <Button type="link" danger onClick={() => handleDeleteProduct(record.productID)}>
             Delete
           </Button>
-
-          <Button type="link" onClick={() => handleGoToBatch(record.productID)}> Manage Batch</Button>
+          <Button type="link" onClick={() => handleGoToBatch(record.productID)}>
+            Manage Batch
+          </Button>
         </>
       ),
     },
@@ -210,7 +209,6 @@ function Manager() {
               + Add new product
             </Button>
           </div>
-          {/* Dùng productID làm rowKey */}
           <Table dataSource={products} columns={columns} rowKey="productID" />
 
           <Modal
@@ -235,15 +233,22 @@ function Manager() {
               >
                 <Input placeholder="Price" />
               </Form.Item>
-              <Form.Item name="category" label="Category" rules={[{ required: true, message: "Please select a category" }]}>
+              <Form.Item
+                name="category"
+                label="Category"
+                rules={[{ required: true, message: "Please select a category" }]}
+              >
                 <Select placeholder="Select category">
                   {categories.map((cat) => (
-                    <Select.Option key={cat} value={cat}>{cat}</Select.Option>  // ✅ Đúng cách
+                    <Select.Option key={cat} value={cat}>
+                      {cat}
+                    </Select.Option>
                   ))}
                 </Select>
               </Form.Item>
+              {/* Thay Input cho Skin Type thành Checkbox.Group */}
               <Form.Item name="skinTypeCompatibility" label="Skin Type">
-                <Input placeholder="Skin Type" />
+                <Checkbox.Group options={skinTypes} />
               </Form.Item>
               <Form.Item name="description" label="Description">
                 <Input.TextArea placeholder="Description" />
@@ -265,8 +270,6 @@ function Manager() {
                   {fileList.length >= 1 ? null : <Button icon={<UploadOutlined />}>Upload Image</Button>}
                 </Upload>
               </Form.Item>
-
-
             </Form>
           </Modal>
         </div>
