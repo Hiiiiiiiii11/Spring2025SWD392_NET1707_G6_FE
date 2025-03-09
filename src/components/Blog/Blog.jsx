@@ -1,5 +1,9 @@
 import React from "react";
 import { List, Typography, Card, Button } from "antd";
+<<<<<<< HEAD
+=======
+import "./Blog.css";
+>>>>>>> parent of d0bc59a (css new blog)
 
 const { Title, Text } = Typography;
 
@@ -41,6 +45,7 @@ const Blog = () => {
         dataSource={blogPosts}
         renderItem={(post) => (
           <List.Item>
+<<<<<<< HEAD
             <Card
               hoverable
               cover={
@@ -59,6 +64,15 @@ const Blog = () => {
               <Title level={4}>{post.title}</Title>
               <Text>{post.content}</Text>
               <div style={{ marginTop: 10, textAlign: "right" }}>
+=======
+            <Card hoverable className="blog-card">
+              <img alt={post.title} src={post.image} className="blog-image" />
+              <Title level={4} className="blog-card-title">
+                {post.title}
+              </Title>
+              <Text className="blog-card-content">{post.content}</Text>
+              <div className="blog-card-button">
+>>>>>>> parent of d0bc59a (css new blog)
                 <Button type="primary">Read More</Button>
               </div>
             </Card>

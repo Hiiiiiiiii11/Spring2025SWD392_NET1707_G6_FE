@@ -1,5 +1,9 @@
 import React from "react";
 import { List, Typography, Card, Button } from "antd";
+<<<<<<< HEAD
+=======
+import "./News.css";
+>>>>>>> parent of d0bc59a (css new blog)
 
 const { Title, Text } = Typography;
 
@@ -29,6 +33,7 @@ const News = () => {
         dataSource={newsItems}
         renderItem={(item) => (
           <List.Item>
+<<<<<<< HEAD
             <Card
               hoverable
               cover={
@@ -43,6 +48,15 @@ const News = () => {
               <Title level={4}>{item.title}</Title>
               <Text>{item.content}</Text>
               <div style={{ marginTop: 10, textAlign: "right" }}>
+=======
+            <Card hoverable className="news-card">
+              <img alt={item.title} src={item.image} className="news-image" />
+              <Title level={4} className="news-card-title">
+                {item.title}
+              </Title>
+              <Text className="news-card-content">{item.content}</Text>
+              <div className="news-card-button">
+>>>>>>> parent of d0bc59a (css new blog)
                 <Button type="primary">Read More</Button>
               </div>
             </Card>
