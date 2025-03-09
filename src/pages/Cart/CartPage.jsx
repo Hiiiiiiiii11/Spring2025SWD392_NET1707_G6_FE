@@ -139,7 +139,7 @@ const CartPage = () => {
                     </button>
                     <div className="h1-content">
                         <h1>
-                            <ShoppingCartOutlined /> Your Cart
+                            <ShoppingCartOutlined />&nbsp; Your Cart
                         </h1>
                     </div>
                 </div>
