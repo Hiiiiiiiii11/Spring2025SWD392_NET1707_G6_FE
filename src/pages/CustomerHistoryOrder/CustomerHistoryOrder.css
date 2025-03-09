@@ -1,0 +1,18 @@
+body {
+    height: 100vh;
+}
+
+.card-order-history {
+    display: flex;
+    justify-content: space-between;
+}
+
+.totalprice-history {
+    padding-right: 30px;
+    color: red;
+}
+
+.div-total-price {
+    display: flex;
+    align-items: center;
+}

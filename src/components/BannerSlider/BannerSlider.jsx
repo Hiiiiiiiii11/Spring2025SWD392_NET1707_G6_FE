@@ -1,9 +1,9 @@
 import React from "react";
 import { Carousel } from "antd";
-import slider1 from "../../assets/images/slider/slider1.jpg";
-import slider2 from "../../assets/images/slider/slider2.jpg";
-import slider3 from "../../assets/images/slider/slider3.jpg";
-import slider4 from "../../assets/images/slider/slider4.jpg";
+import slider1 from "../../assets/banner1.jpg";
+import slider2 from "../../assets/banner2.jpg";
+import slider3 from "../../assets/banner3.jpg";
+import slider4 from "../../assets/banner4.jpg";
 import "./bannerSlider.css";
 
 const bannerImages = [slider1, slider2, slider3, slider4];

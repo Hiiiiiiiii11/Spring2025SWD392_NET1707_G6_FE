@@ -32,7 +32,6 @@ const CartPage = () => {
             }));
             setCartProducts(formattedCart);
         } catch (error) {
-            alert("❌ Failed to fetch cart items!");
         } finally {
             setLoading(false);
         }

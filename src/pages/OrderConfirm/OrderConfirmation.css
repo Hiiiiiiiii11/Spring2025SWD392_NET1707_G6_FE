@@ -37,3 +37,14 @@ button.back-to-cart {
     width: 200px;
     justify-content: center;
 }
+
+.edit-delivery-address {
+    display: flex;
+    align-items: center;
+    width: 90%;
+    justify-content: right;
+}
+
+.body-delivery-info {
+    display: flex;
+}

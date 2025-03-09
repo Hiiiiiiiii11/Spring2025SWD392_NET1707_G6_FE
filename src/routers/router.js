@@ -24,6 +24,7 @@ import ManagePromotion from "../pages/ManagePromotion/ManagePromotion";
 import CustomerHistoryOrder from "../pages/CustomerHistoryOrder/CustomerHistoryOrder";
 import ViewCartProductDetail from "../pages/CartDetail/ViewCartProductDetail";
 import OrderConfirmationPage from "../pages/OrderConfirm/OrderConfirmationPage";
+import ManageQuiz from "../pages/ManageQuiz/ManageQuiz";
 
 
 const AppRouter = createBrowserRouter([
@@ -50,6 +51,7 @@ const AppRouter = createBrowserRouter([
       { path: "/view-cart-product-detail", element: <ViewCartProductDetail /> },
       { path: "/order-confirmation", element: <PrivateRoute element={<OrderConfirmationPage />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/manage-staff", element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} /> },
+      { path: "/manage-quiz", element: <PrivateRoute element={<ManageQuiz />} allowedRoles={["MANAGER"]} /> },
       { path: "/manager-orders", element: <ManageOrders />, },
       { path: "/forgot-password", element: <ForgotPassword /> },
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },

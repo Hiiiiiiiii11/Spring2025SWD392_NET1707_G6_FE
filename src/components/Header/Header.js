@@ -45,6 +45,7 @@ function Header() {
       { label: "Manage Product", path: "/manage_product" },
       { label: "Manage Employee", path: "/manage-staff" },
       { label: "Manage Promotion", path: "/promotion" },
+      { label: "Manage Quiz", path: "/manage-quiz" },
       { label: "View Order", path: "/manager-orders" },
     ];
   } else if (role === "CUSTOMER_STAFF") {

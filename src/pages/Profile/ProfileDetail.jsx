@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Descriptions, Button, Typography, Input, Form, Spin } from 'antd';
 import Header from '../../components/Header/Header';
 import "../Profile/ProfileDetail.css";
-import { GetCustomerProfileAPI, UpdateCustomerProfileAPI } from '../../services/userService';
+import { GetCustomerProfileAPI, GetStaffProfileAPI, UpdateCustomerProfileAPI } from '../../services/userService';
 
 const { Title } = Typography;
 
@@ -12,7 +12,8 @@ const UserProfile = () => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const customerId = sessionStorage.getItem('customerId');
-  const role = sessionStorage.getItem('role');
+  const staffId = sessionStorage.getItem('staffId');
+  const role = sessionStorage.getItem("role")
 
   // Lấy dữ liệu profile khi component được mount
   useEffect(() => {
@@ -21,14 +22,14 @@ const UserProfile = () => {
 
   const fetchProfile = async () => {
     try {
-      if (customerId) {
+      if (role === "CUSTOMER") {
         const data = await GetCustomerProfileAPI(customerId);
         setProfile(data);
         setFormData(data);
-      } else if (!customerId) {
-        // const data = await GetCustomerProfileAPI(customerId);
-        // setProfile(data);
-        // setFormData(data);
+      } else if (role === "CUSTOMER_STAFF" || role === "MANAGER") {
+        const data = await GetStaffProfileAPI(staffId);
+        setProfile(data);
+        setFormData(data);
       }
 
 
@@ -43,7 +44,6 @@ const UserProfile = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  console.log(formData)
   // Lưu thay đổi và cập nhật profile qua API
   const handleSave = async () => {
     try {
@@ -76,14 +76,23 @@ const UserProfile = () => {
         <Card>
           {isEditing ? (
             <Form layout="vertical">
-              <Form.Item label="Full Name">
+              {role === "CUSTOMER" && (<Form.Item label="Full Name">
                 <Input
                   name="fullName"
                   value={formData.fullName || ''}
                   onChange={handleChange}
                   placeholder="Enter full name"
                 />
-              </Form.Item>
+              </Form.Item>)}
+              {(role === "CUSTOMER_STAFF" || role === "MANAGER") && (<Form.Item label="Full Name">
+                <Input
+                  name="fullname"
+                  value={formData.fullname || ''}
+                  onChange={handleChange}
+                  placeholder="Enter full name"
+                />
+              </Form.Item>)}
+
               <Form.Item label="Email">
                 <Input
                   name="email"
@@ -119,18 +128,32 @@ const UserProfile = () => {
             </Form>
           ) : (
             <Descriptions column={1} bordered>
-              <Descriptions.Item label="Name">
-                <div className='colum-item-content'>{profile.fullName}</div>
-              </Descriptions.Item>
+              {role === "CUSTOMER" && (
+                <Descriptions.Item label="Full Name">
+                  <div className='colum-item-content'>{profile.fullName}</div>
+                </Descriptions.Item>
+              )}
+              {(role === "CUSTOMER_STAFF" || role === "MANAGER") && (
+                <Descriptions.Item label="Full Name">
+                  <div className='colum-item-content'>{profile.fullname}</div>
+                </Descriptions.Item>
+              )}
+              {(role === "CUSTOMER_STAFF" || role === "MANAGER") && (
+                <Descriptions.Item label="Role">
+                  <div className='colum-item-content'>{profile.role}</div>
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label="Email">
                 <div className='colum-item-content'>{profile.email}</div>
               </Descriptions.Item>
               <Descriptions.Item label="Phone">
                 <div className='colum-item-content'>{profile.phone}</div>
               </Descriptions.Item>
-              <Descriptions.Item label="Address">
-                <div className='colum-item-content'>{profile.address}</div>
-              </Descriptions.Item>
+              {role === "CUSTOMER" && (
+                <Descriptions.Item label="Adress">
+                  <div className='colum-item-content'>{profile.address}</div>
+                </Descriptions.Item>
+              )}
               <Descriptions.Item label="">
                 <Button type="primary" className='colum-item-content' onClick={() => setIsEditing(true)}>
                   Edit Profile

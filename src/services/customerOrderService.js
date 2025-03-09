@@ -37,3 +37,20 @@ export const createOrderAPI = async (order) => {
         throw error.response?.data;
     }
 };
+export const viewOrderDetailByOrderIdAPI = async (id) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.post(`${API_URL}/orders/${id}`, {
+
+            headers: {
+                Authorization: token,
+                Accept: "*/*",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        throw error.response?.data;
+    }
+};
