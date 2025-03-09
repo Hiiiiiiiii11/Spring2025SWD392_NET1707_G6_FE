@@ -34,7 +34,6 @@ const ManagePromotion = () => {
 
   // Columns cho bảng
   const columns = [
-    { title: 'Id', dataIndex: 'promotionId', key: 'promotionId' },
     { title: 'Name', dataIndex: 'promotionName', key: 'promotionName' },
     { title: 'Description', dataIndex: 'description', key: 'description' },
     { title: 'Discount', dataIndex: 'discountPercentage', key: 'discountPercentage' },
@@ -85,10 +84,6 @@ const ManagePromotion = () => {
         await editPromotionAPI(editingPromotion.promotionId, values);
         alert('Update promotion successfully!')
       } else {
-        if (values.promotionId === promotions.promotionId) {
-          alert('Promotion Id is exist!')
-          return;
-        }
         await createNewPromotionAPI(values);
       }
       fetchPromotions();
@@ -142,14 +137,15 @@ const ManagePromotion = () => {
             onFinish={handleSave}
             layout="vertical"
           >
-            {!editingPromotion && (
+            {/* {!editingPromotion && (
               <Form.Item
                 name="promotionId"
                 label="Promotion Id"
                 rules={[{ required: true, message: 'Please enter the promotion Id!' }]}
               >
                 <Input placeholder="Enter promotion Id" />
-              </Form.Item>)}
+              </Form.Item>
+            )} */}
 
             <Form.Item
               name="promotionName"

@@ -24,9 +24,7 @@ const OrderConfirmationPage = () => {
 
     const orderData = {
       orderDate: dayjs().format("YYYY-MM-DD"),
-      status: "Pending",
-      customerId: 1, // Cần thay bằng ID khách hàng thực tế
-      promotionId: 0, // Nếu có mã khuyến mãi, cần cập nhật
+      promotionId: 0,
       staffId: 1, // Nếu cần ghi nhận nhân viên
       orderDetails: selectedItems.map(item => ({
         productId: item.productID,

@@ -14,6 +14,7 @@ function Header() {
   const token = sessionStorage.getItem("token");
 
   // Default role and user info
+  let staffId = "";
   let customerId = "";
   let role = "guest";
   let userInfo = null;
@@ -27,6 +28,8 @@ function Header() {
       sessionStorage.setItem("role", role);
       customerId = userInfo.customerId;
       sessionStorage.setItem("customerId", customerId);
+      staffId = userInfo.staffId;
+      sessionStorage.setItem("staffId", staffId);
 
     } catch (error) {
       role = "guest";
