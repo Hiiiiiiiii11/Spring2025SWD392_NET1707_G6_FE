@@ -56,7 +56,12 @@ const News = () => {
       <div className="news-grid">
         {newsItems.map((item) => (
           <Card key={item.id} hoverable className="news-card">
-            <img alt={item.title} src={item.image} className="news-image" />
+            <img
+              alt={item.title}
+              src={item.image}
+              className="news-image"
+              style={{ height: 180, objectFit: "cover" }}
+            />
             <Title level={4} className="news-card-title">
               {item.title}
             </Title>

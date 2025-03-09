@@ -1,5 +1,5 @@
 import React from "react";
-import { List, Typography, Card, Button } from "antd";
+import { Typography, Card, Button } from "antd";
 import "./Blog.css";
 
 const { Title, Text } = Typography;
@@ -37,29 +37,24 @@ const Blog = () => {
       <Title level={2} className="blog-title">
         Skincare Blog
       </Title>
-      <List
-        grid={{ gutter: 16, column: 2 }}
-        dataSource={blogPosts}
-        renderItem={(post) => (
-          <List.Item>
-            <Card hoverable className="blog-card">
-              <img alt={post.title} src={post.image} className="blog-image" />
-              <Title level={4} className="blog-card-title">
-                {post.title}
-              </Title>
-              <Text className="blog-card-content">{post.content}</Text>
-              <div className="blog-card-button">
-                <Button type="primary">Read More</Button>
-              </div>
-            </Card>
-          </List.Item>
-        )}
-      />
-
       <div className="blog-grid">
         {blogPosts.map((post) => (
-          <Card key={post.id} hoverable className="blog-card">
-            <img alt={post.title} src={post.image} className="blog-image" />
+          <Card
+            key={post.id}
+            hoverable
+            className="blog-card"
+            style={{
+              borderRadius: 10,
+              overflow: "hidden",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <img
+              alt={post.title}
+              src={post.image}
+              className="blog-image"
+              style={{ height: 200, objectFit: "cover" }}
+            />
             <Title level={4} className="blog-card-title">
               {post.title}
             </Title>
