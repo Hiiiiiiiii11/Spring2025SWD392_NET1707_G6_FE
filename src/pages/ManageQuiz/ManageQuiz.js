@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Input, Button, Form, Modal, Select, message } from "antd";
+import { Table, Input, Button, Form, Modal, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import "./ManageQuiz.css";
 import { useNavigate } from "react-router-dom";
@@ -90,24 +90,24 @@ function ManageQuiz() {
             if (editMode) {
                 const updatedQuiz = [];
                 if (updatedQuiz) {
-                    message.success("Quiz question updated successfully!");
+                    alert("Quiz question updated successfully!");
                     fetchQuizzes();
                 } else {
-                    message.error("Failed to update quiz question!");
+                    alert("Failed to update quiz question!");
                 }
             } else {
                 const newQuiz = await CreateNewQuizAPI(quizData);
                 if (newQuiz) {
-                    message.success("Quiz question added successfully!");
+                    alert("Quiz question added successfully!");
                     fetchQuizzes();
                 } else {
-                    message.error("Failed to add quiz question!");
+                    alert("Failed to add quiz question!");
                 }
             }
             setIsModalVisible(false);
             form.resetFields();
         } catch (error) {
-            message.error("Error processing quiz question!");
+            alert("Error processing quiz question!");
         }
     };
 

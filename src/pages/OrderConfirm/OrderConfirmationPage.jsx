@@ -34,13 +34,13 @@ const OrderConfirmationPage = () => {
         address: data.address,
       });
     } catch (error) {
-      message.error("Failed to load profile!");
+      alert("Failed to load profile!");
     }
   };
 
   const onFinish = async () => {
     if (!selectedItems.length) {
-      message.error("❌ No products selected!");
+      alert("❌ No products selected!");
       return;
     }
 
@@ -55,9 +55,12 @@ const OrderConfirmationPage = () => {
     };
 
     try {
-      await createOrderAPI(orderData);
-      alert("✅ Order placed successfully!");
-      navigate("/historyorders");
+      const orderResult = await createOrderAPI(orderData);
+      console.log("Order Result:", orderResult);
+      // Lưu selectedItems vào sessionStorage để PaymentReturnPage có thể lấy để xóa khỏi cart
+      sessionStorage.setItem("selectedItems", JSON.stringify(selectedItems));
+      // Chuyển hướng đến trang thanh toán VNPay (orderResult chứa URL VNPay)
+      window.location.href = `${orderResult}`;
     } catch (error) {
       alert(`❌ Failed to place order: ${error}`);
     }
@@ -108,7 +111,6 @@ const OrderConfirmationPage = () => {
               <Button
                 type="link"
                 onClick={() => {
-                  // Chỉ set giá trị address vào form vì tên không cần chỉnh sửa
                   shippingForm.setFieldsValue({
                     shippingAddress: shippingInfo.address,
                   });
@@ -140,7 +142,7 @@ const OrderConfirmationPage = () => {
                   <Link to={`/view-cart-product-detail?productId=${item.productID}`}>
                     <img
                       src={item.imageURL || "https://via.placeholder.com/150"}
-                      alt={item.name}
+                      alt={item.productName}
                       style={{
                         width: 160,
                         height: 160,
@@ -160,16 +162,6 @@ const OrderConfirmationPage = () => {
                   <p>
                     <strong>Quantity:</strong> {item.quantity}
                   </p>
-                  <div>
-                    <Button
-                      onClick={() => {
-                        setSelectedProduct(item);
-                        setModalVisible(true);
-                      }}
-                    >
-                      Detail
-                    </Button>
-                  </div>
                 </div>
               </div>
             </Card>
@@ -183,79 +175,79 @@ const OrderConfirmationPage = () => {
             </button>
           </Form>
         </div>
-
-        <Modal
-          title="Product Details"
-          visible={modalVisible}
-          onCancel={() => setModalVisible(false)}
-          footer={null}
-        >
-          {selectedProduct && (
-            <div>
-              <img
-                src={selectedProduct.imageURL || "https://via.placeholder.com/150"}
-                alt={selectedProduct.name}
-                style={{
-                  width: "100%",
-                  height: "300px",
-                  objectFit: "cover",
-                  marginTop: "10px",
-                }}
-              />
-              <h2 className="product-name-confirm">{selectedProduct.productName}</h2>
-              <p>
-                <strong>Category:</strong> {selectedProduct.category}
-              </p>
-              {selectedProduct.skinTypeCompatibility && (
-                <p>
-                  <strong>For Skin Type:</strong>{" "}
-                  {selectedProduct.skinTypeCompatibility}
-                </p>
-              )}
-              <p>
-                <strong>Price:</strong>{" "}
-                {selectedProduct.price
-                  ? selectedProduct.price.toLocaleString() + "$"
-                  : "N/A"}
-              </p>
-              <p>
-                <strong>Quantity:</strong> {selectedProduct.quantity}
-              </p>
-              <p>
-                <strong>Description:</strong>{" "}
-                {selectedProduct.description}
-              </p>
-              <p>
-                <strong>Total:</strong>{" "}
-                {(selectedProduct.price * selectedProduct.quantity).toLocaleString()}$
-              </p>
-            </div>
-          )}
-        </Modal>
-
-        {/* Modal chỉnh sửa thông tin người nhận - chỉ edit address */}
-        <Modal
-          title="Edit Delivery Information"
-          visible={shippingModalVisible}
-          onOk={handleShippingModalOk}
-          onCancel={() => setShippingModalVisible(false)}
-          okText="Save"
-        >
-          <Form form={shippingForm} layout="vertical">
-            <Form.Item
-              name="shippingAddress"
-              label="Address"
-              rules={[{ required: true, message: "Address is required!" }]}
-            >
-              <Input.TextArea
-                placeholder="Enter your delivery address"
-                rows={4}
-              />
-            </Form.Item>
-          </Form>
-        </Modal>
       </div>
       <Footer />
+
+      <Modal
+        title="Product Details"
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+      >
+        {selectedProduct && (
+          <div>
+            <img
+              src={selectedProduct.imageURL || "https://via.placeholder.com/150"}
+              alt={selectedProduct.name}
+              style={{
+                width: "100%",
+                height: "300px",
+                objectFit: "cover",
+                marginTop: "10px",
+              }}
+            />
+            <h2 className="product-name-confirm">{selectedProduct.productName}</h2>
+            <p>
+              <strong>Category:</strong> {selectedProduct.category}
+            </p>
+            {selectedProduct.skinTypeCompatibility && (
+              <p>
+                <strong>For Skin Type:</strong>{" "}
+                {selectedProduct.skinTypeCompatibility}
+              </p>
+            )}
+            <p>
+              <strong>Price:</strong>{" "}
+              {selectedProduct.price
+                ? selectedProduct.price.toLocaleString() + "$"
+                : "N/A"}
+            </p>
+            <p>
+              <strong>Quantity:</strong> {selectedProduct.quantity}
+            </p>
+            <p>
+              <strong>Description:</strong>{" "}
+              {selectedProduct.description}
+            </p>
+            <p>
+              <strong>Total:</strong>{" "}
+              {(selectedProduct.price * selectedProduct.quantity).toLocaleString()}$
+            </p>
+          </div>
+        )}
+      </Modal>
+
+      {/* Modal chỉnh sửa thông tin người nhận - chỉ edit address */}
+      <Modal
+        title="Edit Delivery Information"
+        visible={shippingModalVisible}
+        onOk={handleShippingModalOk}
+        onCancel={() => setShippingModalVisible(false)}
+        okText="Save"
+      >
+        <Form form={shippingForm} layout="vertical">
+          <Form.Item
+            name="shippingAddress"
+            label="Address"
+            rules={[{ required: true, message: "Address is required!" }]}
+          >
+            <Input.TextArea
+              placeholder="Enter your delivery address"
+              rows={4}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

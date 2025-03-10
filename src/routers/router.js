@@ -25,6 +25,7 @@ import CustomerHistoryOrder from "../pages/CustomerHistoryOrder/CustomerHistoryO
 import ViewCartProductDetail from "../pages/CartDetail/ViewCartProductDetail";
 import OrderConfirmationPage from "../pages/OrderConfirm/OrderConfirmationPage";
 import ManageQuiz from "../pages/ManageQuiz/ManageQuiz";
+import PaymentReturnPage from "../pages/PaymentReturnPage";
 
 
 const AppRouter = createBrowserRouter([
@@ -50,6 +51,8 @@ const AppRouter = createBrowserRouter([
       { path: "/manage-batch/:productID", element: <PrivateRoute element={<BatchManagement />} allowedRoles={["MANAGER"]} /> },
       { path: "/view-cart-product-detail", element: <ViewCartProductDetail /> },
       { path: "/order-confirmation", element: <PrivateRoute element={<OrderConfirmationPage />} allowedRoles={["CUSTOMER"]} /> },
+
+      { path: "/payment/return", element: <PrivateRoute element={<PaymentReturnPage />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/manage-staff", element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} /> },
       { path: "/manage-quiz", element: <PrivateRoute element={<ManageQuiz />} allowedRoles={["MANAGER"]} /> },
       { path: "/manager-orders", element: <ManageOrders />, },

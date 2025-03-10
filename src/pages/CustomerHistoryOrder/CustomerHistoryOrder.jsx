@@ -68,10 +68,12 @@ const CustomerHistoryOrder = () => {
   return (
     <div>
       <Header />
-      <div style={{ padding: 24, margin: '0 auto' }}>
+      <div style={{ padding: 24, margin: '0 auto', height: "100vh" }}>
         <Title level={2}>History Order</Title>
         {orders.length === 0 ? (
-          <Text type="secondary">No orders found.</Text>
+          <div className="no-order">
+            <Text type="secondary">No orders found.</Text>
+          </div>
         ) : (
           <List
             dataSource={orders}
@@ -81,12 +83,12 @@ const CustomerHistoryOrder = () => {
                   <div className='card-order-history'>
                     <div>
                       <p>
-                        Status:{" "}
+                        Status :{" "}
                         <Text type={getStatusColor(order.status)} strong>
                           {order.status}
                         </Text>
                       </p>
-                      <p>Payment Method: {order.paymentMethod}</p>
+                      <p>Payment Method : VN Pay</p>
                     </div>
                     <div className='div-total-price'>
                       <p className="totalprice-history" style={{ fontWeight: 'bold' }}>Original Total: ${order.totalAmount}</p>

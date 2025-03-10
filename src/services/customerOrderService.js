@@ -54,3 +54,21 @@ export const viewOrderDetailByOrderIdAPI = async (id) => {
         throw error.response?.data;
     }
 };
+
+export const DeleteOrderByIdAPI = async (id) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.delete(`${API_URL}/orders/${id}`,  // Sửa URL API// Body rỗng vì chỉ gửi dữ liệu qua query params
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "*/*",
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        throw error.response?.data;
+    }
+};
