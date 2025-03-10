@@ -15,7 +15,6 @@ import Blog from "../components/Blog/Blog";
 import News from "../components/News/News";
 import FAQ from "../components/FAQ/FAQ";
 import ProfileDetail from "../pages/Profile/ProfileDetail";
-import SkinTypeQuiz from "../components/SkinTypeQuiz/SkinTypeQuiz";
 import CompareProducts from "../components/CompareProduct/CompareProducts";
 import ManageOrders from "../pages/ManageOrder/ManageOrders";
 import UserProfile from "../pages/Profile/ProfileDetail";
@@ -40,7 +39,6 @@ const AppRouter = createBrowserRouter([
       // { path: "/customer/orders", element: <PrivateRoute element={<OrderPage />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/historyorders", element: <PrivateRoute element={<CustomerHistoryOrder />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/promotion", element: <ManagePromotion /> },
-      { path: "/skin-type-quiz", element: <SkinTypeQuiz /> },
       { path: "/compare-products", element: <CompareProducts /> },
       { path: "/blog", element: <Blog /> },
       { path: "/news", element: <News /> },
