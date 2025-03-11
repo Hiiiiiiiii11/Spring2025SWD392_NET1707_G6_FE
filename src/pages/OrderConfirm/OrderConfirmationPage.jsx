@@ -49,14 +49,9 @@ const OrderConfirmationPage = () => {
 
     // Tạo dữ liệu đơn hàng theo đúng format API yêu cầu
     const orderData = {
-      orderId: 0, // API sẽ tự sinh nếu cần
       orderDate: dayjs().format("YYYY-MM-DD"),
-      totalAmount: totalAmount,
-      status: "Place Order",
+      promotionId: "",
       address: shippingInfo.address,
-      customerId: parseInt(customerId) || 0, // Chuyển customerId thành số
-      promotionId: "", // Cập nhật nếu có mã khuyến mãi
-      staffId: "", // Nếu có staffId thì truyền, còn không để 0
       orderDetails: selectedItems.map((item) => ({
         productId: item.productID,
         quantity: item.quantity,
@@ -71,7 +66,7 @@ const OrderConfirmationPage = () => {
       sessionStorage.setItem("selectedItems", JSON.stringify(selectedItems));
 
       // Điều hướng đến trang thanh toán VNPay (orderResult chứa URL)
-      window.open(orderResult, "_blank");
+      window.location.href = `${orderResult}`;
 
     } catch (error) {
       alert(`❌ Failed to place order: ${error}`);
