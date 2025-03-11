@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { List, Card, Button, Typography, Space, message } from 'antd';
 import Header from '../../components/Header/Header';
-import { ArrowLeftOutlined } from '@ant-design/icons';
 import { GetAllHistoryOrderByIdAPI } from '../../services/customerOrderService';
 import { getProductByIdAPI } from '../../services/manageProductService';
 import "../CustomerHistoryOrder/CustomerHistoryOrder.css"

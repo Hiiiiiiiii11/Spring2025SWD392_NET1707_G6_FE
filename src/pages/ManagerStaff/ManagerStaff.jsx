@@ -12,7 +12,7 @@ function ManagerStaff() {
   const [editMode, setEditMode] = useState(false);
   const [editingStaffId, setEditingStaffId] = useState(null);
   const [form] = Form.useForm();
-  const [roles] = useState(["CUSTOMER_STAFF", "MANAGER"]);
+  const [roles] = useState(["CUSTOMER_STAFF"]);
 
   useEffect(() => {
     fetchEmployees();
@@ -96,8 +96,15 @@ function ManagerStaff() {
   };
 
   const filteredStaffs = staffs
-    ? staffs.filter((s) => s.fullname.toLowerCase().includes(search.toLowerCase()))
+    ? staffs.filter(
+      (s) =>
+        s.role === "CUSTOMER_STAFF" &&
+        s.fullname &&
+        s.fullname.toLowerCase().includes((search || "").toLowerCase())
+    )
     : [];
+
+
 
   const columns = [
     {
