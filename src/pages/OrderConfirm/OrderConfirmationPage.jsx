@@ -44,27 +44,40 @@ const OrderConfirmationPage = () => {
       return;
     }
 
+    // Tính tổng tiền của đơn hàng
+    const totalAmount = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // Tạo dữ liệu đơn hàng theo đúng format API yêu cầu
     const orderData = {
+      orderId: 0, // API sẽ tự sinh nếu cần
       orderDate: dayjs().format("YYYY-MM-DD"),
-      promotionId: "",
-      shippingInfo: shippingInfo,
+      totalAmount: totalAmount,
+      status: "Place Order",
+      address: shippingInfo.address,
+      customerId: parseInt(customerId) || 0, // Chuyển customerId thành số
+      promotionId: "", // Cập nhật nếu có mã khuyến mãi
+      staffId: "", // Nếu có staffId thì truyền, còn không để 0
       orderDetails: selectedItems.map((item) => ({
         productId: item.productID,
         quantity: item.quantity,
       })),
     };
-
+    console.log(orderData);
     try {
       const orderResult = await createOrderAPI(orderData);
       console.log("Order Result:", orderResult);
-      // Lưu selectedItems vào sessionStorage để PaymentReturnPage có thể lấy để xóa khỏi cart
+
+      // Lưu selectedItems vào sessionStorage để xóa khỏi giỏ hàng sau khi thanh toán
       sessionStorage.setItem("selectedItems", JSON.stringify(selectedItems));
-      // Chuyển hướng đến trang thanh toán VNPay (orderResult chứa URL VNPay)
-      window.location.href = `${orderResult}`;
+
+      // Điều hướng đến trang thanh toán VNPay (orderResult chứa URL)
+      window.open(orderResult, "_blank");
+
     } catch (error) {
       alert(`❌ Failed to place order: ${error}`);
     }
   };
+
 
   // Modal chỉnh sửa thông tin người nhận chỉ cập nhật địa chỉ, giữ nguyên tên
   const handleShippingModalOk = async () => {

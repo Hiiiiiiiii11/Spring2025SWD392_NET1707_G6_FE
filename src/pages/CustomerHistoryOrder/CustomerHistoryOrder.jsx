@@ -27,9 +27,10 @@ const CustomerHistoryOrder = () => {
   const fetchCustomerHistoryOrder = async () => {
     try {
       const historyOrder = await GetAllHistoryOrderByIdAPI(customerId);
-      console.log(historyOrder);
       if (historyOrder) {
-        setOrders(historyOrder);
+        // Sắp xếp theo ngày giảm dần (mới nhất trước)
+        const sortedOrders = historyOrder.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        setOrders(sortedOrders);
       } else {
         alert("Failed to load orders!");
       }
@@ -37,6 +38,7 @@ const CustomerHistoryOrder = () => {
       alert("Error fetching orders!");
     }
   };
+
 
   // Hàm này sẽ gọi API lấy thông tin chi tiết của từng sản phẩm trong order (dùng order.orderDetails)
   const fetchProductDetailsForOrder = async (order) => {
@@ -89,6 +91,7 @@ const CustomerHistoryOrder = () => {
                         </Text>
                       </p>
                       <p>Payment Method : VN Pay</p>
+                      <p>Order Address :</p>
                     </div>
                     <div className='div-total-price'>
                       <p className="totalprice-history" style={{ fontWeight: 'bold' }}>Original Total: ${order.totalAmount}</p>

@@ -7,34 +7,9 @@ const { Title } = Typography;
 const ManageOrders = () => {
   const chartRef = useRef(null); // Thêm useRef để quản lý Chart instance
 
-  const [orders, setOrders] = useState([
-    {
-      orderId: 'ORD001',
-      customerName: 'Nguyen Van A',
-      paymentMethod: 'Credit Card',
-      status: 'Delivered',
-      total: 65,
-    },
-    {
-      orderId: 'ORD002',
-      customerName: 'Tran Thi B',
-      paymentMethod: 'Cash on Delivery',
-      status: 'Pending',
-      total: 20,
-    },
-    {
-      orderId: 'ORD003',
-      customerName: 'Le Van C',
-      paymentMethod: 'E-Wallet',
-      status: 'Shipped',
-      total: 45,
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
 
   const [stats, setStats] = useState({
-    totalRevenue: 130,
-    totalOrders: 3,
-    paymentStats: { 'Credit Card': 1, 'Cash on Delivery': 1, 'E-Wallet': 1 },
   });
 
   useEffect(() => {
@@ -43,21 +18,6 @@ const ManageOrders = () => {
     }
 
     const ctx = document.getElementById('paymentChart');
-    // chartRef.current = new Chart(ctx, {
-    //   type: 'pie',
-    //   data: {
-    //     labels: Object.keys(stats.paymentStats || {}),
-    //     datasets: [
-    //       {
-    //         label: 'Payment Methods Usage',
-    //         data: Object.values(stats.paymentStats || {}),
-    //         backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
-    //         borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
-    //         borderWidth: 1,
-    //       },
-    //     ],
-    //   },
-    // });
 
     return () => {
       if (chartRef.current) {

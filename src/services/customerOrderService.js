@@ -26,9 +26,10 @@ export const createOrderAPI = async (order) => {
         const response = await axios.post(`${API_URL}/orders`, order, {
 
             headers: {
-                Authorization: token,
                 Accept: "*/*",
+                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
+
             },
         });
 
@@ -71,4 +72,8 @@ export const DeleteOrderByIdAPI = async (id) => {
     } catch (error) {
         throw error.response?.data;
     }
+};
+
+export const sendPaymentResultToBackend = async (paymentData) => {
+    return await axios.post(`${API_URL}/orders/return`, paymentData);
 };
