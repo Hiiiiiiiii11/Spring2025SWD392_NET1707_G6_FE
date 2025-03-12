@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Form, Button, message, Card, Modal, Input } from "antd";
+import { Form, Button, message, Card, Modal, Input, Select } from "antd";
 import dayjs from "dayjs";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import "../OrderConfirm/OrderConfirmation.css";
 import Footer from "../../components/Footer/Footer";
 import { createOrderAPI } from "../../services/customerOrderService";
 import { GetCustomerProfileAPI } from "../../services/userService";
+import { getAllPromotionAPI } from "../../services/managePromotionService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const { Option } = Select;
 
 const OrderConfirmationPage = () => {
   const navigate = useNavigate();
@@ -19,38 +24,47 @@ const OrderConfirmationPage = () => {
   const [shippingModalVisible, setShippingModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [shippingInfo, setShippingInfo] = useState({ name: "", address: "" });
+  const [promotions, setPromotions] = useState([]);
+  const [selectedPromotion, setSelectedPromotion] = useState(null);
   const customerId = sessionStorage.getItem("customerId");
 
   useEffect(() => {
     fetchProfile();
+    fetchPromotions();
   }, []);
 
   const fetchProfile = async () => {
     try {
       const data = await GetCustomerProfileAPI(customerId);
-      // Giả sử API trả về các trường fullName và address
       setShippingInfo({
         name: data.fullName,
         address: data.address,
       });
     } catch (error) {
-      alert("Failed to load profile!");
+      toast.error("Failed to load profile!");
     }
   };
 
+  const fetchPromotions = async () => {
+    try {
+      const data = await getAllPromotionAPI();
+      setPromotions(data);
+    } catch (error) {
+      console.error("Failed to fetch promotions", error);
+    }
+  };
+
+  const totalAmount = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
   const onFinish = async () => {
     if (!selectedItems.length) {
-      alert("❌ No products selected!");
+      toast.warning(" No products selected!");
       return;
     }
 
-    // Tính tổng tiền của đơn hàng
-
-
-    // Tạo dữ liệu đơn hàng theo đúng format API yêu cầu
     const orderData = {
       orderDate: dayjs().format("YYYY-MM-DD"),
-      promotionId: "",
+      promotionId: selectedPromotion || "",
       address: shippingInfo.address,
       orderDetails: selectedItems.map((item) => ({
         productId: item.productID,
@@ -60,16 +74,10 @@ const OrderConfirmationPage = () => {
 
     try {
       const orderResult = await createOrderAPI(orderData);
-      console.log("Order Result:", orderResult);
-
-      // Lưu selectedItems vào sessionStorage để xóa khỏi giỏ hàng sau khi thanh toán
       sessionStorage.setItem("selectedItems", JSON.stringify(selectedItems));
-
-      // Điều hướng đến trang thanh toán VNPay (orderResult chứa URL)
       window.location.href = `${orderResult}`;
-
     } catch (error) {
-      alert(`❌ Failed to place order: ${error}`);
+      toast.error(` Failed to place order: ${error}`);
     }
   };
 
@@ -92,11 +100,9 @@ const OrderConfirmationPage = () => {
   return (
     <div>
       <div className="order-create-page">
+        <ToastContainer />
         <div className="header-content-order">
-          <button
-            className="back-to-cart"
-            onClick={() => navigate("/cart")}
-          >
+          <button className="back-to-cart" onClick={() => navigate("/cart")}>
             <ArrowLeftOutlined /> &nbsp;Cart Page
           </button>
           <div className="h2-content-order">
@@ -104,7 +110,6 @@ const OrderConfirmationPage = () => {
           </div>
         </div>
 
-        {/* Card hiển thị thông tin người nhận */}
         <Card title="Delivery Information" style={{ marginBottom: "16px" }}>
           <div className="body-delivery-info">
             <div className="delivery-info">
@@ -131,7 +136,8 @@ const OrderConfirmationPage = () => {
           </div>
         </Card>
 
-        {/* Hiển thị danh sách sản phẩm đã chọn */}
+
+
         <div style={{ display: "flex", flexDirection: "column" }}>
           {selectedItems.map((item) => (
             <Card
@@ -151,11 +157,7 @@ const OrderConfirmationPage = () => {
                     <img
                       src={item.imageURL || "https://via.placeholder.com/150"}
                       alt={item.productName}
-                      style={{
-                        width: 160,
-                        height: 160,
-                        objectFit: "cover",
-                      }}
+                      style={{ width: 160, height: 160, objectFit: "cover" }}
                     />
                   </Link>
                 </div>
@@ -164,8 +166,7 @@ const OrderConfirmationPage = () => {
                     <h2 className="product-name-confirm">{item.productName}</h2>
                   </Link>
                   <p className="price">
-                    <strong>Price:</strong>{" "}
-                    {item.price ? item.price.toLocaleString() + "$" : "N/A"}
+                    <strong>Price:</strong> {item.price ? item.price.toLocaleString() + "$" : "N/A"}
                   </p>
                   <p>
                     <strong>Quantity:</strong> {item.quantity}
@@ -175,6 +176,26 @@ const OrderConfirmationPage = () => {
             </Card>
           ))}
         </div>
+        <Card title="Apply Promotion" style={{ marginBottom: "16px" }}>
+          <Select
+            style={{ width: "100%" }}
+            placeholder="Select a promotion"
+            onChange={setSelectedPromotion}
+            disabled={totalAmount < 50}
+          >
+            {promotions.map((promo) => (
+              <Option key={promo.promotionId} value={promo.promotionId}>
+                {promo.promotionName}
+              </Option>
+            ))}
+          </Select>
+
+          {totalAmount < 50 && (
+            <p style={{ color: "red", marginTop: "8px" }}>
+              ⚠️ You need to spend at least $50 to apply a promotion!
+            </p>
+          )}
+        </Card>
 
         <div className="place-order-submit">
           <Form form={form} onFinish={onFinish} style={{ marginTop: 20 }}>
@@ -185,7 +206,6 @@ const OrderConfirmationPage = () => {
         </div>
       </div>
       <Footer />
-
       <Modal
         title="Product Details"
         visible={modalVisible}

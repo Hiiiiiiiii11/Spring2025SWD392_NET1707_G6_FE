@@ -5,6 +5,8 @@ import "./ManageQuiz.css";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import { CreateNewQuizAPI, DeleteQuizAPI, GetAllQuizAPI } from "../../services/ManageQuizService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 function ManageQuiz() {
@@ -57,10 +59,10 @@ function ManageQuiz() {
         if (!confirmDelete) return;
         try {
             await DeleteQuizAPI(id);
-            alert("Quiz question deleted successfully!");
+            toast.success("Quiz question deleted successfully!");
             fetchQuizzes();
         } catch (e) {
-            alert('Fail to delete promotion!')
+            toast.error('Fail to delete promotion!')
         }
 
 
@@ -90,18 +92,18 @@ function ManageQuiz() {
             if (editMode) {
                 const updatedQuiz = [];
                 if (updatedQuiz) {
-                    alert("Quiz question updated successfully!");
+                    toast.success("Quiz question updated successfully!");
                     fetchQuizzes();
                 } else {
-                    alert("Failed to update quiz question!");
+                    toast.error("Failed to update quiz question!");
                 }
             } else {
                 const newQuiz = await CreateNewQuizAPI(quizData);
                 if (newQuiz) {
-                    alert("Quiz question added successfully!");
+                    toast.success("Quiz question added successfully!");
                     fetchQuizzes();
                 } else {
-                    alert("Failed to add quiz question!");
+                    toast.error("Failed to add quiz question!");
                 }
             }
             setIsModalVisible(false);
@@ -152,6 +154,7 @@ function ManageQuiz() {
     return (
         <div>
             <Header />
+            <ToastContainer />
             <div className="manager-quiz-page">
                 <div className="manager-container">
                     <h2>Manage Quiz Questions</h2>

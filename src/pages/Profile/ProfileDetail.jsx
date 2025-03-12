@@ -3,6 +3,8 @@ import { Card, Descriptions, Button, Typography, Input, Form, Spin } from 'antd'
 import Header from '../../components/Header/Header';
 import "../Profile/ProfileDetail.css";
 import { GetCustomerProfileAPI, GetStaffProfileAPI, UpdateCustomerProfileAPI, UpdateStaffProfileAPI } from '../../services/userService';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const { Title } = Typography;
 
@@ -64,10 +66,10 @@ const UserProfile = () => {
         setProfile(updatedProfile);
         setFormData(updatedProfile);
         setIsEditing(false);
-        alert("Profile updated successfully!");
+        toast.success("Profile updated successfully!");
       }
     } catch (error) {
-      alert("Failed to update profile");
+      toast.error("Failed to update profile");
     }
   };
 
@@ -84,6 +86,7 @@ const UserProfile = () => {
 
   return (
     <div>
+      <ToastContainer />
       <Header />
       <div style={{ padding: 24 }}>
         <Title level={2}>User's Profile</Title>

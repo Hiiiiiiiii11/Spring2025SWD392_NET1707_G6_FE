@@ -6,6 +6,8 @@ import Footer from "../../components/Footer/Footer";
 import "./ProductPage.css";
 import { getAllProductAPI } from "../../services/manageProductService";
 import { AddProductToCartAPI, GetAllProductCartAPI } from "../../services/cartService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const { Meta } = Card;
 
@@ -53,7 +55,7 @@ const ProductPage = () => {
 
       // Kiểm tra tổng số lượng đã có trong giỏ hàng
       if (currentCartQuantity + quantity > selectedProduct.stockQuantity) {
-        alert("❌ You cannot add more of this product. Stock limit reached!");
+        toast.error(" You cannot add more of this product. Stock limit reached!");
         return;
       }
 
@@ -64,12 +66,12 @@ const ProductPage = () => {
       });
 
       if (response) {
-        alert(`✅ Added "${selectedProduct.productName}" x${quantity} to cart!`);
+        toast.success(` Added "${selectedProduct.productName}" x${quantity} to cart!`);
       } else {
-        alert("❌ Failed to add product to cart!");
+        toast.error(" Failed to add product to cart!");
       }
     } catch (error) {
-      alert("❌ Error adding product to cart! Session Time Out!!!");
+      toast.error(" Error adding product to cart! Session Time Out!!!");
     }
 
     setIsModalVisible(false);
@@ -82,6 +84,7 @@ const ProductPage = () => {
     <div>
       <Header />
       <div className="product-page">
+        <ToastContainer />
         <h1>Skincare Products</h1>
         <div className="search-product-page">
           <Input

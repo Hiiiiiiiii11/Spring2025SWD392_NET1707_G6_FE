@@ -1,58 +1,58 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import skincareImage from "../../assets/skincare.jpg";
-import { loginAPI } from "../../services/authService"; // Import service
+import { loginAPI } from "../../services/authService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./Login.css";
 
 const Login = () => {
-
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "", rememberMe: false });
-  const [errors, setErrors] = useState({}); // State lưu lỗi
+  const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
-  // Hàm kiểm tra email hợp lệ
+  // Kiểm tra email hợp lệ
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let newErrors = {};
-    if (!formData.email) newErrors.email = "Email is required!";
-    else if (!validateEmail(formData.email)) newErrors.email = "Invalid email format!";
-    if (!formData.password) newErrors.password = "Password is required!";
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    if (!formData.email) {
+      toast.error(" Email is required!");
+      return;
+    }
+    if (!validateEmail(formData.email)) {
+      toast.error(" Invalid email format!");
+      return;
+    }
+    if (!formData.password) {
+      toast.error(" Password is required!");
       return;
     }
 
     try {
       const data = await loginAPI(formData);
       sessionStorage.setItem("token", data.token);
-      console.log(data.token)
-      alert("Login successful!");
-      navigate("/");
-    } catch (error) {
 
-      alert("Sai tài khoản hoặc mật khẩu!");
+      toast.success(" Login successful!", {
+        onClose: () => navigate("/"),
+      });
+
+    } catch (error) {
+      toast.error(" Incorrect email or password!");
     }
   };
-  const handleForgotPassword = () => {
-    navigate("/forgot-password");
-  }
-  const handleSignup = () => {
-    navigate("/register");
-  }
+
   return (
     <div className="login-page">
+      <ToastContainer />
       <div className="login-container">
         <img src={skincareImage} alt="Skincare" className="login-image" />
         <h2>Sign in for your beauty</h2>
@@ -63,9 +63,7 @@ const Login = () => {
             placeholder="Username or email"
             value={formData.email}
             onChange={handleChange}
-            required
           />
-          {errors.email && <p className="error-message">{errors.email}</p>}
 
           <input
             type="password"
@@ -73,18 +71,20 @@ const Login = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            required
           />
-          {errors.password && <p className="error-message">{errors.password}</p>}
 
           <div className="login-options">
-            <a className="forgot-password"
-              onClick={() => { handleForgotPassword() }}>Forgot password?</a>
+            <a className="forgot-password" onClick={() => navigate("/forgot-password")}>
+              Forgot password?
+            </a>
           </div>
           <button type="submit">Login</button>
         </form>
         <p className="register-link">
-          Don't have an account? <a className="signup" onClick={() => { handleSignup() }} >Sign up now</a>
+          Don't have an account?{" "}
+          <a className="signup" onClick={() => navigate("/register")}>
+            Sign up now
+          </a>
         </p>
       </div>
     </div>

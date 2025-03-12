@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, InputNumber, DatePicker, message, Space } from "antd";
+import { Table, Button, Modal, Form, InputNumber, DatePicker, Space } from "antd";
 import { useParams } from "react-router-dom";
 import { createNewBatchAPI, deleteBatchAPI, editBatchAPI, getAllBatchByProductIdAPI } from "../../services/manageBatchService";
 import moment from "moment";
 
 import Header from "../../components/Header/Header";
 import "../ManageBatch/BatchManagement.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BatchManagement = () => {
   const { productID } = useParams();
@@ -37,10 +39,10 @@ const BatchManagement = () => {
     if (!confirmDelete) return;
     try {
       await deleteBatchAPI(batchId);
-      alert("Batch deleted successfully");
+      toast.success("Batch deleted successfully");
       fetchBatchById();
     } catch (error) {
-      alert("Failed to delete batch");
+      toast.error("Failed to delete batch");
     }
   }
 
@@ -58,25 +60,29 @@ const BatchManagement = () => {
 
   const handleSaveEditBatch = async () => {
     try {
-      const values = await form.validateFields(); // Lấy dữ liệu từ form
-
-      const updatedBatch = {
-        batchId: editingBatch.batchId,  // Sử dụng batchId thay vì batchID
-        productId: editingBatch.productId,  // API yêu cầu có productId
+      const values = await form.validateFields();
+      const batchData = {
+        productId: productID,
         quantity: values.quantity,
-        importDate: values.importDate.toISOString(), // Chuyển đổi sang ISO-8601
+        importDate: values.importDate.toISOString(),
         expireDate: values.expireDate.toISOString(),
       };
 
-      await editBatchAPI(editingBatch.batchId, updatedBatch);
-      alert("✅ Batch updated successfully!");
+      if (isEditMode) {
+        batchData.batchId = editingBatch.batchId;
+        await editBatchAPI(editingBatch.batchId, batchData);
+        toast.success("✅ Batch updated successfully!");
+      } else {
+        await createNewBatchAPI(batchData);
+        toast.success("✅ Batch created successfully!");
+      }
 
       setIsModalVisible(false);
       setIsEditMode(false);
-      fetchBatchById(); // Gọi lại danh sách để cập nhật UI
+      fetchBatchById();
     } catch (error) {
-      console.error("Error updating batch:", error);
-      alert("❌ Failed to update batch!");
+      console.error("Error saving batch:", error);
+      toast.error("❌ Failed to save batch!");
     }
   };
 
@@ -109,6 +115,7 @@ const BatchManagement = () => {
 
   return (
     <div>
+      <ToastContainer />
       <Header />
       <div className="batch-page">
         <h2 className="batch-header-conte">Manage Batch for {product?.productName || "Product"}</h2>

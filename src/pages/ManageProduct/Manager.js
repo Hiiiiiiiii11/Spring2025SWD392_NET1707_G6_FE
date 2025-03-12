@@ -11,6 +11,8 @@ import {
   uploadToCloudinary,
 } from "../../services/manageProductService";
 import Header from "../../components/Header/Header";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Manager() {
   const [products, setProducts] = useState([]);
@@ -68,17 +70,17 @@ function Manager() {
     if (!confirmDelete) return;
 
     if (product && product.stockQuantity > 0) {
-      alert("Cannot delete product with stock remaining!");
+      toast.warning("Cannot delete product with stock remaining!");
       return;
     }
 
     try {
       await deleteProductAPI(id);
-      alert("Product deleted successfully!");
+      toast.success("Product deleted successfully!");
       const data = await getAllProductAPI();
       if (data) setProducts(data);
     } catch (error) {
-      alert("Failed to delete product. Please try again.");
+      toast.warning("Failed to delete product. Please try again.");
     }
   };
 
@@ -103,10 +105,10 @@ function Manager() {
 
       if (editMode) {
         await editProductAPI(editingProductID, values);
-        alert("Product updated successfully!");
+        toast.success("Product updated successfully!");
       } else {
         await createNewProductAPI(values);
-        alert("Product added successfully!");
+        toast.success("Product added successfully!");
       }
 
       const data = await getAllProductAPI();
@@ -117,7 +119,7 @@ function Manager() {
       setFile(null);
       setFileList([]);
     } catch (error) {
-      message.error("Error processing product. Please try again.");
+      toast.error("Error processing product. Please try again.");
     }
   };
 
@@ -188,6 +190,7 @@ function Manager() {
 
   return (
     <div>
+      <ToastContainer />
       <Header />
       <div className="manager-page">
         <div className="manager-container">

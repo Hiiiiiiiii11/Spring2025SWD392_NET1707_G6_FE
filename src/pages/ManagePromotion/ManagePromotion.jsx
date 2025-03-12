@@ -4,6 +4,8 @@ import Header from '../../components/Header/Header';
 import { createNewPromotionAPI, deletePromotionAPI, editPromotionAPI, getAllPromotionAPI } from '../../services/managePromotionService';
 import { useEffect } from 'react';
 import moment from 'moment';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const { Title } = Typography;
 
 const ManagePromotion = () => {
@@ -25,10 +27,10 @@ const ManagePromotion = () => {
       if (promotions) {
         setPromotions(promotions);
       } else {
-        alert("Failed to load promotions!");
+        toast.success("Failed to load promotions!");
       }
     } catch (error) {
-      alert("Error fetching promotions!");
+      toast.error("Error fetching promotions!");
     }
   };
 
@@ -70,10 +72,10 @@ const ManagePromotion = () => {
     if (!confirmDelete) return;
     try {
       await deletePromotionAPI(promotionId);
-      alert('Delete promotion successfully!');
+      toast.success('Delete promotion successfully!');
       fetchPromotions();
     } catch (e) {
-      alert('Fail to delete promotion!')
+      toast.error('Fail to delete promotion!')
     }
   };
 
@@ -82,7 +84,7 @@ const ManagePromotion = () => {
     try {
       if (editingPromotion) {
         await editPromotionAPI(editingPromotion.promotionId, values);
-        alert('Update promotion successfully!')
+        toast.success('Update promotion successfully!')
       } else {
         await createNewPromotionAPI(values);
       }
@@ -91,7 +93,7 @@ const ManagePromotion = () => {
       form.resetFields();
       setEditingPromotion(null);
     } catch (error) {
-      alert("Failed to save promotion!");
+      toast.error("Failed to save promotion!");
     }
   };
 
@@ -112,6 +114,7 @@ const ManagePromotion = () => {
 
   return (
     <div>
+      <ToastContainer />
       <Header />
       <div style={{ padding: 24, margin: '0 auto' }}>
         <Title level={2}>Promotion Management</Title>

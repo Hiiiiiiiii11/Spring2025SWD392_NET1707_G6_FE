@@ -4,6 +4,8 @@ import Header from '../../components/Header/Header';
 import { GetAllHistoryOrderByIdAPI } from '../../services/customerOrderService';
 import { getProductByIdAPI } from '../../services/manageProductService';
 import "../CustomerHistoryOrder/CustomerHistoryOrder.css"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const { Title, Text } = Typography;
 
@@ -31,10 +33,10 @@ const CustomerHistoryOrder = () => {
         const sortedOrders = historyOrder.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
         setOrders(sortedOrders);
       } else {
-        alert("Failed to load orders!");
+        toast.error("Failed to load orders!");
       }
     } catch (error) {
-      alert("Error fetching orders!");
+      toast.error("Error fetching orders!");
     }
   };
 
@@ -52,7 +54,7 @@ const CustomerHistoryOrder = () => {
       }));
       setOrderProductDetails(prev => ({ ...prev, [order.orderId]: details }));
     } catch (error) {
-      alert("Failed to load product details for order " + order.orderId);
+      toast.error("Failed to load product details for order " + order.orderId);
     }
   };
 
@@ -68,6 +70,7 @@ const CustomerHistoryOrder = () => {
 
   return (
     <div>
+      <ToastContainer />
       <Header />
       <div style={{ padding: 24, margin: '0 auto', height: "100vh" }}>
         <Title level={2}>History Order</Title>

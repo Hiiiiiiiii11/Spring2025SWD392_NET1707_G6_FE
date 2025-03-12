@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
 import { GetAllProductCartAPI, UpdateQuantityProductAPI, RemoveProductFromCartAPI } from "../../services/cartService";
 import "../Cart/CartPage.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CartPage = () => {
     const [cartProducts, setCartProducts] = useState([]);
@@ -51,7 +53,7 @@ const CartPage = () => {
     // Xử lý đặt hàng (chuyển đến OrderConfirmationPage với các sản phẩm được chọn)
     const handleOrderProduct = () => {
         if (selectedProducts.length === 0) {
-            alert("⚠️ Please select at least one product to order!");
+            toast.warning("⚠️ Please select at least one product to order!");
             return;
         }
 
@@ -70,7 +72,7 @@ const CartPage = () => {
 
         try {
             await UpdateQuantityProductAPI(selectedProduct.productID, newQuantity);
-            alert("✅ Quantity updated successfully!");
+            toast.success(" Quantity updated successfully!");
             setCartProducts((prevCart) =>
                 prevCart.map((item) =>
                     item.productID === selectedProduct.productID ? { ...item, quantity: newQuantity } : item
@@ -78,7 +80,7 @@ const CartPage = () => {
             );
             handleCancel();
         } catch (error) {
-            alert("❌ Failed to update quantity!");
+            toast.error(" Failed to update quantity!");
         }
     };
 
@@ -92,7 +94,7 @@ const CartPage = () => {
 
         try {
             await RemoveProductFromCartAPI(productToRemove.productID);
-            alert("✅ Product removed from cart!");
+            toast.success(" Product removed from cart!");
             setCartProducts((prevCart) => prevCart.filter((item) => item.productID !== productToRemove.productID));
             setSelectedProducts((prevSelected) => prevSelected.filter((id) => id !== productToRemove.productID));
             fetchCart();
@@ -113,23 +115,24 @@ const CartPage = () => {
     // Xóa nhiều sản phẩm đã chọn
     const handleRemoveSelectedProducts = async () => {
         if (selectedProducts.length === 0) {
-            alert("⚠️ Please select at least one product!");
+            toast.warning(" Please select at least one product!");
             return;
         }
 
         try {
             await Promise.all(selectedProducts.map((productID) => RemoveProductFromCartAPI(productID)));
-            alert("✅ Selected products removed!");
+            toast.success(" Selected products removed!");
             setCartProducts((prevCart) => prevCart.filter((item) => !selectedProducts.includes(item.productID)));
             setSelectedProducts([]);
             fetchCart();
         } catch (error) {
-            alert("❌ Failed to remove selected products!");
+            toast.error(" Failed to remove selected products!");
         }
     };
 
     return (
         <div>
+            <ToastContainer />
             <div className="cart-page">
                 <div className="cartpage-info">
                     <button className="back-to-product" onClick={() => navigate("/products")}>

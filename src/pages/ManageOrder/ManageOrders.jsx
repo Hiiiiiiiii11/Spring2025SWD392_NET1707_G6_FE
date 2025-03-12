@@ -3,7 +3,9 @@ import { Table, Card, Statistic, Typography, Button, message, List } from "antd"
 import Header from "../../components/Header/Header";
 import { GetAllCustomerOrderAPI } from "../../services/manageOrderService";
 import { getProductByIdAPI } from "../../services/manageProductService";
-import "../ManageOrder/ManageOrders.css"
+import "../ManageOrder/ManageOrders.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -23,7 +25,7 @@ const ManageOrders = () => {
       const data = await GetAllCustomerOrderAPI();
       setOrders(data);
     } catch (error) {
-      message.error("Failed to fetch orders");
+      toast.error("Failed to fetch orders");
     }
   };
 
@@ -47,7 +49,7 @@ const ManageOrders = () => {
       }));
       setOrderProductDetails(prev => ({ ...prev, [order.orderId]: details }));
     } catch (error) {
-      message.error("Failed to load product details");
+      toast.error("Failed to load product details");
     }
   };
 
@@ -62,6 +64,7 @@ const ManageOrders = () => {
 
   return (
     <div>
+      <ToastContainer />
       <Header />
       <div style={{ padding: 24, margin: "0 auto" }}>
         <Title level={2}>Order Management Dashboard</Title>

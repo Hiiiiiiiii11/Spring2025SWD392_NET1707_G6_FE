@@ -37,5 +37,22 @@ export const CreateEmployeeAPI = async (employeeData) => {
     }
 };
 
+// export const UpdateEmployeeAPI = async (employeeData) => {
+//     try {
+//         const token = sessionStorage.getItem("token");
+//         const response = await axios.post(`${API_URL}/auth/register-staff`, employeeData, {
+//             headers: {
+//                 Accept: "*/*",
+//                 "Content-Type": "application/json",
+//                 Authorization: `Bearer ${token}`,
+//             },
+//         });
+//         return response.data;
+//     } catch (error) {
+//         console.error("Error creating staff:", error);
+//         return null;
+//     }
+// };
+
 
 

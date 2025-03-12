@@ -4,6 +4,9 @@ import { getProductByIdAPI, getAllProductAPI } from "../../services/manageProduc
 import { InputNumber, Modal, Card, Row, Col, Button } from "antd";
 import { AddProductToCartAPI, GetAllProductCartAPI } from "../../services/cartService";
 import "./ProductDetail.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const { Meta } = Card;
 
@@ -71,7 +74,7 @@ const ProductDetail = () => {
 
       // Kiểm tra tổng số lượng đã có trong giỏ hàng
       if (currentCartQuantity + quantity > selectedProduct.stockQuantity) {
-        alert("❌ You cannot add more of this product. Stock limit reached!");
+        toast.error(" You cannot add more of this product. Stock limit reached!");
         return;
       }
 
@@ -82,9 +85,9 @@ const ProductDetail = () => {
       });
 
       if (response) {
-        alert(`✅ Added "${selectedProduct.productName}" x${quantity} to cart!`);
+        toast.success(` Added "${selectedProduct.productName}" x${quantity} to cart!`);
       } else {
-        alert("❌ Failed to add product to cart!");
+        toast.error(" Failed to add product to cart!");
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
@@ -98,6 +101,7 @@ const ProductDetail = () => {
 
   return (
     <div className="product-detail-container">
+      <ToastContainer />
       <button className="back-to-products" onClick={handleBacktoProduct}>
         Back to Products
       </button>

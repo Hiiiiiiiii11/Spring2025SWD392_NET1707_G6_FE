@@ -4,6 +4,8 @@ import { SearchOutlined } from "@ant-design/icons";
 import "./ManagerStaff.css";
 import { CreateEmployeeAPI, GetAllEmployeeAPI } from "../../services/manageEmployeeService";
 import Header from "../../components/Header/Header";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ManagerStaff() {
   const [staffs, setStaffs] = useState([]);
@@ -24,10 +26,10 @@ function ManagerStaff() {
       if (employees) {
         setStaffs(employees);
       } else {
-        alert("Failed to load employees!");
+        toast.error("Failed to load employees!");
       }
     } catch (error) {
-      alert("Error fetching employees!");
+      toast.error("Error fetching employees!");
     }
   };
 
@@ -49,7 +51,7 @@ function ManagerStaff() {
       title: "Are you sure you want to delete this staff?",
       onOk: () => {
         setStaffs((prev) => prev.filter((s) => s.id !== id));
-        alert("Staff deleted successfully!");
+        toast.success("Staff deleted successfully!");
       },
     });
   };
@@ -82,16 +84,16 @@ function ManagerStaff() {
         const newEmployee = await CreateEmployeeAPI(newEmployeeData);
         if (newEmployee) {
           setStaffs((prev) => [...prev, { id: newEmployee.id, ...newEmployeeData }]);
-          alert("Staff added successfully!");
+          toast.success("Staff added successfully!");
         } else {
-          alert("Failed to add staff!");
+          toast.warning("Failed to add staff!");
         }
       }
 
       setIsModalVisible(false);
       form.resetFields();
     } catch {
-      alert("Error saving staff!");
+      toast.warning("Error saving staff!");
     }
   };
 
@@ -130,6 +132,7 @@ function ManagerStaff() {
 
   return (
     <div>
+      <ToastContainer />
       <Header />
       <div className="manager-staff-page">
         <div className="manager-container">

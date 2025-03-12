@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./Register.css";
 import registerImage from "../../assets/skincare.jpg";
-import { notification } from "antd";
 import { registerAPI } from "../../services/authService";// Import API service
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const Register = () => {
@@ -70,17 +71,17 @@ const Register = () => {
     try {
       const data = await registerAPI(formData);
       console.log("Register success:", data);
-      notification.success({ message: "Account created successfully!" });
+      toast.success({ message: "Account created successfully!" });
       // Điều hướng nếu cần
       // navigate("/login");
     } catch (error) {
-      console.error("Registration failed:", error);
-      notification.error({ message: "Registration failed. Please try again." });
+      toast.error({ message: "Registration failed. Please try again." });
     }
   };
 
   return (
     <div className="register-page">
+      <ToastContainer />
       <div className="register-container">
         <div className="register-image-container">
           <img src={registerImage} alt="Register" className="register-image" />
