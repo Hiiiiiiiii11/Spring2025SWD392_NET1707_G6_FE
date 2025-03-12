@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Descriptions, Button, Typography, Input, Form, Spin } from 'antd';
 import Header from '../../components/Header/Header';
 import "../Profile/ProfileDetail.css";
-import { GetCustomerProfileAPI, GetStaffProfileAPI, UpdateCustomerProfileAPI } from '../../services/userService';
+import { GetCustomerProfileAPI, GetStaffProfileAPI, UpdateCustomerProfileAPI, UpdateStaffProfileAPI } from '../../services/userService';
 
 const { Title } = Typography;
 
@@ -14,6 +14,7 @@ const UserProfile = () => {
   const customerId = sessionStorage.getItem('customerId');
   const staffId = sessionStorage.getItem('staffId');
   const role = sessionStorage.getItem("role")
+  const staffEmail = sessionStorage.getItem("staffEmail");
 
   // Lấy dữ liệu profile khi component được mount
   useEffect(() => {
@@ -47,16 +48,29 @@ const UserProfile = () => {
   // Lưu thay đổi và cập nhật profile qua API
   const handleSave = async () => {
     try {
-      // Gọi API cập nhật profile với dữ liệu từ formData
-      const updatedProfile = await UpdateCustomerProfileAPI(formData);
-      setProfile(updatedProfile);
-      setFormData(updatedProfile);
-      setIsEditing(false);
-      alert("Profile updated successfully!");
+      let updatedProfile = null;
+
+      if (role === "CUSTOMER") {
+        updatedProfile = await UpdateCustomerProfileAPI(formData);
+      } else if (role === "CUSTOMER_STAFF" || role === "MANAGER") {
+        updatedProfile = await UpdateStaffProfileAPI(staffEmail, {
+          fullName: formData.fullname,
+          phone: formData.phone,
+          address: formData.address
+        });
+      }
+
+      if (updatedProfile) {
+        setProfile(updatedProfile);
+        setFormData(updatedProfile);
+        setIsEditing(false);
+        alert("Profile updated successfully!");
+      }
     } catch (error) {
       alert("Failed to update profile");
     }
   };
+
 
   // Hủy chỉnh sửa và đặt lại formData theo profile gốc
   const handleCancel = () => {
@@ -155,9 +169,11 @@ const UserProfile = () => {
                 </Descriptions.Item>
               )}
               <Descriptions.Item label="">
-                <Button type="primary" className='colum-item-content' onClick={() => setIsEditing(true)}>
-                  Edit Profile
-                </Button>
+                {(role === "CUSTOMER_STAFF" || role === "CUSTOMER") && (
+                  <Button type="primary" className='colum-item-content' onClick={() => setIsEditing(true)}>
+                    Edit Profile
+                  </Button>
+                )}
               </Descriptions.Item>
             </Descriptions>
           )}

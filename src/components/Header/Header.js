@@ -18,6 +18,7 @@ function Header() {
   let customerId = "";
   let role = "guest";
   let userInfo = null;
+  let staffEmail = "";
 
   // If token exists, decode it to get user info and role
   if (token) {
@@ -30,6 +31,8 @@ function Header() {
       sessionStorage.setItem("customerId", customerId);
       staffId = userInfo.staffId;
       sessionStorage.setItem("staffId", staffId);
+      staffEmail = userInfo.sub;
+      sessionStorage.setItem("staffEmail", staffEmail);
 
     } catch (error) {
       role = "guest";
@@ -52,7 +55,7 @@ function Header() {
     menuItems = [
       { label: "Home", path: "/" },
       { label: "Products", path: "/products" },
-      { label: "View Order", path: "/view-order" },
+      { label: "View Order", path: "/manager-orders" },
     ];
   } else if (role === "CUSTOMER") {
     menuItems = [

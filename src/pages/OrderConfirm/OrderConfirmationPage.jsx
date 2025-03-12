@@ -45,7 +45,7 @@ const OrderConfirmationPage = () => {
     }
 
     // Tính tổng tiền của đơn hàng
-    const totalAmount = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
 
     // Tạo dữ liệu đơn hàng theo đúng format API yêu cầu
     const orderData = {
@@ -57,7 +57,7 @@ const OrderConfirmationPage = () => {
         quantity: item.quantity,
       })),
     };
-    console.log(orderData);
+
     try {
       const orderResult = await createOrderAPI(orderData);
       console.log("Order Result:", orderResult);

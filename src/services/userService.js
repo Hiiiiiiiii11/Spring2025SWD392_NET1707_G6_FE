@@ -48,3 +48,18 @@ export const GetStaffProfileAPI = async (id) => {
         throw error.response?.data;
     }
 };
+
+export const UpdateStaffProfileAPI = async (email, updateData) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.put(`${API_URL}/staff/update?email=${email}`, updateData, {
+            headers: {
+                Accept: "*/*",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data;
+    }
+};

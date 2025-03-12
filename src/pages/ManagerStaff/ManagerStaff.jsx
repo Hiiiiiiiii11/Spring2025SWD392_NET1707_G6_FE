@@ -12,7 +12,7 @@ function ManagerStaff() {
   const [editMode, setEditMode] = useState(false);
   const [editingStaffId, setEditingStaffId] = useState(null);
   const [form] = Form.useForm();
-  const [roles] = useState(["CUSTOMER_STAFF"]);
+  const [roles] = useState(["CUSTOMER_STAFF", "DELIVERY_STAFF"]);
 
   useEffect(() => {
     fetchEmployees();
@@ -201,9 +201,10 @@ function ManagerStaff() {
                   label="Password"
                   rules={[{ required: true, message: "Password is required!" }]}
                 >
-                  <Input placeholder="Password" />
+                  <Input.Password placeholder="********" />
                 </Form.Item>
               )}
+
             </Form>
           </Modal>
         </div>
