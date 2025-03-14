@@ -54,5 +54,21 @@ export const CreateEmployeeAPI = async (employeeData) => {
 //     }
 // };
 
+export const deleteEmployeeAPI = async (id) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        console.log("Token:", token);
+        const response = await axios.delete(`${API_URL}/staff/${id}`, {
+            headers: {
+                Accept: "*/*",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+    }
+};
+
 
 

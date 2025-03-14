@@ -152,11 +152,11 @@ function ManageQuiz() {
     ];
 
     return (
-        <div>
+        <div >
             <Header />
             <ToastContainer />
             <div className="manager-quiz-page">
-                <div className="manager-container">
+                <div className="manager-container" style={{ minHeight: "100vh" }}>
                     <h2>Manage Quiz Questions</h2>
                     <div
                         style={{

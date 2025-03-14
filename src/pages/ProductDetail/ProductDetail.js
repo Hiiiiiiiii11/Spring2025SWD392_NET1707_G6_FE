@@ -195,7 +195,7 @@ const ProductDetail = () => {
             </p>
             <InputNumber
               min={1}
-              max={99}
+              max={1000}
               value={quantity}
               onChange={setQuantity}
               style={{ width: "200px", height: "40px", fontSize: "15px" }}

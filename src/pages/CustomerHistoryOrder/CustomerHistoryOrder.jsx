@@ -93,10 +93,10 @@ const CustomerHistoryOrder = () => {
                         </Text>
                       </p>
                       <p>Payment Method : VN Pay</p>
-                      <p>Order Address :</p>
+                      <p>Order Address : {order.address}</p>
                     </div>
                     <div className='div-total-price'>
-                      <p className="totalprice-history" style={{ fontWeight: 'bold' }}>Original Total: ${order.totalAmount}</p>
+                      <p className="totalprice-history" style={{ fontWeight: 'bold' }}>Original Total: ${order.totalAmount / 25000}</p>
                     </div>
                   </div>
 

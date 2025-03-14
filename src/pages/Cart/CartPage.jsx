@@ -8,6 +8,7 @@ import { GetAllProductCartAPI, UpdateQuantityProductAPI, RemoveProductFromCartAP
 import "../Cart/CartPage.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getAllBatchByProductIdAPI } from "../../services/manageBatchService";
 
 const CartPage = () => {
     const [cartProducts, setCartProducts] = useState([]);
@@ -19,6 +20,7 @@ const CartPage = () => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [productToRemove, setProductToRemove] = useState(null);
     const navigate = useNavigate();
+    const [productBatches, setProductBatches] = useState([]);
 
     useEffect(() => {
         fetchCart();
@@ -38,6 +40,7 @@ const CartPage = () => {
             setLoading(false);
         }
     };
+
 
     const showUpdateModal = (product) => {
         setSelectedProduct(product);

@@ -20,3 +20,21 @@ export const GetAllCustomerOrderAPI = async () => {
         throw error.response?.data;
     }
 };
+
+export const UpdateCustomerOrderStatusAPI = async (orderId, status) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.put(`${API_URL}/orders/${orderId}/status?status=${status}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "*/*",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || "Error updating order status";
+    }
+};

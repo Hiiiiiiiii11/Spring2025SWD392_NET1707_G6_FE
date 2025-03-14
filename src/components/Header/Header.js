@@ -67,8 +67,12 @@ function Header() {
       { label: "Home", path: "/" },
 
     ];
+  } else if (role === "DELIVERY_STAFF") {
+    menuItems = [
+      { label: "Home", path: "/" },
+      { label: "View Order", path: "/manager-orders" },
+    ];
   }
-
   const handleNavigate = (path) => {
     navigate(path);
   };

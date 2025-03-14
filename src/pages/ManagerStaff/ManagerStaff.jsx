@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Input, Button, Form, Modal, Select, } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import "./ManagerStaff.css";
-import { CreateEmployeeAPI, GetAllEmployeeAPI } from "../../services/manageEmployeeService";
+import { CreateEmployeeAPI, deleteEmployeeAPI, GetAllEmployeeAPI } from "../../services/manageEmployeeService";
 import Header from "../../components/Header/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -40,21 +40,27 @@ function ManagerStaff() {
   };
 
   const handleEditStaff = (record) => {
+
     setEditMode(true);
-    setEditingStaffId(record.id);
+    setEditingStaffId(record.staffId);
     form.setFieldsValue(record);
     setIsModalVisible(true);
   };
 
-  const handleDeleteStaff = (id) => {
-    Modal.confirm({
-      title: "Are you sure you want to delete this staff?",
-      onOk: () => {
-        setStaffs((prev) => prev.filter((s) => s.id !== id));
-        toast.success("Staff deleted successfully!");
-      },
-    });
-  };
+  const handleDeleteStaff = async (id) => {
+    console.log(id)
+    const confirmDelete = window.confirm("Are you sure you want to delete this promotion?");
+    if (!confirmDelete) return;
+    try {
+      await deleteEmployeeAPI(id);
+      setStaffs((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Staff deleted successfully!");
+      fetchEmployees();
+    } catch (error) {
+      toast.error("Failed to delete staff!");
+    }
+  }
+
 
   const handleModalOk = async () => {
     try {
@@ -124,18 +130,18 @@ function ManagerStaff() {
       render: (_, record) => (
         <>
           <Button type="link" onClick={() => handleEditStaff(record)}>Edit</Button>
-          <Button type="link" danger onClick={() => handleDeleteStaff(record.id)}>Delete</Button>
+          <Button type="link" danger onClick={() => handleDeleteStaff(record.staffId)}>Delete</Button>
         </>
       ),
     },
   ];
 
   return (
-    <div>
+    <>
       <ToastContainer />
       <Header />
       <div className="manager-staff-page">
-        <div className="manager-container">
+        <div className="manager-container" div style={{ minHeight: "100vh" }}>
           <h2>Manager Staff</h2>
           <div
             style={{
@@ -212,7 +218,7 @@ function ManagerStaff() {
           </Modal>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

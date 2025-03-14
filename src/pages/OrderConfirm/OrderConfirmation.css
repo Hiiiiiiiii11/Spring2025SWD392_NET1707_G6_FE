@@ -1,5 +1,6 @@
 h2.product-name-confirm {
     margin: 0;
+    text-align: left;
 }
 
 .card-order-content {
@@ -47,4 +48,18 @@ button.back-to-cart {
 
 .body-delivery-info {
     display: flex;
+}
+
+.ant-card-body {
+    width: 100%;
+}
+
+.product-date {
+    align-items: center;
+}
+
+.order-bettween-date {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }

@@ -113,7 +113,7 @@ const ManagePromotion = () => {
   };
 
   return (
-    <div>
+    <div style={{ minHeight: "100vh" }}>
       <ToastContainer />
       <Header />
       <div style={{ padding: 24, margin: '0 auto' }}>
