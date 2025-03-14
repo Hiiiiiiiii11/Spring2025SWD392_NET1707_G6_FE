@@ -28,6 +28,7 @@ function ManageQuiz() {
     const fetchQuizzes = async () => {
         try {
             const data = await GetAllQuizAPI();
+            console.log(data)
             if (data) {
                 setQuizzes(data);
             }
