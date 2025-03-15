@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Radio, Typography, Card, Progress, Row, Col } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
 import './SkinTypeQuiz.css';
 
 const { Title, Text } = Typography;
@@ -49,19 +48,12 @@ const SkinTypeQuiz = () => {
       setCurrent(current + 1); // Chuyển sang bước kết quả
       setTimeout(() => {
         alert(`Loại da của bạn: ${skinType}. Đề xuất sản phẩm: [Sản phẩm phù hợp ${skinType.toLowerCase()}].`);
-      }, 500); // Kết quả hiển thị sau animation
+      }, 500);
     }
   };
 
   const prev = () => {
     if (current > 0) setCurrent(current - 1);
-  };
-
-  // Animation variants
-  const variants = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-    exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
   };
 
   return (
@@ -76,18 +68,11 @@ const SkinTypeQuiz = () => {
         }}
         className="quiz-progress"
       />
-      <motion.div
-        key={current}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        variants={variants}
-        className="quiz-content"
-      >
-        {current < questions.length ? (
-          <Card className="quiz-card" bordered={false}>
-            <Row justify="center" align="middle">
-              <Col span={24}>
+      <Card className="quiz-card" bordered={false}>
+        <Row justify="center" align="middle">
+          <Col span={24}>
+            {current < questions.length ? (
+              <>
                 <Text className="quiz-question">{questions[current].question}</Text>
                 <Radio.Group
                   onChange={(e) => handleAnswer(e.target.value)}
@@ -110,20 +95,20 @@ const SkinTypeQuiz = () => {
                     {current === questions.length - 1 ? 'Submit' : 'Next'} <LoadingOutlined spin={false} />
                   </Button>
                 </div>
-              </Col>
-            </Row>
-          </Card>
-        ) : (
-          <Card className="quiz-result-card" bordered={false}>
-            <Title level={3} className="quiz-result-title">
-              Your Skin Type Result
-            </Title>
-            <Text className="quiz-result-text">
-              Thank you for completing the quiz! Your skin type will be displayed here soon. (Mock result: Check console for details.)
-            </Text>
-          </Card>
-        )}
-      </motion.div>
+              </>
+            ) : (
+              <div className="quiz-result">
+                <Title level={3} className="quiz-result-title">
+                  Your Skin Type Result
+                </Title>
+                <Text className="quiz-result-text">
+                  Thank you for completing the quiz! Your skin type will be displayed here soon. (Mock result: Check console for details.)
+                </Text>
+              </div>
+            )}
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };
