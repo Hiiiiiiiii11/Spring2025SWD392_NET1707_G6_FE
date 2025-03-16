@@ -1,6 +1,4 @@
 /* General Styling */
-
-
 .home-container {
   color: #333;
 }
@@ -117,7 +115,6 @@
 .product__topsale {
   margin-top: 40px;
 }
-
 .product__title {
   font-weight: 700;
   font-size: 26px;
@@ -150,24 +147,20 @@
 
 @media (max-width: 1200px) {
   .product-grid {
-    grid-template-columns: repeat(3,
-        1fr);
+    grid-template-columns: repeat(3, 1fr);
     /* 3 sản phẩm trên hàng khi màn hình nhỏ hơn 1200px */
   }
 }
-
 @media (max-width: 768px) {
   .product-grid {
-    grid-template-columns: repeat(2,
-        1fr);
+    grid-template-columns: repeat(2, 1fr);
     /* 2 sản phẩm trên hàng khi màn hình nhỏ hơn 768px */
   }
 }
 
 @media (max-width: 480px) {
   .product-grid {
-    grid-template-columns: repeat(1,
-        1fr);
+    grid-template-columns: repeat(1, 1fr);
     /* 1 sản phẩm trên hàng khi màn hình nhỏ */
   }
 }
