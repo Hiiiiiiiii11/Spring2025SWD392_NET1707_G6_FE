@@ -11,7 +11,7 @@ import { getAllPromotionAPI } from "../../services/managePromotionService";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getAllBatchByProductIdAPI } from "../../services/manageBatchService";
+import { RemoveProductFromCartAPI } from "../../services/cartService";
 
 const { Option } = Select;
 
@@ -23,15 +23,17 @@ const OrderConfirmationPage = () => {
   const [form] = Form.useForm();
   const [shippingForm] = Form.useForm();
   const [shippingInfo, setShippingInfo] = useState({ name: "", address: "" });
+  const [shippingModalVisible, setShippingModalVisible] = useState(false);
   const [promotions, setPromotions] = useState([]);
   const [selectedPromotion, setSelectedPromotion] = useState(null);
-  const [batchData, setBatchData] = useState({});
+  const [showAll, setShowAll] = useState(false);
   const customerId = sessionStorage.getItem("customerId");
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [discountedTotal, setDiscountedTotal] = useState(0);
 
   useEffect(() => {
     fetchProfile();
     fetchPromotions();
-    fetchBatchData();
   }, []);
 
   const fetchProfile = async () => {
@@ -49,41 +51,82 @@ const OrderConfirmationPage = () => {
   const fetchPromotions = async () => {
     try {
       const data = await getAllPromotionAPI();
+      console.log(data)
       setPromotions(data);
     } catch (error) {
       console.error("Failed to fetch promotions", error);
     }
   };
-
-  const fetchBatchData = async () => {
-    const batchInfo = {};
-    for (const item of selectedItems) {
-      const batches = await getAllBatchByProductIdAPI(item.productID);
-
-      // Sắp xếp batch theo hạn sử dụng từ sớm nhất đến muộn nhất
-      batches.sort((a, b) => new Date(a.expireDate) - new Date(b.expireDate));
-
-      let remainingQuantity = item.quantity;
-      const selectedBatches = [];
-
-      for (const batch of batches) {
-        if (remainingQuantity <= 0) break;
-        const usedQuantity = Math.min(remainingQuantity, batch.quantity);
-        selectedBatches.push({
-          batchId: batch.batchId,
-          importDate: batch.importDate,
-          expireDate: batch.expireDate,
-          usedQuantity,
-        });
-        remainingQuantity -= usedQuantity;
-      }
-
-      batchInfo[item.productID] = selectedBatches;
+  const onFinish = async () => {
+    if (!selectedItems.length) {
+      toast.warning("No products selected!");
+      return;
     }
-    setBatchData(batchInfo);
+
+    setIsPlacingOrder(true);
+    const orderData = {
+      orderDate: dayjs().format("YYYY-MM-DD"),
+      promotionId: selectedPromotion ? selectedPromotion.promotionId : "",
+      address: shippingInfo.address,
+      orderDetails: selectedItems.map((item) => ({
+        productId: item.productID,
+        quantity: item.quantity,
+      })),
+    };
+
+    try {
+      const orderResult = await createOrderAPI(orderData);
+
+      // Xóa sản phẩm đã đặt hàng khỏi giỏ hàng
+      await Promise.all(selectedItems.map((item) => RemoveProductFromCartAPI(item.productID)));
+
+      sessionStorage.removeItem("selectedItems");
+
+      setTimeout(() => {
+        window.location.href = `${orderResult}`;
+      }, 2000);
+    } catch (error) {
+      toast.error(`Failed to place order: ${error}`);
+      setIsPlacingOrder(false);
+    }
   };
 
+
+  const handleShippingModalOk = async () => {
+    try {
+      const values = await shippingForm.validateFields();
+      setShippingInfo({
+        ...shippingInfo, // giữ nguyên name
+        address: values.shippingAddress,
+      });
+      setShippingModalVisible(false);
+      toast.success("Shipping info updated successfully!");
+    } catch (error) {
+      toast.warning("Please check the shipping information!");
+    }
+  };
   const totalAmount = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleApplyPromotion = (promotionId) => {
+    const promo = promotions.find((p) => p.promotionId === promotionId);
+    console.log("Selected Promotion:", promo); // Kiểm tra giá trị minimumAmount
+    console.log("Total Amount:", totalAmount);
+
+    if (promo) {
+      if (totalAmount < Number(promo.minimumAmount)) { // Đổi từ minimumOrderAmount -> minimumAmount
+        toast.warning(`This promotion requires a minimum order amount of $${promo.minimumAmount}`);
+        return;
+      }
+
+      const discount = (totalAmount * promo.discountPercentage) / 100;
+      setDiscountedTotal(totalAmount - discount);
+      setSelectedPromotion(promo);
+      toast.success(`Applied Promotion: ${promo.promotionName}`);
+    }
+  };
+
+
+
 
   return (
     <div>
@@ -107,6 +150,19 @@ const OrderConfirmationPage = () => {
               <p>
                 <strong>Address: </strong>&nbsp;{shippingInfo.address}
               </p>
+            </div>
+            <div className="edit-delivery-address">
+              <Button
+                type="link"
+                onClick={() => {
+                  shippingForm.setFieldsValue({
+                    shippingAddress: shippingInfo.address,
+                  });
+                  setShippingModalVisible(true);
+                }}
+              >
+                Change Address
+              </Button>
             </div>
           </div>
         </Card>
@@ -147,24 +203,100 @@ const OrderConfirmationPage = () => {
                     </p>
 
                   </div>
-                  <div className="product-date">
-                    {batchData[item.productID] && batchData[item.productID].length > 1 && (
-                      <p style={{ color: "Blue", fontWeight: "bold" }}>This product has multiple expiration dates.</p>
-                    )}
-
-                    {batchData[item.productID]?.map((batch, index) => (
-                      <div key={index}>
-                        <p><strong>Manufacturing Date:</strong> {dayjs(batch.importDate).format("YYYY-MM-DD")}</p>
-                        <p><strong>Expiration Date:</strong> {dayjs(batch.expireDate).format("YYYY-MM-DD")}</p>
-                      </div>
-                    ))}
-
-                  </div>
                 </div>
               </div>
             </Card>
+
           ))}
+          <Card title="Select Promotions" style={{ marginBottom: "16px" }}>
+            {promotions.length > 0 && (
+              <div>
+                {showAll
+                  ? promotions.map((promo) => (
+                    <Card key={promo.promotionId} style={{ marginBottom: "8px" }}>
+                      <div className="promotion-select">
+                        <div className="promotion-info">
+                          <div >
+                            <p><strong>{promo.promotionName}</strong></p>
+                            <p>{promo.description}</p>
+                          </div>
+                          <div className="valid-date-pro">
+                            <p>Valid: {new Date(promo.startDate).toLocaleDateString()} - {new Date(promo.endDate).toLocaleDateString()}</p>
+
+                          </div>
+                        </div>
+                        <div className="apply-promotion">
+                          <Button type="primary" onClick={() => handleApplyPromotion(promo.promotionId)}>Apply</Button>
+                        </div>
+
+                      </div>
+                    </Card>
+                  ))
+                  : (
+                    <Card key={promotions[0].promotionId} style={{ marginBottom: "8px" }}>
+                      <div className="promotion-select">
+                        <div className="promotion-info">
+                          <div>
+                            <p><strong>{promotions[0].promotionName}</strong></p>
+                            <p>{promotions[0].description}</p>
+                          </div>
+                          <div className="valid-date-pro">
+                            <p>Valid: {new Date(promotions[0].startDate).toLocaleDateString()} - {new Date(promotions[0].endDate).toLocaleDateString()}</p>
+
+                          </div>
+                        </div>
+                        <div className="apply-promotion">
+                          <Button type="primary" onClick={() => handleApplyPromotion(promotions[0].promotionId)}>Apply</Button>
+                        </div>
+                      </div>
+                    </Card>
+                  )
+                }
+                {promotions.length > 1 && (
+                  <Button type="link" onClick={() => setShowAll(!showAll)}>
+                    {showAll ? "Hide Promotions" : "View More Promotions"}
+                  </Button>
+                )}
+              </div>
+            )}
+          </Card>
+
+          <Card title="Order Summary" style={{ marginBottom: "16px" }}>
+            <div className="total-price-order">
+              <div>
+                <p><strong style={{ color: "red" }}>Total Amount:</strong> ${totalAmount.toLocaleString()}</p>
+                {selectedPromotion && <p><strong style={{ color: "green" }}>Total payment:</strong> ${discountedTotal.toLocaleString()}</p>}
+              </div>
+            </div>
+          </Card>
+          <div className="place-order-submit">
+            <Form form={form} onFinish={onFinish} style={{ marginTop: 20 }}>
+              <button type="submit" className="place-order-button" disabled={isPlacingOrder}>
+                {isPlacingOrder ? "Processing..." : "Place Order"}
+              </button>
+            </Form>
+          </div>
         </div>
+        <Modal
+          title="Edit Delivery Information"
+          visible={shippingModalVisible}
+          onOk={handleShippingModalOk}
+          onCancel={() => setShippingModalVisible(false)}
+          okText="Save"
+        >
+          <Form form={shippingForm} layout="vertical">
+            <Form.Item
+              name="shippingAddress"
+              label="Address"
+              rules={[{ required: true, message: "Address is required!" }]}
+            >
+              <Input.TextArea
+                placeholder="Enter your delivery address"
+                rows={4}
+              />
+            </Form.Item>
+          </Form>
+        </Modal>
 
         <Footer />
       </div>

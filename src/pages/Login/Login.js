@@ -41,9 +41,8 @@ const Login = () => {
       const data = await loginAPI(formData);
       sessionStorage.setItem("token", data.token);
 
-      toast.success(" Login successful!", {
-        onClose: () => navigate("/"),
-      });
+      sessionStorage.setItem("loginSuccess", "true");
+      navigate("/");
 
     } catch (error) {
       toast.error(" Incorrect email or password!");

@@ -11,9 +11,7 @@ const { Title, Text } = Typography;
 
 const CustomerHistoryOrder = () => {
   const [orders, setOrders] = useState([]);
-  // Lưu các order id đang được mở rộng để hiển thị chi tiết đơn hàng
   const [expandedOrders, setExpandedOrders] = useState([]);
-  // Lưu trữ thông tin sản phẩm cho từng order: { [orderId]: [productDetail, ...] }
   const [orderProductDetails, setOrderProductDetails] = useState({});
   const customerId = sessionStorage.getItem("customerId");
 
@@ -28,6 +26,7 @@ const CustomerHistoryOrder = () => {
   const fetchCustomerHistoryOrder = async () => {
     try {
       const historyOrder = await GetAllHistoryOrderByIdAPI(customerId);
+      console.log(historyOrder)
       if (historyOrder) {
         // Sắp xếp theo ngày giảm dần (mới nhất trước)
         const sortedOrders = historyOrder.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
@@ -69,10 +68,10 @@ const CustomerHistoryOrder = () => {
   };
 
   return (
-    <div>
+    <div style={{ minHeight: "100vh" }}>
       <ToastContainer />
       <Header />
-      <div style={{ padding: 24, margin: '0 auto', height: "100vh" }}>
+      <div style={{ padding: 24, margin: '0 auto' }}>
         <Title level={2}>History Order</Title>
         {orders.length === 0 ? (
           <div className="no-order">
@@ -96,14 +95,36 @@ const CustomerHistoryOrder = () => {
                       <p>Order Address : {order.address}</p>
                     </div>
                     <div className='div-total-price'>
-                      <p className="totalprice-history" style={{ fontWeight: 'bold' }}>Original Total: ${order.totalAmount / 25000}</p>
+                      <p className="totalprice-history" style={{ fontWeight: 'bold' }}>Original Total: ${order.totalAmount}</p>
                     </div>
                   </div>
 
-                  <Space style={{ marginTop: 10 }}>
-                    <Button type="default" onClick={() => handleToggleDetails(order)}>
-                      {expandedOrders.includes(order.orderId) ? 'Hide Details' : 'View Details'}
-                    </Button>
+                  <Space style={{ marginTop: 10, width: "100%" }}>
+                    <div className='group-button-order'>
+                      <div>
+                        <Button type="default" onClick={() => handleToggleDetails(order)}>
+                          {expandedOrders.includes(order.orderId) ? 'Hide Details' : 'View Details'}
+                        </Button>
+                      </div>
+                      {order.status === "PENDING" && (
+                        <Button
+                          className='order-continue-payment'
+                          type="primary"
+                          onClick={() => window.location.href = order.paymentUrl}
+                        >
+                          Continue Payment
+                        </Button>
+                      )}
+                      {order.status === "DELIVERED" && (
+                        <Button
+                          className='order-continue-payment'
+                          type="primary"
+                        // onClick={() => }
+                        >
+                          Return Product
+                        </Button>
+                      )}
+                    </div>
                   </Space>
 
                   {/* Nếu đơn hàng được mở rộng, hiển thị danh sách sản phẩm */}

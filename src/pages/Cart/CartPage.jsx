@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Spin, Modal, InputNumber, Checkbox } from "antd";
+import { Card, Button, Spin, Modal, InputNumber, Checkbox, Table } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -8,7 +8,7 @@ import { GetAllProductCartAPI, UpdateQuantityProductAPI, RemoveProductFromCartAP
 import "../Cart/CartPage.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getAllBatchByProductIdAPI } from "../../services/manageBatchService";
+
 
 const CartPage = () => {
     const [cartProducts, setCartProducts] = useState([]);
@@ -19,8 +19,9 @@ const CartPage = () => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [productToRemove, setProductToRemove] = useState(null);
+    const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
+    const [selectedProductBatches, setSelectedProductBatches] = useState([]);
     const navigate = useNavigate();
-    const [productBatches, setProductBatches] = useState([]);
 
     useEffect(() => {
         fetchCart();
@@ -30,17 +31,19 @@ const CartPage = () => {
         try {
             setLoading(true);
             const data = await GetAllProductCartAPI();
+            console.log(data)
             const formattedCart = data.map((item) => ({
                 ...item.product,
                 quantity: item.quantity,
+                batches: item.batches || [] // Thêm thông tin batch vào sản phẩm
             }));
             setCartProducts(formattedCart);
         } catch (error) {
+            console.error("Failed to fetch cart:", error);
         } finally {
             setLoading(false);
         }
     };
-
 
     const showUpdateModal = (product) => {
         setSelectedProduct(product);
@@ -56,7 +59,7 @@ const CartPage = () => {
     // Xử lý đặt hàng (chuyển đến OrderConfirmationPage với các sản phẩm được chọn)
     const handleOrderProduct = () => {
         if (selectedProducts.length === 0) {
-            toast.warning("⚠️ Please select at least one product to order!");
+            toast.warning(" Please select at least one product to order!");
             return;
         }
 
@@ -73,8 +76,12 @@ const CartPage = () => {
     const handleUpdateQuantity = async () => {
         if (!selectedProduct) return;
 
+        // Kiểm tra nếu số lượng mới lớn hơn số lượng tồn kho
+
+
         try {
             await UpdateQuantityProductAPI(selectedProduct.productID, newQuantity);
+
             toast.success(" Quantity updated successfully!");
             setCartProducts((prevCart) =>
                 prevCart.map((item) =>
@@ -133,8 +140,33 @@ const CartPage = () => {
         }
     };
 
+    const batchColumns = [
+        {
+            title: "Quantity",
+            dataIndex: "quantity",
+            key: "quantity",
+        },
+        {
+            title: "Manufactured Date",
+            dataIndex: "importDate",
+            key: "importDate",
+            render: (text) => new Date(text).toLocaleDateString(),
+        },
+        {
+            title: "Expiration Date",
+            dataIndex: "expireDate",
+            key: "expireDate",
+            render: (text) => new Date(text).toLocaleDateString(),
+        },
+
+    ];
+    const showBatchModal = (batches) => {
+        setSelectedProductBatches(batches);
+        setIsBatchModalOpen(true);
+    };
+
     return (
-        <div>
+        <div style={{ minHeight: "100vh" }}>
             <ToastContainer />
             <div className="cart-page">
                 <div className="cartpage-info">
@@ -180,15 +212,26 @@ const CartPage = () => {
                                         />
                                     </Link>
                                     <div className="cart-card-info">
-                                        <Link to={`/view-cart-product-detail?productId=${product.productID}`}>
-                                            <h2>{product.productName}</h2>
-                                        </Link>
-                                        <p><strong>Category:</strong> {product.category}</p>
-                                        <p><strong>For Skin Type:</strong> {product.skinTypeCompatibility}</p>
-                                        <p className="price"><strong>Price:</strong> {product.price ? product.price.toLocaleString() + "$" : "N/A"}</p>
-                                        <p><strong>Description:</strong> {product.description}</p>
-                                        <p><strong>Quantity:</strong> {product.quantity}</p>
-                                        <p className="price" style={{ fontSize: "20px" }}><strong>Total:</strong> {product.price * product.quantity}$</p>
+                                        <div className="cart-card-info-and-batches">
+                                            <div>
+                                                <Link to={`/view-cart-product-detail?productId=${product.productID}`}>
+                                                    <h2>{product.productName}</h2>
+                                                </Link>
+
+                                                <p><strong>Category : </strong> {product.category}</p>
+                                                <p><strong>For Skin Type : </strong> {product.skinTypeCompatibility}</p>
+                                                <p><strong>Price : </strong> {product.price ? product.price.toLocaleString() + "$" : "N/A"}</p>
+                                                <p><strong>Quantity : </strong> {product.quantity}</p>
+                                            </div>
+                                            <div className="cart-batch-detail">
+                                                <Button onClick={() => showBatchModal(product.batches)} type="link">
+                                                    View Batch Details
+                                                </Button>
+                                            </div>
+                                        </div>
+
+
+                                        <p className="price" style={{ fontSize: "20px", color: "red" }}><strong>Total:</strong> {product.price * product.quantity}$</p>
 
                                         <div className="cart-actions">
                                             <Button type="primary" onClick={() => showUpdateModal(product)}>
@@ -213,7 +256,7 @@ const CartPage = () => {
                     </>
                 )}
             </div>
-            <Footer />
+
 
 
 
@@ -229,10 +272,18 @@ const CartPage = () => {
                 Quantity:
                 <InputNumber
                     min={1}
-                    max={selectedProduct?.stockQuantity || 100}
+                    max={selectedProduct?.stockQuantity} // Giới hạn tối đa là số lượng sản phẩm trong kho
                     value={newQuantity}
-                    onChange={(value) => setNewQuantity(value)}
+                    onChange={(value) => {
+                        if (value > selectedProduct.stockQuantity) {
+                            toast.warning("You cannot add more than the available stock!");
+                        } else {
+                            setNewQuantity(value);
+                        }
+                    }}
+                    style={{ width: "200px", height: "40px", fontSize: "15px" }}
                 />
+
             </Modal>
 
             <Modal
@@ -245,6 +296,17 @@ const CartPage = () => {
             >
                 <p>Do you want to remove <strong>{productToRemove?.productName}</strong> from your cart?</p>
             </Modal>
+
+            <Modal
+                title="Batch Details"
+                open={isBatchModalOpen}
+                onCancel={() => setIsBatchModalOpen(false)}
+                footer={null}
+                width={600}
+            >
+                <Table columns={batchColumns} dataSource={selectedProductBatches} rowKey="batchNumber" />
+            </Modal>
+            <Footer />
         </div>
     );
 };

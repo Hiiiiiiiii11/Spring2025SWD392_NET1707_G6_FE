@@ -43,11 +43,7 @@
     color: #555;
 }
 
-.cart-card-info .price {
-    color: #e74c3c;
-    font-weight: bold;
-    font-size: 1.2em;
-}
+
 
 .cartpage-info {
     display: flex;
@@ -81,4 +77,14 @@
     width: 100%;
     display: flex;
     justify-content: right;
+}
+
+.cart-card-info-and-batches {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cart-batch-detail {
+    display: flex;
+    align-items: flex-end;
 }

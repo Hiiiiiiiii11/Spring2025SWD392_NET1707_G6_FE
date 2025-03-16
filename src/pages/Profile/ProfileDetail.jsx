@@ -30,7 +30,7 @@ const UserProfile = () => {
         console.log(data)
         setProfile(data);
         setFormData(data);
-      } else if (role === "CUSTOMER_STAFF" || role === "MANAGER") {
+      } else if (role === "CUSTOMER_STAFF" || role === "MANAGER" || role === "DELIVERY_STAFF") {
         const data = await GetStaffProfileAPI(staffId);
         setProfile(data);
         setFormData(data);
@@ -56,7 +56,7 @@ const UserProfile = () => {
       if (role === "CUSTOMER") {
         updatedProfile = await UpdateCustomerProfileAPI(formData);
         fetchProfile();
-      } else if (role === "CUSTOMER_STAFF" || role === "MANAGER") {
+      } else if (role === "CUSTOMER_STAFF" || role === "MANAGER" || role === "DELIVERY_STAFF") {
         updatedProfile = await UpdateStaffProfileAPI(staffEmail, {
           fullName: formData.fullname,
           phone: formData.phone,

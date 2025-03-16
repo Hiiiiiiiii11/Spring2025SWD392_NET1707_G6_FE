@@ -95,6 +95,7 @@ function Header() {
       onClick: () => {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("role");
+        sessionStorage.removeItem("loginSuccess");
         navigate("/login");
       },
     },

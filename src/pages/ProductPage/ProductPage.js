@@ -159,11 +159,18 @@ const ProductPage = () => {
             </p>
             <InputNumber
               min={1}
-              max={1000}
+              max={selectedProduct?.stockQuantity} // Giới hạn tối đa là số lượng sản phẩm trong kho
               value={quantity}
-              onChange={setQuantity}
+              onChange={(value) => {
+                if (value > selectedProduct.stockQuantity) {
+                  toast.warning("You cannot add more than the available stock!");
+                } else {
+                  setQuantity(value);
+                }
+              }}
               style={{ width: "200px", height: "40px", fontSize: "15px" }}
             />
+
           </>
         )}
       </Modal>

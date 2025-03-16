@@ -8,6 +8,8 @@ import { getAllProductAPI } from "../../services/manageProductService";
 import Blog from "../../components/Blog/Blog";
 import FAQ from "../../components/FAQ/FAQ";
 import News from "../../components/News/News";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const { Meta } = Card;
 
@@ -52,6 +54,13 @@ function Home() {
 
   // Fetch products from API when component mounts
   useEffect(() => {
+    const loginSuccess = sessionStorage.getItem("loginSuccess");
+    if (loginSuccess) {
+      toast.success("Login successful!");
+    }
+    setTimeout(() => {
+      sessionStorage.removeItem("loginSuccess");
+    }, 1000);
     const fetchProducts = async () => {
       const data = await getAllProductAPI();
       if (data) setProducts(data);
@@ -61,7 +70,9 @@ function Home() {
 
   return (
     <div className="home-page">
+      <ToastContainer />
       <Header />
+
       <div className="home-container">
         <BannerSlider />
 

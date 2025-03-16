@@ -26,6 +26,8 @@ import ViewCartProductDetail from "../pages/CartDetail/ViewCartProductDetail";
 import OrderConfirmationPage from "../pages/OrderConfirm/OrderConfirmationPage";
 import ManageQuiz from "../pages/ManageQuiz/ManageQuiz";
 import PaymentReturnPage from "../pages/PaymentReturnPage";
+import RefundForm from "../components/FormRefund/FormRefund";
+
 
 
 const AppRouter = createBrowserRouter([
@@ -56,13 +58,14 @@ const AppRouter = createBrowserRouter([
       { path: "/manage-staff", element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} /> },
       { path: "/manage-quiz", element: <PrivateRoute element={<ManageQuiz />} allowedRoles={["MANAGER"]} /> },
       { path: "/manager-orders", element: <ManageOrders />, },
-      { path: "/forgot-password", element: <ForgotPassword /> },
+
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
     ],
   },
-
+  { path: "/refund", element: <RefundForm /> },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
+  { path: "/forgot-password", element: <ForgotPassword /> },
 
 ]);
 

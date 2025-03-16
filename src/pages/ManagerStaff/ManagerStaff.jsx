@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Input, Button, Form, Modal, Select, } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import "./ManagerStaff.css";
-import { CreateEmployeeAPI, deleteEmployeeAPI, GetAllEmployeeAPI } from "../../services/manageEmployeeService";
+import { CreateEmployeeAPI, deleteEmployeeAPI, GetAllEmployeeAPI, UpdateEmployeeAPI } from "../../services/manageEmployeeService";
 import Header from "../../components/Header/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -48,7 +48,6 @@ function ManagerStaff() {
   };
 
   const handleDeleteStaff = async (id) => {
-    console.log(id)
     const confirmDelete = window.confirm("Are you sure you want to delete this promotion?");
     if (!confirmDelete) return;
     try {
@@ -67,18 +66,27 @@ function ManagerStaff() {
       const values = await form.validateFields();
 
       if (editMode) {
-        // 🔹 Gọi API cập nhật nhân viên nếu có
-        // const updatedEmployee = await UpdateEmployeeAPI(editingStaffId, values);
-        // if (updatedEmployee) {
-        //   setStaffs((prev) =>
-        //     prev.map((s) => (s.id === editingStaffId ? updatedEmployee : s))
-        //   );
-        //   alert("Staff updated successfully!");
-        // } else {
-        //   alert("Failed to update staff!");
-        // }
+        const updatedEmployee = await UpdateEmployeeAPI(editingStaffId, {
+          staffId: editingStaffId,
+          fullname: values.fullname,
+          email: values.email,
+          phone: values.phone,
+          role: values.role.toUpperCase(),
+          password: values.password,
+        });
+
+        if (updatedEmployee) {
+          setStaffs((prev) =>
+            prev.map((s) =>
+              s.staffId === editingStaffId ? { ...s, ...values } : s
+            )
+          );
+          toast.success("Staff updated successfully!");
+          fetchEmployees();
+        } else {
+          toast.error("Failed to update staff!");
+        }
       } else {
-        // Thêm nhân viên mới
         const newEmployeeData = {
           fullname: values.fullname,
           email: values.email,
@@ -89,8 +97,9 @@ function ManagerStaff() {
 
         const newEmployee = await CreateEmployeeAPI(newEmployeeData);
         if (newEmployee) {
-          setStaffs((prev) => [...prev, { id: newEmployee.id, ...newEmployeeData }]);
+          setStaffs((prev) => [...prev, { staffId: newEmployee.staffId, ...newEmployeeData }]);
           toast.success("Staff added successfully!");
+          fetchEmployees();
         } else {
           toast.warning("Failed to add staff!");
         }
@@ -103,10 +112,11 @@ function ManagerStaff() {
     }
   };
 
+
   const filteredStaffs = staffs
     ? staffs.filter(
       (s) =>
-        s.role === "CUSTOMER_STAFF" &&
+        s.role === "CUSTOMER_STAFF" || s.role === "DELIVERY_STAFF" &&
         s.fullname &&
         s.fullname.toLowerCase().includes((search || "").toLowerCase())
     )
@@ -204,15 +214,15 @@ function ManagerStaff() {
                   ))}
                 </Select>
               </Form.Item>
-              {!editMode && (
-                <Form.Item
-                  name="password"
-                  label="Password"
-                  rules={[{ required: true, message: "Password is required!" }]}
-                >
-                  <Input.Password placeholder="********" />
-                </Form.Item>
-              )}
+
+              <Form.Item
+                name="password"
+                label="Password"
+                rules={[{ required: true, message: "Password is required!" }]}
+                hidden
+              >
+                <Input.Password placeholder="********" />
+              </Form.Item>
 
             </Form>
           </Modal>

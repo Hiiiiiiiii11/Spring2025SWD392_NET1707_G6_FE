@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DeleteOrderByIdAPI } from "../services/customerOrderService";
-import { RemoveProductFromCartAPI } from "../services/cartService";
-import { sendPaymentResultToBackend } from "../services/customerOrderService"; // API gửi về backend
+import { sendPaymentResultToBackend } from "../services/customerOrderService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PaymentReturnPage = () => {
     const navigate = useNavigate();
-    const isProcessing = useRef(false); // Tránh gọi API 2 lần
-    const [paymentHandled, setPaymentHandled] = useState(false); // Tránh xử lý lại kết quả thanh toán
+    const isProcessing = useRef(false);
+    const [paymentHandled, setPaymentHandled] = useState(false);
 
     useEffect(() => {
-        if (isProcessing.current || paymentHandled) return; // Chặn lần gọi thứ hai
+        if (isProcessing.current || paymentHandled) return;
         isProcessing.current = true;
 
         const params = new URLSearchParams(window.location.search);
@@ -22,7 +23,7 @@ const PaymentReturnPage = () => {
         sendPaymentResultToBackend(paymentData)
             .then(() => {
                 console.log("Payment result sent successfully.");
-                setPaymentHandled(true); // Đánh dấu đã xử lý xong
+                setPaymentHandled(true);
             })
             .catch((error) => {
                 console.error("Failed to send payment result to backend:", error);
@@ -36,38 +37,27 @@ const PaymentReturnPage = () => {
         window.history.replaceState({}, document.title, newUrl);
 
         if (responseCode === "00") {
-            // Thành công: xóa sản phẩm khỏi giỏ hàng
-            const selectedItemsStr = sessionStorage.getItem("selectedItems");
-            if (selectedItemsStr) {
-                const selectedItems = JSON.parse(selectedItemsStr);
-                Promise.all(
-                    selectedItems.map((item) => RemoveProductFromCartAPI(item.productID))
-                )
-                    .then(() => {
-                        alert("Order placed successfully!");
-                        sessionStorage.removeItem("selectedItems");
-                        navigate("/historyorders", { replace: true });
-                    })
-                    .catch(() => {
-                        alert("Order placed successfully, but failed to clear cart!");
-                        sessionStorage.removeItem("selectedItems");
-                        navigate("/historyorders", { replace: true });
-                    });
-            } else {
-                alert("Order placed successfully!");
-                navigate("/historyorders", { replace: true });
-            }
+            // Thanh toán thành công
+            toast.success("Order placed successfully!");
+            navigate("/historyorders", { replace: true });
         } else {
-            // Thất bại: Xóa đơn hàng
-            DeleteOrderByIdAPI(orderId)
-                .finally(() => {
-                    alert("Payment failed. Order has been cancelled!");
-                    navigate("/cart", { replace: true });
-                });
+            // Thanh toán thất bại
+            DeleteOrderByIdAPI(orderId).finally(() => {
+                toast.warning("Payment failed. Order has been cancelled!");
+                navigate("/cart", { replace: true });
+            });
         }
+
     }, [navigate, paymentHandled]);
 
-    return <div>Processing Payment Result...</div>;
+    return (
+        <div>
+            <ToastContainer />
+            <div style={{ fontSize: "20px" }}>
+                Processing Payment Result...
+            </div>
+        </div>
+    );
 };
 
 export default PaymentReturnPage;

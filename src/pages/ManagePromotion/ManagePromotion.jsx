@@ -38,6 +38,7 @@ const ManagePromotion = () => {
   const columns = [
     { title: 'Name', dataIndex: 'promotionName', key: 'promotionName' },
     { title: 'Description', dataIndex: 'description', key: 'description' },
+    { title: 'Active Price', dataIndex: 'minimumAmount', key: 'minimumAmount' },
     { title: 'Discount', dataIndex: 'discountPercentage', key: 'discountPercentage' },
     { title: 'Start Date', dataIndex: 'startDate', key: 'startDate', render: (text) => new Date(text).toLocaleDateString() },
     { title: 'End Date', dataIndex: 'endDate', key: 'endDate', render: (text) => new Date(text).toLocaleDateString() },
@@ -163,6 +164,13 @@ const ManagePromotion = () => {
               rules={[{ required: true, message: 'Please enter the description!' }]}
             >
               <Input.TextArea placeholder="Enter promotion description" rows={4} />
+            </Form.Item>
+            <Form.Item
+              name="minimumAmount"
+              label="Active Price"
+              rules={[{ required: true, message: 'Please enter the description!' }]}
+            >
+              <Input placeholder="Enter promotion minimumAmount" rows={4} />
             </Form.Item>
             <Form.Item
               name="discountPercentage"

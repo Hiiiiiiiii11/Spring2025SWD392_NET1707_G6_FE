@@ -63,3 +63,23 @@ button.back-to-cart {
     justify-content: space-between;
     width: 100%;
 }
+
+.promotion-info {
+    display: flex;
+    justify-content: space-between;
+}
+
+.apply-promotion {
+    display: flex;
+    justify-content: right;
+}
+
+.valid-date-pro {
+    display: flex;
+    align-items: flex-end;
+}
+
+.total-price-order {
+    display: flex;
+    justify-content: end;
+}

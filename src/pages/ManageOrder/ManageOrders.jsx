@@ -9,13 +9,13 @@ import "react-toastify/dist/ReactToastify.css";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-const statusOptions = ["PENDING", "SHIPPED", "PAID", "CANCELLED", "RETURNED", "REFUNDED"];
+const statusOptions = ["PENDING", "SHIPPED", "DELIVERED", "PAID", "CANCELLED", "RETURNED", "REFUNDED"];
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [expandedOrders, setExpandedOrders] = useState([]);
   const [orderProductDetails, setOrderProductDetails] = useState({});
-
+  const role = sessionStorage.getItem("role");
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -30,7 +30,17 @@ const ManageOrders = () => {
     }
   };
 
-  const handleUpdateStatus = async (orderId, newStatus) => {
+  const handleUpdateStatus = async (orderId, newStatus, currentStatus) => {
+    const validTransitions = {
+      PENDING: ["SHIPPED"],
+      SHIPPED: ["DELIVERED"],
+    };
+
+    if (!validTransitions[currentStatus]?.includes(newStatus)) {
+      toast.error(`Invalid status transition from ${currentStatus} to ${newStatus}`);
+      return;
+    }
+
     try {
       await UpdateCustomerOrderStatusAPI(orderId, newStatus);
       setOrders(orders.map(o =>
@@ -41,6 +51,7 @@ const ManageOrders = () => {
       toast.error("Failed to update status");
     }
   };
+
 
   const fetchProductDetailsForOrder = async (order) => {
     try {
@@ -73,16 +84,37 @@ const ManageOrders = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text, order) => (
-        <Select
-          defaultValue={text}
-          style={{ width: 150 }}
-          onChange={(value) => handleUpdateStatus(order.orderId, value)}
-          options={statusOptions.map(status => ({ value: status, label: status }))}
-        /*            If you wish to disable dropdown when order is already delivered, you can add: \n disabled={text === 'DELIVERED'} */
-        />
-      ),
+      render: (text, order) => {
+        const allowedStatuses = {
+          PAID: ["SHIPPED"],
+          SHIPPED: ["DELIVERED"],
+        };
+
+        return (<>
+
+          <Select
+            value={text}
+            style={{ width: 150 }}
+            onChange={(value) => handleUpdateStatus(order.orderId, value, text)}
+            disabled={!allowedStatuses[text]}
+          >
+            {role === "DELIVERY_STAFF" && (
+              <>
+                {(allowedStatuses[text] || []).map(status => (
+                  <Option key={status} value={status}>
+                    {status}
+                  </Option>
+                ))}
+              </>
+            )}
+          </Select>
+
+        </>
+        );
+      },
     },
+
+
     {
       title: "Total",
       dataIndex: "totalAmount",

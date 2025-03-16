@@ -17,7 +17,23 @@ body {
     align-items: center;
 }
 
+.order-continue-payment {
+    margin-right: 20px;
+}
+
+.div-display-price-and-paymenturl {}
+
 .no-order {
     margin-top: 50px;
     text-align: center;
+}
+
+.ant-space-item {
+    width: 100%;
+}
+
+.group-button-order {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
 }
