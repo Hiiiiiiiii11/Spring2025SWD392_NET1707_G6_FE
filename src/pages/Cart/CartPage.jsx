@@ -31,7 +31,6 @@ const CartPage = () => {
         try {
             setLoading(true);
             const data = await GetAllProductCartAPI();
-            console.log(data)
             const formattedCart = data.map((item) => ({
                 ...item.product,
                 quantity: item.quantity,
@@ -39,7 +38,6 @@ const CartPage = () => {
             }));
             setCartProducts(formattedCart);
         } catch (error) {
-            console.error("Failed to fetch cart:", error);
         } finally {
             setLoading(false);
         }
@@ -76,7 +74,10 @@ const CartPage = () => {
     const handleUpdateQuantity = async () => {
         if (!selectedProduct) return;
 
-        // Kiểm tra nếu số lượng mới lớn hơn số lượng tồn kho
+        if (newQuantity > selectedProduct.stockQuantity) {
+            toast.warning("You cannot add more than the available stock!");
+            return;
+        }
 
 
         try {
@@ -272,14 +273,10 @@ const CartPage = () => {
                 Quantity:
                 <InputNumber
                     min={1}
-                    max={selectedProduct?.stockQuantity} // Giới hạn tối đa là số lượng sản phẩm trong kho
+                    max={1000} // Giới hạn tối đa là số lượng sản phẩm trong kho
                     value={newQuantity}
-                    onChange={(value) => {
-                        if (value > selectedProduct.stockQuantity) {
-                            toast.warning("You cannot add more than the available stock!");
-                        } else {
-                            setNewQuantity(value);
-                        }
+                    onChange={(quantity) => {
+                        setNewQuantity(quantity);
                     }}
                     style={{ width: "200px", height: "40px", fontSize: "15px" }}
                 />

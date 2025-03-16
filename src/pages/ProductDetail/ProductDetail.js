@@ -60,6 +60,10 @@ const ProductDetail = () => {
 
   const handleAddProductToCart = async () => {
     if (!selectedProduct) return;
+    if (quantity > selectedProduct.stockQuantity) {
+      toast.warning("You cannot add more than the available stock!");
+      return;
+    }
 
     try {
       // Lấy danh sách sản phẩm trong giỏ hàng

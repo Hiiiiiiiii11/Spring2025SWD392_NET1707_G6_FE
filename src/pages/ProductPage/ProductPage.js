@@ -41,41 +41,37 @@ const ProductPage = () => {
 
   const handleAddToCart = async () => {
     if (!selectedProduct) return;
+    if (quantity > selectedProduct.stockQuantity) {
+      toast.warning("You cannot add more than the available stock!");
+      return;
+    }
 
     try {
-      // Lấy danh sách sản phẩm trong giỏ hàng
       let cartItems = await GetAllProductCartAPI();
-
-      // Kiểm tra nếu cartItems không phải là mảng, đặt giá trị mặc định []
       cartItems = Array.isArray(cartItems) ? cartItems : [];
 
-      // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
       const existingItem = cartItems.find(item => item.product.productID === selectedProduct.productID);
       const currentCartQuantity = existingItem ? existingItem.quantity : 0;
 
-      // Kiểm tra tổng số lượng đã có trong giỏ hàng
       if (currentCartQuantity + quantity > selectedProduct.stockQuantity) {
-        toast.error(" You cannot add more of this product. Stock limit reached!");
+        toast.error("You cannot add more of this product. Stock limit reached!");
         return;
       }
 
-      // Gọi API thêm sản phẩm vào giỏ hàng
-      const response = await AddProductToCartAPI({
-        product: selectedProduct,
-        quantity,
-      });
+      const response = await AddProductToCartAPI({ product: selectedProduct, quantity });
 
       if (response) {
-        toast.success(` Added "${selectedProduct.productName}" x${quantity} to cart!`);
+        toast.success(`Added "${selectedProduct.productName}" x${quantity} to cart!`);
       } else {
-        toast.error(" Failed to add product to cart!");
+        toast.error("Failed to add product to cart!");
       }
     } catch (error) {
-      toast.error(" Error adding product to cart! Session Time Out!!!");
+      toast.error("Error adding product to cart! Session Time Out!!!");
     }
 
     setIsModalVisible(false);
   };
+
 
 
 
@@ -159,15 +155,9 @@ const ProductPage = () => {
             </p>
             <InputNumber
               min={1}
-              max={selectedProduct?.stockQuantity} // Giới hạn tối đa là số lượng sản phẩm trong kho
+              max={1000} // Giới hạn số lượng nhập tối đa
               value={quantity}
-              onChange={(value) => {
-                if (value > selectedProduct.stockQuantity) {
-                  toast.warning("You cannot add more than the available stock!");
-                } else {
-                  setQuantity(value);
-                }
-              }}
+              onChange={setQuantity}
               style={{ width: "200px", height: "40px", fontSize: "15px" }}
             />
 
