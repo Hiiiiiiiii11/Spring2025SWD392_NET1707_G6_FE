@@ -23,6 +23,7 @@ function ManagerStaff() {
   const fetchEmployees = async () => {
     try {
       const employees = await GetAllEmployeeAPI();
+      console.log(employees)
       if (employees) {
         setStaffs(employees);
       } else {
@@ -74,6 +75,7 @@ function ManagerStaff() {
           role: values.role.toUpperCase(),
           password: values.password,
         });
+        fetchEmployees();
 
         if (updatedEmployee) {
           setStaffs((prev) =>
@@ -82,7 +84,7 @@ function ManagerStaff() {
             )
           );
           toast.success("Staff updated successfully!");
-          fetchEmployees();
+
         } else {
           toast.error("Failed to update staff!");
         }
@@ -199,7 +201,10 @@ function ManagerStaff() {
               <Form.Item
                 name="phone"
                 label="Phone"
-                rules={[{ required: true, message: "Phone number is required!" }]}
+                rules={[
+                  { required: true, message: "Phone number is required!" },
+                  { pattern: /^\d{10}$/, message: "Phone number must be exactly 10 digits!" },
+                ]}
               >
                 <Input placeholder="Phone" />
               </Form.Item>

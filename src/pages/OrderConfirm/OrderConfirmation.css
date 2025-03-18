@@ -48,6 +48,7 @@ button.back-to-cart {
 
 .body-delivery-info {
     display: flex;
+    justify-content: space-between;
 }
 
 .ant-card-body {
@@ -71,15 +72,16 @@ button.back-to-cart {
 
 .apply-promotion {
     display: flex;
-    justify-content: right;
+    justify-content: end;
 }
 
-.valid-date-pro {
-    display: flex;
-    align-items: flex-end;
-}
+
 
 .total-price-order {
     display: flex;
     justify-content: end;
+}
+
+.delivery-info {
+    width: 800px;
 }

@@ -71,11 +71,14 @@ const Register = () => {
     try {
       const data = await registerAPI(formData);
       console.log("Register success:", data);
-      toast.success({ message: "Account created successfully!" });
+      toast.success("Account created successfully!");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
       // Điều hướng nếu cần
       // navigate("/login");
     } catch (error) {
-      toast.error({ message: "Registration failed. Please try again." });
+      toast.error("Registration failed. Please try again.");
     }
   };
 

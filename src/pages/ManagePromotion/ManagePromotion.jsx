@@ -88,6 +88,7 @@ const ManagePromotion = () => {
         toast.success('Update promotion successfully!')
       } else {
         await createNewPromotionAPI(values);
+        toast.success('Create promotion successfully!')
       }
       fetchPromotions();
       setIsModalVisible(false);

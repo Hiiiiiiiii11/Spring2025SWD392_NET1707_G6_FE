@@ -119,7 +119,7 @@ const ManageOrders = () => {
       title: "Total",
       dataIndex: "totalAmount",
       key: "totalAmount",
-      render: (text) => `$${text / 25000}`,
+      render: (text) => `$${text}`,
     },
     {
       title: "Actions",

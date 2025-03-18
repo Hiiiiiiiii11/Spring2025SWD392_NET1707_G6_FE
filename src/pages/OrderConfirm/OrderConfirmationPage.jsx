@@ -51,8 +51,8 @@ const OrderConfirmationPage = () => {
   const fetchPromotions = async () => {
     try {
       const data = await getAllPromotionAPI();
-      console.log(data)
-      setPromotions(data);
+      const sortedPromotions = data.sort((a, b) => Number(a.minimumAmount) - Number(b.minimumAmount));
+      setPromotions(sortedPromotions);
     } catch (error) {
       console.error("Failed to fetch promotions", error);
     }
@@ -222,12 +222,20 @@ const OrderConfirmationPage = () => {
                           </div>
                           <div className="valid-date-pro">
                             <p>Valid: {new Date(promo.startDate).toLocaleDateString()} - {new Date(promo.endDate).toLocaleDateString()}</p>
+                            <div className="apply-promotion" >
+                              <Button
+                                type="primary"
+                                onClick={() => handleApplyPromotion(promo.promotionId)}
+                                disabled={totalAmount < Number(promo.minimumAmount)}
+                              >
+                                Apply
+                              </Button>
+                            </div>
 
-                          </div>
+                          </div >
+                          {/* <div className="apply-promotion"> */}
                         </div>
-                        <div className="apply-promotion">
-                          <Button type="primary" onClick={() => handleApplyPromotion(promo.promotionId)}>Apply</Button>
-                        </div>
+
 
                       </div>
                     </Card>
@@ -246,7 +254,13 @@ const OrderConfirmationPage = () => {
                           </div>
                         </div>
                         <div className="apply-promotion">
-                          <Button type="primary" onClick={() => handleApplyPromotion(promotions[0].promotionId)}>Apply</Button>
+                          <Button
+                            type="primary"
+                            onClick={() => handleApplyPromotion(promotions[0].promotionId)}
+                            disabled={totalAmount < Number(promotions[0].minimumAmount)}
+                          >
+                            Apply
+                          </Button>
                         </div>
                       </div>
                     </Card>
