@@ -28,6 +28,7 @@ import ManageQuiz from "../pages/ManageQuiz/ManageQuiz";
 import PaymentReturnPage from "../pages/PaymentReturnPage";
 import RefundForm from "../components/FormRefund/FormRefund";
 import ManageRequestRefund from "../pages/ManageRequestRefund/ManageRequestRefund";
+import ManageRefundOrderDelivery from "../pages/ManageRefundOrderDelivery/ManageRefundOrderDelivery";
 
 
 
@@ -60,11 +61,12 @@ const AppRouter = createBrowserRouter([
       { path: "/manage-quiz", element: <PrivateRoute element={<ManageQuiz />} allowedRoles={["MANAGER"]} /> },
       { path: "/manager-orders", element: <ManageOrders />, },
       { path: "/manager-request-orders", element: <ManageRequestRefund />, },
+      { path: "/manager-request-return", element: <ManageRefundOrderDelivery />, },
 
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
     ],
   },
-  { path: "/refund", element: <RefundForm /> },
+  { path: "/refund/:refundId", element: <RefundForm /> },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
   { path: "/forgot-password", element: <ForgotPassword /> },

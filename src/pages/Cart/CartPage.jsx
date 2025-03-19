@@ -232,7 +232,10 @@ const CartPage = () => {
                                         </div>
 
 
-                                        <p className="price" style={{ fontSize: "20px", color: "red" }}><strong>Total:</strong> {product.price * product.quantity}$</p>
+                                        <p className="price" style={{ fontSize: "20px", color: "red" }}>
+                                            <strong>Total:</strong> ${(product.price * product.quantity).toFixed(3)}
+                                        </p>
+
 
                                         <div className="cart-actions">
                                             <Button type="primary" onClick={() => showUpdateModal(product)}>

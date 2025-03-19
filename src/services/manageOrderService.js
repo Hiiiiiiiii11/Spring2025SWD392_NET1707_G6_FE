@@ -91,3 +91,73 @@ export const VertifyRefundOrderRequestAPI = async (refundId, staffId) => {
         throw error.response?.data || "Error updating order status";
     }
 };
+export const ManageRefundOrderStatusByDeliveryAPI = async (refundId, status, staffId) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.put(`${API_URL}/refunds/${refundId}/delivery-status?newStatus=${status}&staffId=${staffId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "*/*",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || "Error updating order status";
+    }
+};
+
+export const GetRefundOrderByIdAPI = async (refundId) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.get(`${API_URL}/refunds/${refundId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "*/*",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || "Error updating order status";
+    }
+};
+
+export const GetOrderByIdAPI = async (id) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.get(`${API_URL}/orders/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "*/*",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || "Error updating order status";
+    }
+};
+export const SendCompleteRefundAPI = async (refundId, staffId, imagUrl) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.put(`${API_URL}/refunds/${refundId}/process?staffId=${staffId}&proofDocumentUrl=${imagUrl}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "*/*",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || "Error updating order status";
+    }
+};

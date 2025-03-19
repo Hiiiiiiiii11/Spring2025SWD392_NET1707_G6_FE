@@ -18,7 +18,6 @@ export const GetAllHistoryOrderByIdAPI = async (customerId) => {
 
     return response.data;
   } catch (error) {
-    throw error.response?.data;
   }
 };
 export const createOrderAPI = async (order) => {
@@ -34,7 +33,7 @@ export const createOrderAPI = async (order) => {
 
     return response.data;
   } catch (error) {
-    throw error.response?.data;
+
   }
 };
 export const viewOrderDetailByOrderIdAPI = async (id) => {
@@ -50,7 +49,6 @@ export const viewOrderDetailByOrderIdAPI = async (id) => {
 
     return response.data;
   } catch (error) {
-    throw error.response?.data;
   }
 };
 

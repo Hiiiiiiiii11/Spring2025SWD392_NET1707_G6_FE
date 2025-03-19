@@ -140,15 +140,15 @@ const CustomerHistoryOrder = () => {
                         </Button>
                       )}
 
-                      {/* {order.status === "PAID" && (
+                      {order.status === "REFUNDED" && (
                         <Button
                           className='order-continue-payment'
                           type="primary"
                         // onClick={() => handleRefundRequest(order.orderId)}
                         >
-                          Cancel Order
+                          View Refund Image
                         </Button>
-                      )} */}
+                      )}
                     </div>
                   </Space>
 

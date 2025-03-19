@@ -64,11 +64,33 @@ const OrderConfirmationPage = () => {
     }
 
     setIsPlacingOrder(true);
+
+    // Sort the selected items in ascending order by productID
+    const sortedItems = [...selectedItems].sort((a, b) => a.productID - b.productID);
+
+    // Attempt to remove all sorted selected items from the cart.
+    const removalResults = await Promise.allSettled(
+      sortedItems.map((item) => RemoveProductFromCartAPI(item.productID))
+    );
+    console.log(removalResults)
+
+    // Check for any rejected removals.
+    const removalFailures = removalResults.filter((result) => result.status === "rejected");
+    if (removalFailures.length > 0) {
+      toast.error("Failed to remove some products from cart. Please try again.");
+      setIsPlacingOrder(false);
+      return;
+    }
+
+    // Clear the selected items from sessionStorage after successful removal.
+    sessionStorage.removeItem("selectedItems");
+
+    // Now, create the order.
     const orderData = {
       orderDate: dayjs().format("YYYY-MM-DD"),
       promotionId: selectedPromotion ? selectedPromotion.promotionId : "",
       address: shippingInfo.address,
-      orderDetails: selectedItems.map((item) => ({
+      orderDetails: sortedItems.map((item) => ({
         productId: item.productID,
         quantity: item.quantity,
       })),
@@ -76,12 +98,7 @@ const OrderConfirmationPage = () => {
 
     try {
       const orderResult = await createOrderAPI(orderData);
-
-      // Xóa sản phẩm đã đặt hàng khỏi giỏ hàng
-      await Promise.all(selectedItems.map((item) => RemoveProductFromCartAPI(item.productID)));
-
-      sessionStorage.removeItem("selectedItems");
-
+      // Navigate to the order detail page after a short delay.
       setTimeout(() => {
         window.location.href = `${orderResult}`;
       }, 2000);
@@ -90,6 +107,9 @@ const OrderConfirmationPage = () => {
       setIsPlacingOrder(false);
     }
   };
+
+
+
 
 
   const handleShippingModalOk = async () => {
