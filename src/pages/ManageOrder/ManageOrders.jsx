@@ -32,7 +32,7 @@ const ManageOrders = () => {
 
   const handleUpdateStatus = async (orderId, newStatus, currentStatus) => {
     const validTransitions = {
-      PENDING: ["SHIPPED"],
+      PAID: ["SHIPPED"],
       SHIPPED: ["DELIVERED"],
     };
 

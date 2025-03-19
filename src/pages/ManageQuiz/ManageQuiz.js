@@ -75,7 +75,10 @@ function ManageQuiz() {
             // Nếu loại câu hỏi là YES_NO, ta đặt mặc định options là ["Yes", "No"]
             let options;
             if (values.type === "SINGLE_CHOICE") {
-                options = ["Yes", "No"];
+                options = values.options
+                    .split(",")
+                    .map((opt) => opt.trim())
+                    .filter((opt) => opt);
             } else {
                 // Nếu MULTI_CHOICE, chuyển chuỗi nhập từ form thành mảng
                 options = values.options

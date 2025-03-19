@@ -56,6 +56,7 @@ function Header() {
       { label: "Home", path: "/" },
       { label: "Products", path: "/products" },
       { label: "View Order", path: "/manager-orders" },
+      { label: "Order Request", path: "/manager-request-orders" },
     ];
   } else if (role === "CUSTOMER") {
     menuItems = [

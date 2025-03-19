@@ -6,6 +6,7 @@ import { getProductByIdAPI } from '../../services/manageProductService';
 import "../CustomerHistoryOrder/CustomerHistoryOrder.css"
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CustomerCancelOrderAPI } from '../../services/manageOrderService';
 
 const { Title, Text } = Typography;
 
@@ -14,6 +15,7 @@ const CustomerHistoryOrder = () => {
   const [expandedOrders, setExpandedOrders] = useState([]);
   const [orderProductDetails, setOrderProductDetails] = useState({});
   const customerId = sessionStorage.getItem("customerId");
+  const [refundRequestedOrders, setRefundRequestedOrders] = useState([]);
 
   const getStatusColor = (status) => {
     return status === 'Delivered' ? 'success' : 'warning';
@@ -64,6 +66,18 @@ const CustomerHistoryOrder = () => {
     } else {
       await fetchProductDetailsForOrder(order);
       setExpandedOrders([...expandedOrders, order.orderId]);
+    }
+  };
+  const handleRefundRequest = async (orderId) => {
+    console.log(orderId)
+    try {
+      const data = await CustomerCancelOrderAPI(orderId);
+      console.log("Check return order", data)
+      toast.success("Refund request submitted successfully!");
+      setRefundRequestedOrders((prev) => [...prev, orderId]);
+      fetchCustomerHistoryOrder(); // Cập nhật danh sách đơn hàng sau khi yêu cầu refund
+    } catch (error) {
+      toast.error(error || "Failed to process refund request.");
     }
   };
 
@@ -118,12 +132,23 @@ const CustomerHistoryOrder = () => {
                       {order.status === "DELIVERED" && (
                         <Button
                           className='order-continue-payment'
-                          type="primary"
-                        // onClick={() => }
+                          type={refundRequestedOrders.includes(order.orderId) ? "default" : "primary"}
+                          disabled={refundRequestedOrders.includes(order.orderId)}
+                          onClick={() => handleRefundRequest(order.orderId)}
                         >
-                          Return Product
+                          {refundRequestedOrders.includes(order.orderId) ? "Request Sent" : "Return Product"}
                         </Button>
                       )}
+
+                      {/* {order.status === "PAID" && (
+                        <Button
+                          className='order-continue-payment'
+                          type="primary"
+                        // onClick={() => handleRefundRequest(order.orderId)}
+                        >
+                          Cancel Order
+                        </Button>
+                      )} */}
                     </div>
                   </Space>
 
