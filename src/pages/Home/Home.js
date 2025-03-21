@@ -112,7 +112,7 @@ function Home() {
           </Row>
         </div>
         <Blog />
-        <News />
+
 
       </div>
       <Footer />

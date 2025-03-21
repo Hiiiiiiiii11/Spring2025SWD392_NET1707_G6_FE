@@ -42,7 +42,7 @@ const BatchManagement = () => {
       toast.success("Batch deleted successfully");
       fetchBatchById();
     } catch (error) {
-      toast.error("Failed to delete batch");
+      toast.warning("Can't not delete batch have product has been sold!");
     }
   }
 

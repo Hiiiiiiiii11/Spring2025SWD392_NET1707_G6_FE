@@ -100,25 +100,7 @@ const BlogDetail = () => {
             </div>
           </div>
 
-          <div className="post-stats">
-            <Tag icon={<EyeOutlined />} color="blue">
-              {blog.views} views
-            </Tag>
-            <Tag icon={<HeartOutlined />} color="red">
-              {blog.likes} likes
-            </Tag>
-            <Button type="text" icon={<ShareAltOutlined />}>
-              Share
-            </Button>
-          </div>
-        </div>
 
-        <div className="categories-container">
-          {blog.categories.map((category, index) => (
-            <Tag key={index} color="cyan" className="category-tag">
-              {category}
-            </Tag>
-          ))}
         </div>
       </div>
 
@@ -139,21 +121,25 @@ const BlogDetail = () => {
           <Divider />
 
           <div className="navigation-buttons">
-            {prevPost && (
-              <Link to={`/blog/${prevPost.id}`} className="prev-button">
-                <Button icon={<LeftOutlined />}>
-                  Previous: {prevPost.title.substring(0, 20)}...
-                </Button>
-              </Link>
-            )}
+            <div className="prev-button">
+              {prevPost && (
+                <Link to={`/blog/${prevPost.id}`} >
+                  <Button icon={<LeftOutlined />}>
+                    Previous
+                  </Button>
+                </Link>
+              )}
+            </div>
+            <div className="next-button">
+              {nextPost && (
+                <Link to={`/blog/${nextPost.id}`} >
+                  <Button icon={<RightOutlined />}>
+                    Next
+                  </Button>
+                </Link>
+              )}
+            </div>
 
-            {nextPost && (
-              <Link to={`/blog/${nextPost.id}`} className="next-button">
-                <Button icon={<RightOutlined />}>
-                  Next: {nextPost.title.substring(0, 20)}...
-                </Button>
-              </Link>
-            )}
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ import {
   HeartOutlined,
 } from "@ant-design/icons";
 import "./Blog.css";
+import tipskincare from "../../assets/tip-skincare.jpg"
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -19,7 +20,7 @@ export const blogPosts = [
       "Learn how to care for oily skin effectively with these expert-recommended tips.",
     content:
       "Dealing with oily skin can be challenging, but with the right approach, you can achieve a balanced, healthy complexion. Start by using a gentle foaming cleanser twice daily to remove excess oil without stripping your skin. Always follow with an oil-free, non-comedogenic moisturizer – yes, even oily skin needs hydration! Incorporate products with ingredients like niacinamide, salicylic acid, and clay masks to regulate sebum production and clear pores. Don't over-exfoliate as this can trigger more oil production. Use blotting papers throughout the day for quick touch-ups, and be sure to apply a lightweight, oil-free sunscreen daily. Finally, consider using a retinoid product at night to help control oil and prevent breakouts.",
-    image: "https://i.imgur.com/OIWOaxV.jpeg",
+    image: tipskincare,
     author: "Dr. Sarah Kim",
     date: "March 15, 2025",
     readTime: "8 min",
@@ -129,13 +130,6 @@ const Blog = () => {
                 <Avatar src="https://i.imgur.com/7D7I6dI.png" size={36} />
                 <div className="meta-info">
                   <Text strong>{blogPosts[0].author}</Text>
-                  <div className="meta-details">
-                    <Text type="secondary">
-                      <ClockCircleOutlined /> {blogPosts[0].date}
-                    </Text>
-                    <Text type="secondary">·</Text>
-                    <Text type="secondary">{blogPosts[0].readTime} read</Text>
-                  </div>
                 </div>
               </div>
               <Link to={`/blog/${blogPosts[0].id}`}>
@@ -185,12 +179,6 @@ const Blog = () => {
                   <Text className="author-name">{post.author}</Text>
                 </div>
                 <div className="post-stats">
-                  <Text type="secondary">
-                    <EyeOutlined /> {post.views}
-                  </Text>
-                  <Text type="secondary">
-                    <HeartOutlined /> {post.likes}
-                  </Text>
                 </div>
               </div>
               <Link to={`/blog/${post.id}`}>

@@ -1,27 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import {
-  Card,
-  Button,
-  Radio,
-  Spin,
-  Result,
-  Typography,
-  Steps,
-  Space,
-  Tag,
-  Divider,
-  List,
-  message
-} from 'antd';
-import {
-  ArrowRightOutlined,
-  ArrowLeftOutlined,
-  CheckOutlined,
-  SkinOutlined,
-  InfoCircleOutlined
-} from '@ant-design/icons';
+import { Card, Button, Radio, Typography, Steps, Space, Tag, Divider, List } from 'antd';
+import { ArrowRightOutlined, ArrowLeftOutlined, CheckOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import mapResponse from './mapResponse';
+import { GetAllQuizAPI, submitQuizAPI } from '../../services/ManageQuizService';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const { Title, Paragraph, Text } = Typography;
 const { Step } = Steps;
 
@@ -29,17 +13,13 @@ const SkinQuiz = ({ onComplete }) => {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
   const [mappedResponses, setMappedResponses] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
-  const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const customerId = sessionStorage.getItem("customerId");
 
-  const API_BASE_URL = 'http://localhost:8080/api';
-
-  const mapResponseValues = (questionId, answer, label) => {
-    return mapResponse(label, answer);
+  const mapResponseValues = (questionId, answer) => {
+    return mapResponse(null, answer);
   };
 
   const getKeyResponseIdentifier = (question) => {
@@ -50,32 +30,31 @@ const SkinQuiz = ({ onComplete }) => {
   };
 
   useEffect(() => {
-    const fetchQuestions = async () => {
+    const loadQuestions = async () => {
       try {
-        setIsLoading(true);
-        const response = await axios.get(`${API_BASE_URL}/quiz/questions`);
-        let quizQuestions = response.data;
-        if (quizQuestions.length > 15) {
-          quizQuestions = quizQuestions.slice(0, 15);
+        let quizQuestions = await GetAllQuizAPI();
+        // Check if quizQuestions is an array
+        if (Array.isArray(quizQuestions)) {
+          if (quizQuestions.length > 15) {
+            quizQuestions = quizQuestions.slice(0, 15);
+          }
+          setQuestions(quizQuestions);
+          const initialResponses = {};
+          const initialMappedResponses = {};
+          quizQuestions.forEach(question => {
+            initialResponses[question.questionId] = null;
+            initialMappedResponses[getKeyResponseIdentifier(question)] = null;
+          });
+          setResponses(initialResponses);
+          setMappedResponses(initialMappedResponses);
+        } else {
+          toast.error('No quiz questions available.');
         }
-        setQuestions(quizQuestions);
-        const initialResponses = {};
-        const initialMappedResponses = {};
-        quizQuestions.forEach(question => {
-          initialResponses[question.questionId] = null;
-          initialMappedResponses[getKeyResponseIdentifier(question)] = null;
-        });
-        setResponses(initialResponses);
-        setMappedResponses(initialMappedResponses);
-        setIsLoading(false);
       } catch (err) {
-        setError('Failed to load quiz questions. Please try again later.');
-        setIsLoading(false);
-        console.error('Error fetching questions:', err);
-        message.error('Failed to load quiz questions');
+        toast.error('Failed to load quiz questions');
       }
     };
-    fetchQuestions();
+    loadQuestions();
   }, []);
 
   const handleResponseChange = (questionId, selectedIndex) => {
@@ -121,170 +100,50 @@ const SkinQuiz = ({ onComplete }) => {
   const handleSubmit = async () => {
     const unansweredQuestions = questions.filter(q => responses[q.questionId] === null).length;
     if (unansweredQuestions > 0) {
-      message.warning(`Please answer all ${unansweredQuestions} remaining questions before submitting.`);
+      toast.warning(`Please answer all ${unansweredQuestions} remaining questions before submitting.`);
       return;
     }
     try {
-      setIsLoading(true);
       const finalResponses = Object.fromEntries(
         Object.entries(mappedResponses).filter(([_, v]) => v !== null)
       );
-      const response = await axios.post(
-        `${API_BASE_URL}/quiz/submit/${customerId}`,
-        finalResponses
-      );
-      setResults(response.data.quizResult);
-      setRecommendedProducts(response.data.recommendedProducts);
+      const submissionResult = await submitQuizAPI(customerId, finalResponses);
+      setResults(submissionResult.quizResult.customer.skinConcerns);
       if (onComplete) {
         onComplete({
-          quizResult: response.data.quizResult,
-          recommendedProducts: response.data.recommendedProducts
+          quizResult: submissionResult.quizResult.customer.skinConcerns,
         });
+
       }
-      setIsLoading(false);
+
+      // Clear answers after successful submission:
+      const resetResponses = {};
+      const resetMappedResponses = {};
+      questions.forEach(question => {
+        resetResponses[question.questionId] = null;
+        resetMappedResponses[getKeyResponseIdentifier(question)] = null;
+      });
+      setResponses(resetResponses);
+      setMappedResponses(resetMappedResponses);
+      setCurrentQuestionIndex(0);
     } catch (err) {
-      setError('Failed to submit quiz. Please try again later.');
-      setIsLoading(false);
-      console.error('Error submitting quiz:', err);
-      message.error('Failed to submit quiz');
+      toast.error('Failed to submit quiz!');
     }
   };
 
-  const viewProductDetails = (productId) => {
-    window.location.href = `/products/${productId}`;
-  };
-
-  const browseAllProducts = () => {
-    window.location.href = '/products';
-  };
-
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-        <Spin size="large" tip="Loading your skin assessment..." />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Result
-        status="error"
-        title="Something went wrong"
-        subTitle={error}
-        extra={[
-          <Button type="primary" key="retry" onClick={() => window.location.reload()}>
-            Try Again
-          </Button>
-        ]}
-      />
-    );
-  }
-
-  if (results) {
-    return (
-      <Card
-        title={<Title level={3} style={{ textAlign: 'center' }}>Your Skin Analysis Results</Title>}
-        style={{ maxWidth: 1000, margin: '0 auto' }}
-      >
-        <div style={{ marginBottom: 24 }}>
-          <Title level={4}>
-            <SkinOutlined /> Your Skin Type:
-          </Title>
-          <Tag color="blue" style={{ fontSize: 16, padding: '5px 10px' }}>
-            {results.recommendedSkinType}
-          </Tag>
-          <Paragraph style={{ marginTop: 16 }}>
-            Based on your responses, your skin appears to be {results.recommendedSkinType.toLowerCase()} type.
-            This assessment is designed to help you understand your skin better and guide you toward
-            appropriate skincare products.
-          </Paragraph>
-        </div>
-
-        {results.recommendedConcerns && results.recommendedConcerns.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
-            <Title level={4}>Your Skin Concerns:</Title>
-            <Space wrap>
-              {results.recommendedConcerns.map((concern, index) => (
-                <Tag color="purple" key={index} style={{ fontSize: 14, padding: '4px 8px', margin: '4px' }}>
-                  {concern}
-                </Tag>
-              ))}
-            </Space>
-          </div>
-        )}
-
-        <Divider />
-
-        <div style={{ marginBottom: 24 }}>
-          <Title level={4}>Recommended Products</Title>
-          {recommendedProducts.length > 0 ? (
-            <List
-              grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 3 }}
-              dataSource={recommendedProducts}
-              renderItem={product => (
-                <List.Item>
-                  <Card
-                    hoverable
-                    cover={product.imageURL && <img alt={product.productName} src={product.imageURL} />}
-                  >
-                    <Card.Meta
-                      title={product.productName}
-                      description={
-                        <>
-                          <div style={{ marginBottom: 8 }}>{product.category}</div>
-                          <div style={{ marginBottom: 8 }}>{product.description}</div>
-                          <div style={{ fontWeight: 'bold', marginBottom: 8 }}>${product.price}</div>
-                          <Space>
-                            {product.targetsConcerns && product.targetsConcerns.map((concern, i) => (
-                              <Tag key={i} color="green">{concern}</Tag>
-                            ))}
-                          </Space>
-                          <Button
-                            type="primary"
-                            style={{ marginTop: 12 }}
-                            onClick={() => viewProductDetails(product.productID)}
-                          >
-                            View Details
-                          </Button>
-                        </>
-                      }
-                    />
-                  </Card>
-                </List.Item>
-              )}
-            />
-          ) : (
-            <Paragraph>No specific products recommended at this time.</Paragraph>
-          )}
-        </div>
-
-        <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <Button type="primary" size="large" onClick={browseAllProducts}>
-            Browse All Products
-          </Button>
-        </div>
-      </Card>
-    );
-  }
-
-  if (questions.length === 0) {
-    return (
-      <Result
-        status="info"
-        title="No Questions Available"
-        subTitle="There are no quiz questions available at the moment."
-      />
-    );
-  }
 
   const currentQuestion = questions[currentQuestionIndex];
+  // Guard: in case currentQuestion is undefined
+  if (!currentQuestion) {
+    return null;
+  }
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
   const options = currentQuestion.options || [];
+
   return (
     <div className="skin-quiz-container">
-
+      <ToastContainer />
       <Steps
         current={currentQuestionIndex}
         size="small"
@@ -292,10 +151,7 @@ const SkinQuiz = ({ onComplete }) => {
         onChange={goToQuestion}
       >
         {questions.map((_, index) => (
-          <Step
-            key={index}
-            disabled={index > currentQuestionIndex + 1}
-          />
+          <Step key={index} disabled={index > currentQuestionIndex + 1} />
         ))}
       </Steps>
 
@@ -317,11 +173,7 @@ const SkinQuiz = ({ onComplete }) => {
             style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
           >
             {options.map((option, index) => (
-              <Radio
-                key={`${currentQuestion.questionId}-${index}`}
-                value={index}
-                style={{ fontSize: 16 }}
-              >
+              <Radio key={`${currentQuestion.questionId}-${index}`} value={index} style={{ fontSize: 16 }}>
                 {option}
               </Radio>
             ))}
@@ -334,7 +186,6 @@ const SkinQuiz = ({ onComplete }) => {
               Previous
             </Button>
           )}
-
           <div style={{ marginLeft: 'auto' }}>
             {!isLastQuestion ? (
               <Button

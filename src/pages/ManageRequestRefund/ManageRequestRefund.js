@@ -105,7 +105,7 @@ const ManageRequestRefund = () => {
             setModalVisible(false);
             fetchRefundRequests();
         } catch (error) {
-            toast.error("Failed to send refund completion");
+            toast.warning("Product has deliveried must be returned to warehouse before send complete!");
         } finally {
             setUploading(false);
             setFile(null);
@@ -146,15 +146,6 @@ const ManageRequestRefund = () => {
                             onClick={() => handleVerifyRefund(record.id)}
                         >
                             Accept
-                        </Button>
-                    </div>
-                    <div>
-                        <Button
-                            type="primary"
-                            disabled={record.status !== "REQUESTED"}
-                            style={{ backgroundColor: "red", color: "white" }}
-                        >
-                            Reject
                         </Button>
                     </div>
                     {(record.status === "RETURNED_TO_WAREHOUSE" || record.status === "VERIFIED") && (

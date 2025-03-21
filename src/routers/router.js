@@ -65,7 +65,6 @@ const AppRouter = createBrowserRouter([
       { path: "/manager-request-return", element: <PrivateRoute element={<ManageRefundOrderDelivery />} allowedRoles={["DELIVERY_STAFF"]} /> },
 
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
-      { path: "/skin-quiz", element: <SkinQuiz /> },
       { path: "/blog/:id", element: <BlogDetail /> },
       { path: "/news/:id", element: <NewsDetail /> },
     ],

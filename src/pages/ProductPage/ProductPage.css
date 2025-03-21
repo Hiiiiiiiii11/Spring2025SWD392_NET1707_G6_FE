@@ -155,14 +155,15 @@ li {
 }
 
 .search-input-product {
-  width: 400px;
+  width: 600px;
   margin-right: 10px;
-
+  margin-top: 5px;
 }
 
 .compare-product-btn {
   margin-left: 10px;
 }
+
 
 .start-compare-product {
   width: 100%;
@@ -173,4 +174,16 @@ li {
 
 .product-select-compare {
   margin-left: 10px;
+}
+
+.take-quiz {
+  display: flex;
+  justify-content: end;
+  width: 100%;
+  margin-right: 20px;
+}
+
+.searcch-and-filter {
+  display: flex;
+  align-items: center;
 }

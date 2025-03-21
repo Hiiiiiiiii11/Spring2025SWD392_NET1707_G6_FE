@@ -1,6 +1,5 @@
 /* Blog.css */
 .blog-container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
 }
@@ -11,7 +10,7 @@
 }
 
 .main-title {
-  font-size: 3rem !important;
+  font-size: 2em !important;
   font-weight: 800 !important;
   margin-bottom: 10px !important;
   background: linear-gradient(45deg, #ff7eb3, #7189ff);
@@ -62,11 +61,6 @@
   margin-left: 12px;
 }
 
-.meta-details {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
 
 .read-button {
   background: linear-gradient(45deg, #ff7eb3, #7189ff);
@@ -179,7 +173,6 @@
 
 /* BlogDetail.css */
 .blog-detail-container {
-  max-width: 1000px;
   margin: 0 auto;
   padding: 40px 20px;
 }

@@ -128,9 +128,8 @@ const News = () => {
             <Card
               key={item.id}
               hoverable
-              className={`trending-card ${
-                index === 0 ? "featured-trending" : ""
-              }`}
+              className={`trending-card ${index === 0 ? "featured-trending" : ""
+                }`}
               cover={
                 <div className="trending-image-container">
                   <img
@@ -183,83 +182,8 @@ const News = () => {
         </div>
       </div>
 
-      {/* Regular News Section */}
-      <div className="regular-news-section">
-        <div className="section-header">
-          <Title level={3} className="section-title">
-            Latest Updates
-          </Title>
-        </div>
 
-        <List
-          grid={{ gutter: 24, column: 3, xs: 1, sm: 2, md: 3 }}
-          dataSource={regularNews}
-          renderItem={(item) => (
-            <List.Item>
-              <Card hoverable className="news-card">
-                <div className="news-image-container">
-                  <img
-                    alt={item.title}
-                    src={item.image}
-                    className="news-image"
-                  />
-                </div>
 
-                <div className="card-meta">
-                  <Text className="news-date">
-                    <CalendarOutlined /> {item.date}
-                  </Text>
-                  <Text className="news-views">
-                    <EyeOutlined /> {item.views}
-                  </Text>
-                </div>
-
-                <Title level={4} className="news-card-title">
-                  {item.title}
-                </Title>
-                <Paragraph ellipsis={{ rows: 2 }} className="news-card-content">
-                  {item.summary}
-                </Paragraph>
-
-                <Space className="news-tags" wrap>
-                  {item.tags.map((tag) => (
-                    <Tag key={tag}>{tag}</Tag>
-                  ))}
-                </Space>
-
-                <div className="news-card-button">
-                  <Link to={`/news/${item.id}`}>
-                    <Button type="primary">Read More</Button>
-                  </Link>
-                </div>
-              </Card>
-            </List.Item>
-          )}
-        />
-      </div>
-
-      {/* Subscribe Section */}
-      <div className="subscribe-section">
-        <Card className="subscribe-card">
-          <div className="subscribe-content">
-            <Title level={3}>Stay Updated</Title>
-            <Paragraph>
-              Subscribe to our newsletter to receive the latest skincare news,
-              exclusive offers, and product updates directly to your inbox.
-            </Paragraph>
-            <div className="subscribe-form">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="subscribe-input"
-              />
-              <Button type="primary" size="large">
-                Subscribe
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </div>
     </div>
   );
 };

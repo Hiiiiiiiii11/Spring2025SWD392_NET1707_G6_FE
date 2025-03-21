@@ -4,10 +4,14 @@ import { SearchOutlined } from "@ant-design/icons";
 import "./ManageQuiz.css";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
-import { CreateNewQuizAPI, DeleteQuizAPI, GetAllQuizAPI } from "../../services/ManageQuizService";
+import {
+    CreateNewQuizAPI,
+    DeleteQuizAPI,
+    GetAllQuizAPI,
+    UpdateNewQuizAPI, // <-- Import the update API function
+} from "../../services/ManageQuizService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 
 function ManageQuiz() {
     const [quizzes, setQuizzes] = useState([]);
@@ -18,8 +22,10 @@ function ManageQuiz() {
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
-    // Các loại quiz: ví dụ MULTI_CHOICE và YES_NO
-    const quizTypes = ["MULTI_CHOICE", "SINGLE_CHOICE", "TEXTINPUT"];
+    // Quiz types available in your system
+    const quizTypes = ["MULTI_CHOICE", "SINGLE_CHOICE"];
+    // Dropdown labels from your provided JSON (ensure these are unique)
+    const quizLabels = ["oiliness", "dryness", "sensitivity", "acne", "aging", "hyperpigmentation", "redness"];
 
     useEffect(() => {
         fetchQuizzes();
@@ -28,11 +34,11 @@ function ManageQuiz() {
     const fetchQuizzes = async () => {
         try {
             const data = await GetAllQuizAPI();
-            console.log(data)
             if (data) {
                 setQuizzes(data);
             }
         } catch (error) {
+            toast.error("Failed to fetch quizzes");
         }
     };
 
@@ -45,56 +51,47 @@ function ManageQuiz() {
     const handleEditQuiz = (record) => {
         setEditMode(true);
         setEditQuizId(record.questionId);
-        // Chuyển mảng options thành chuỗi, cách nhau bởi dấu phẩy
+        // Convert options array into comma-separated string
         const optionsStr = record.options.join(", ");
         form.setFieldsValue({
             question: record.question,
             type: record.type,
+            label: record.label, // preselect the label when editing
             options: optionsStr,
         });
         setIsModalVisible(true);
     };
 
     const handleDeleteQuiz = async (id) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this promotion?");
+        const confirmDelete = window.confirm("Are you sure you want to delete this quiz question?");
         if (!confirmDelete) return;
         try {
             await DeleteQuizAPI(id);
             toast.success("Quiz question deleted successfully!");
             fetchQuizzes();
         } catch (e) {
-            toast.error('Fail to delete promotion!')
+            toast.error("Failed to delete quiz question!");
         }
-
-
     };
 
     const handleModalOk = async () => {
         try {
             const values = await form.validateFields();
-            // Nếu loại câu hỏi là YES_NO, ta đặt mặc định options là ["Yes", "No"]
-            let options;
-            if (values.type === "SINGLE_CHOICE") {
-                options = values.options
-                    .split(",")
-                    .map((opt) => opt.trim())
-                    .filter((opt) => opt);
-            } else {
-                // Nếu MULTI_CHOICE, chuyển chuỗi nhập từ form thành mảng
-                options = values.options
-                    .split(",")
-                    .map((opt) => opt.trim())
-                    .filter((opt) => opt);
-            }
+            // Process options: split by comma and trim each one
+            const options = values.options
+                .split(",")
+                .map((opt) => opt.trim())
+                .filter((opt) => opt);
 
             const quizData = {
                 question: values.question,
                 type: values.type,
+                label: values.label, // include the label value
                 options: options,
             };
 
             if (editMode) {
-                const updatedQuiz = [];
+                const updatedQuiz = await UpdateNewQuizAPI(editQuizId, quizData);
                 if (updatedQuiz) {
                     toast.success("Quiz question updated successfully!");
                     fetchQuizzes();
@@ -134,6 +131,11 @@ function ManageQuiz() {
             key: "type",
         },
         {
+            title: "Label",
+            dataIndex: "label",
+            key: "label",
+        },
+        {
             title: "Options",
             dataIndex: "options",
             key: "options",
@@ -156,7 +158,7 @@ function ManageQuiz() {
     ];
 
     return (
-        <div >
+        <div>
             <Header />
             <ToastContainer />
             <div className="manager-quiz-page">
@@ -205,6 +207,19 @@ function ManageQuiz() {
                                     {quizTypes.map((type) => (
                                         <Select.Option key={type} value={type}>
                                             {type}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item
+                                name="label"
+                                label="Label"
+                                rules={[{ required: true, message: "Please select a label" }]}
+                            >
+                                <Select placeholder="Select a label">
+                                    {quizLabels.map((label) => (
+                                        <Select.Option key={label} value={label}>
+                                            {label}
                                         </Select.Option>
                                     ))}
                                 </Select>
