@@ -30,8 +30,8 @@ import RefundForm from "../components/FormRefund/FormRefund";
 import ManageRequestRefund from "../pages/ManageRequestRefund/ManageRequestRefund";
 import ManageRefundOrderDelivery from "../pages/ManageRefundOrderDelivery/ManageRefundOrderDelivery";
 import SkinQuiz from "../pages/ManageQuiz/SkinQuiz";
-
-
+import BlogDetail from "../pages/BlogDetail/BlogDetail";
+import NewsDetail from "../pages/NewsDetail/NewsDetail";
 
 const AppRouter = createBrowserRouter([
   {
@@ -66,6 +66,8 @@ const AppRouter = createBrowserRouter([
 
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
       { path: "/skin-quiz", element: <SkinQuiz /> },
+      { path: "/blog/:id", element: <BlogDetail /> },
+      { path: "/news/:id", element: <NewsDetail /> },
     ],
   },
   { path: "/refund/:refundId", element: <RefundForm /> },
