@@ -6,13 +6,15 @@ const API_URL = "http://localhost:8080";
 export const GetAllQuizAPI = async () => {
     try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.get(`${API_URL}/api/questions`, {
-            headers: {
-                Accept: "*/*",
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await axios.get(`${API_URL}/api/questions`
+        //     , {
+        //     headers: {
+        //         Accept: "*/*",
+        //         "Content-Type": "application/json",
+        //         Authorization: `Bearer ${token}`,
+        //     },
+        // }
+    );
         return response.data;
     } catch (error) {
         console.error("Error creating staff:", error);
