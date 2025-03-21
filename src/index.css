@@ -4,7 +4,9 @@ body {
     sans-serif;
 }
 
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 
 /* Đảm bảo thẻ HTML và body chiếm toàn bộ viewport */
