@@ -113,7 +113,6 @@ function Home() {
         </div>
         <Blog />
         <News />
-        <FAQ />
 
       </div>
       <Footer />

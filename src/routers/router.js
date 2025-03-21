@@ -59,9 +59,9 @@ const AppRouter = createBrowserRouter([
       { path: "/payment/return", element: <PrivateRoute element={<PaymentReturnPage />} allowedRoles={["CUSTOMER"]} /> },
       { path: "/manage-staff", element: <PrivateRoute element={<ManagerStaff />} allowedRoles={["MANAGER"]} /> },
       { path: "/manage-quiz", element: <PrivateRoute element={<ManageQuiz />} allowedRoles={["MANAGER"]} /> },
-      { path: "/manager-orders", element: <ManageOrders />, },
-      { path: "/manager-request-orders", element: <ManageRequestRefund />, },
-      { path: "/manager-request-return", element: <ManageRefundOrderDelivery />, },
+      { path: "/manager-orders", element: <PrivateRoute element={<ManageOrders />} allowedRoles={["DELIVERY_STAFF", "MANAGER", "CUSTOMER_STAFF"]} /> },
+      { path: "/manager-request-orders", element: <PrivateRoute element={<ManageRequestRefund />} allowedRoles={["CUSTOMER_STAFF"]} /> },
+      { path: "/manager-request-return", element: <PrivateRoute element={<ManageRefundOrderDelivery />} allowedRoles={["DELIVERY_STAFF"]} /> },
 
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
     ],

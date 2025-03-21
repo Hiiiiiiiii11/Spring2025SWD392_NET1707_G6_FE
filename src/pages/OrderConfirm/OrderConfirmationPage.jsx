@@ -68,15 +68,12 @@ const OrderConfirmationPage = () => {
     // Sort the selected items in ascending order by productID
     const sortedItems = [...selectedItems].sort((a, b) => a.productID - b.productID);
 
-    // Attempt to remove all sorted selected items from the cart.
-    const removalResults = await Promise.allSettled(
-      sortedItems.map((item) => RemoveProductFromCartAPI(item.productID))
-    );
-    console.log(removalResults)
-
-    // Check for any rejected removals.
-    const removalFailures = removalResults.filter((result) => result.status === "rejected");
-    if (removalFailures.length > 0) {
+    // Sequentially remove each selected item from the cart.
+    try {
+      for (const item of sortedItems) {
+        await RemoveProductFromCartAPI(item.productID);
+      }
+    } catch (error) {
       toast.error("Failed to remove some products from cart. Please try again.");
       setIsPlacingOrder(false);
       return;
@@ -99,6 +96,11 @@ const OrderConfirmationPage = () => {
     try {
       const orderResult = await createOrderAPI(orderData);
       // Navigate to the order detail page after a short delay.
+      if (orderResult === "") {
+        toast.error("Fail to process! Please try again later")
+        setIsPlacingOrder(false);
+        return;
+      }
       setTimeout(() => {
         window.location.href = `${orderResult}`;
       }, 2000);
@@ -107,6 +109,7 @@ const OrderConfirmationPage = () => {
       setIsPlacingOrder(false);
     }
   };
+
 
 
 

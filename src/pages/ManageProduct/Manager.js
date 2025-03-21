@@ -122,6 +122,11 @@ function Manager() {
       toast.error("Error processing product. Please try again.");
     }
   };
+  // Inside your component render or before return:
+  const filteredProducts = products.filter((product) =>
+    product.productName.toLowerCase().includes(search.toLowerCase())
+  );
+
 
   const handleGoToBatch = (productID) => {
     navigate(`/manage-batch/${productID}`);
@@ -212,7 +217,8 @@ function Manager() {
               + Add new product
             </Button>
           </div>
-          <Table dataSource={products} columns={columns} rowKey="productID" />
+          <Table dataSource={filteredProducts} columns={columns} rowKey="productID" />
+
 
           <Modal
             title={editMode ? "Edit Product" : "Add Product"}
@@ -232,7 +238,13 @@ function Manager() {
               <Form.Item
                 name="price"
                 label="Price"
-                rules={[{ required: true, message: "Price is required!" }]}
+                rules={[
+                  { required: true, message: "Price is required!" },
+                  {
+                    pattern: new RegExp(/^\d+(\.\d+)?$/),
+                    message: "Price must be a valid number (integer or float).",
+                  },
+                ]}
               >
                 <Input placeholder="Price" />
               </Form.Item>

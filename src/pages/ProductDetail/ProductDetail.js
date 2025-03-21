@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getProductByIdAPI, getAllProductAPI } from "../../services/manageProductService";
-import { InputNumber, Modal, Card, Row, Col, Button } from "antd";
+import { InputNumber, Modal, Card, Row, Col, Button, Rate } from "antd";
 import { AddProductToCartAPI, GetAllProductCartAPI } from "../../services/cartService";
 import "./ProductDetail.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { GetReviewProductByProductIdAPI } from "../../services/ManageReview";
 
 const { Meta } = Card;
 
@@ -21,6 +21,10 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const role = sessionStorage.getItem("role");
 
+  // New state for reviews and average rating
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -31,9 +35,9 @@ const ProductDetail = () => {
 
         setProduct(productData);
 
-        // Lọc sản phẩm liên quan (không bao gồm sản phẩm hiện tại)
+        // Filter related products (exclude the current product)
         const filteredProducts = allProducts.filter((p) => p.productID !== id);
-        setRelatedProducts(filteredProducts.slice(0, 4)); // Giới hạn 4 sản phẩm liên quan
+        setRelatedProducts(filteredProducts.slice(0, 4)); // Limit to 4 related products
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -44,6 +48,22 @@ const ProductDetail = () => {
     fetchData();
     window.scrollTo(0, 0);
   }, [id]);
+
+  // Fetch reviews for the current product and calculate the average rating
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (product) {
+        const data = await GetReviewProductByProductIdAPI(product.productID);
+        if (data) {
+          setReviews(data);
+          const total = data.reduce((sum, review) => sum + review.rating, 0);
+          setAverageRating(data.length ? total / data.length : 0);
+        }
+      }
+    };
+
+    fetchReviews();
+  }, [product]);
 
   if (loading) return <div>Loading...</div>;
   if (!product) return <div>Product not found!</div>;
@@ -66,32 +86,31 @@ const ProductDetail = () => {
     }
 
     try {
-      // Lấy danh sách sản phẩm trong giỏ hàng
+      // Get current cart items
       let cartItems = await GetAllProductCartAPI();
-
-      // Kiểm tra nếu cartItems không phải là mảng, đặt giá trị mặc định []
       cartItems = Array.isArray(cartItems) ? cartItems : [];
 
-      // Kiểm tra sản phẩm đã có trong giỏ hàng chưa
-      const existingItem = cartItems.find(item => item.product.productID === selectedProduct.productID);
+      // Check if the product already exists in the cart
+      const existingItem = cartItems.find(
+        (item) => item.product.productID === selectedProduct.productID
+      );
       const currentCartQuantity = existingItem ? existingItem.quantity : 0;
 
-      // Kiểm tra tổng số lượng đã có trong giỏ hàng
       if (currentCartQuantity + quantity > selectedProduct.stockQuantity) {
-        toast.error(" You cannot add more of this product. Stock limit reached!");
+        toast.error("You cannot add more of this product. Stock limit reached!");
         return;
       }
 
-      // Gọi API thêm sản phẩm vào giỏ hàng
+      // Call API to add the product to the cart
       const response = await AddProductToCartAPI({
         product: selectedProduct,
         quantity,
       });
 
       if (response) {
-        toast.success(` Added "${selectedProduct.productName}" x${quantity} to cart!`);
+        toast.success(`Added "${selectedProduct.productName}" x${quantity} to cart!`);
       } else {
-        toast.error(" Failed to add product to cart!");
+        toast.error("Failed to add product to cart!");
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
@@ -101,8 +120,6 @@ const ProductDetail = () => {
     setIsModalVisible(false);
   };
 
-
-
   return (
     <div className="product-detail-container">
       <ToastContainer />
@@ -110,7 +127,7 @@ const ProductDetail = () => {
         Back to Products
       </button>
 
-      {/* Chi tiết sản phẩm */}
+      {/* Product Detail Section */}
       <div className="product-detail">
         <div className="product-image">
           <img
@@ -120,6 +137,8 @@ const ProductDetail = () => {
         </div>
         <div className="product-info">
           <h1>{product.productName}</h1>
+          {/* Moved average rating display into product detail */}
+
           <p className="price">
             {product.price > 1000
               ? `${product.price.toLocaleString()}đ`
@@ -128,6 +147,12 @@ const ProductDetail = () => {
           <p className="description">{product.description}</p>
           <p className="description">Category: {product.category}</p>
           <p className="description">Skin Type: {product.skinTypeCompatibility}</p>
+          <div className="average-rating" style={{ marginBottom: "8px" }}>
+            <p style={{ marginRight: "8px", fontSize: "16px" }}>
+              Rating: <Rate disabled allowHalf value={averageRating} />
+            </p>
+
+          </div>
           <p className="description">✅Available Product: {product.stockQuantity}</p>
           {role === "CUSTOMER" && (
             <button className="add-to-cart" onClick={() => openQuantityModal(product)}>
@@ -137,7 +162,28 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Sản phẩm liên quan (hiển thị trong Card giống ProductPage) */}
+      {/* Reviews Section */}
+      <div className="customer-review-section">
+        <h2>Customer Reviews</h2>
+        <Card>
+          <div className="reviews-section" style={{ padding: "24px", background: "#fafafa", marginTop: "20px" }}>
+            {reviews.length === 0 ? (
+              <p>No reviews available for this product.</p>
+            ) : (
+              reviews.map((review) => (
+                <Card key={review.reviewId} style={{ marginBottom: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <Rate disabled defaultValue={review.rating} style={{ marginRight: "8px" }} />
+                    <p style={{ margin: 0 }}>{review.comment}</p>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {/* Related Products Section */}
       <div className="related-products">
         <h2>Related Products</h2>
         <Row gutter={[16, 16]}>
@@ -156,11 +202,10 @@ const ProductDetail = () => {
                   <Button
                     type="primary"
                     onClick={() => openQuantityModal(product)}
-                    disabled={role !== "CUSTOMER"} // Chỉ CUSTOMER mới có thể nhấn
+                    disabled={role !== "CUSTOMER"}
                   >
                     Add to Cart
-                  </Button>
-                  ,
+                  </Button>,
                   <Link to={`/products/${item.productID}`}>View Details</Link>,
                 ]}
               >
@@ -184,7 +229,7 @@ const ProductDetail = () => {
         </Row>
       </div>
 
-      {/* Modal chọn số lượng sản phẩm */}
+      {/* Modal for selecting quantity */}
       <Modal
         title="Select Quantity"
         open={isModalVisible}

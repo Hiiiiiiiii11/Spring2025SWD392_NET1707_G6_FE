@@ -176,7 +176,7 @@ const ManageRequestRefund = () => {
                             onClick={() => handleSendComplete(record.id)}
                             disabled={record.status === "COMPLETED"}
                         >
-                            {record.status === "COMPLETED" ? "Completed" : "Send Complete"}
+                            {record.status === "COMPLETED" ? "Completed Refuned" : "Send Complete"}
                         </Button>
                     )}
                 </div>

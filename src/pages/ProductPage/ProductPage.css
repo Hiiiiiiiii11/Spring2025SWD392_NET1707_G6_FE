@@ -16,7 +16,6 @@
 }
 
 .search-bar {
-  width: 80%;
   max-width: 400px;
   padding: 5px;
   border: 1px solid #ddd;
@@ -149,7 +148,29 @@ li {
 
 .search-product-page {
   width: 100%;
-  margin-right: 20px;
   display: flex;
-  justify-content: right;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.search-input-product {
+  width: 400px;
+  margin-right: 10px;
+
+}
+
+.compare-product-btn {
+  margin-left: 10px;
+}
+
+.start-compare-product {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-select-compare {
+  margin-left: 10px;
 }

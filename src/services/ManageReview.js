@@ -1,12 +1,11 @@
 import axios from "axios";
+
 const API_URL = "http://localhost:8080";
 
-
-
-export const GetAllQuizAPI = async () => {
+export const SendReviewproductAPI = async (reviewData) => {
     try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.get(`${API_URL}/api/questions`, {
+        const response = await axios.post(`${API_URL}/reviews`, reviewData, {
             headers: {
                 Accept: "*/*",
                 "Content-Type": "application/json",
@@ -15,15 +14,14 @@ export const GetAllQuizAPI = async () => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error creating staff:", error);
         return null;
     }
 };
 
-export const CreateNewQuizAPI = async (quiz) => {
+export const GetReviewByIdAPI = async (reviewId) => {
     try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.post(`${API_URL}/api/questions`, quiz, {
+        const response = await axios.get(`${API_URL}/reviews/${reviewId}`, {
             headers: {
                 Accept: "*/*",
                 "Content-Type": "application/json",
@@ -32,14 +30,13 @@ export const CreateNewQuizAPI = async (quiz) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error creating staff:", error);
         return null;
     }
 };
-export const UpdateNewQuizAPI = async (quiz) => {
+export const GetReviewProductByProductIdAPI = async (productId) => {
     try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.post(`${API_URL}/api/questions`, quiz, {
+        const response = await axios.get(`${API_URL}/reviews/product/${productId}`, {
             headers: {
                 Accept: "*/*",
                 "Content-Type": "application/json",
@@ -48,15 +45,13 @@ export const UpdateNewQuizAPI = async (quiz) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error creating staff:", error);
         return null;
     }
 };
-
-export const DeleteQuizAPI = async (id) => {
+export const UpdateReviewProductByIdAPI = async (reviewId, reviewData) => {
     try {
         const token = sessionStorage.getItem("token");
-        const response = await axios.delete(`${API_URL}/api/questions/${id}`, {
+        const response = await axios.put(`${API_URL}/reviews/${reviewId}`, reviewData, {
             headers: {
                 Accept: "*/*",
                 "Content-Type": "application/json",
@@ -65,11 +60,6 @@ export const DeleteQuizAPI = async (id) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Error creating staff:", error);
         return null;
     }
 };
-
-
-
-

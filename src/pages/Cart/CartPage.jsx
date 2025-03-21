@@ -126,20 +126,27 @@ const CartPage = () => {
     // Xóa nhiều sản phẩm đã chọn
     const handleRemoveSelectedProducts = async () => {
         if (selectedProducts.length === 0) {
-            toast.warning(" Please select at least one product!");
+            toast.warning("Please select at least one product!");
             return;
         }
 
         try {
-            await Promise.all(selectedProducts.map((productID) => RemoveProductFromCartAPI(productID)));
-            toast.success(" Selected products removed!");
-            setCartProducts((prevCart) => prevCart.filter((item) => !selectedProducts.includes(item.productID)));
+            // Process removals sequentially
+            for (const productID of selectedProducts) {
+                await RemoveProductFromCartAPI(productID);
+            }
+
+            toast.success("Selected products removed!");
+            setCartProducts((prevCart) =>
+                prevCart.filter((item) => !selectedProducts.includes(item.productID))
+            );
             setSelectedProducts([]);
             fetchCart();
         } catch (error) {
-            toast.error(" Failed to remove selected products!");
+            toast.error("Failed to remove selected products!");
         }
     };
+
 
     const batchColumns = [
         {
@@ -233,7 +240,7 @@ const CartPage = () => {
 
 
                                         <p className="price" style={{ fontSize: "20px", color: "red" }}>
-                                            <strong>Total:</strong> ${(product.price * product.quantity).toFixed(3)}
+                                            <strong>Total:</strong> ${(product.price * product.quantity).toFixed(0, 3)}
                                         </p>
 
 
