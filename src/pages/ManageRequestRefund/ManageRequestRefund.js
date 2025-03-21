@@ -157,7 +157,7 @@ const ManageRequestRefund = () => {
                             Reject
                         </Button>
                     </div>
-                    {record.status === "RETURNED_TO_WAREHOUSE" && (
+                    {(record.status === "RETURNED_TO_WAREHOUSE" || record.status === "VERIFIED") && (
                         <div>
                             <Button
                                 type="default"
