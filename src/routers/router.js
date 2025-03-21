@@ -29,6 +29,7 @@ import PaymentReturnPage from "../pages/PaymentReturnPage";
 import RefundForm from "../components/FormRefund/FormRefund";
 import ManageRequestRefund from "../pages/ManageRequestRefund/ManageRequestRefund";
 import ManageRefundOrderDelivery from "../pages/ManageRefundOrderDelivery/ManageRefundOrderDelivery";
+import SkinQuiz from "../pages/ManageQuiz/SkinQuiz";
 
 
 
@@ -64,12 +65,15 @@ const AppRouter = createBrowserRouter([
       { path: "/manager-request-return", element: <PrivateRoute element={<ManageRefundOrderDelivery />} allowedRoles={["DELIVERY_STAFF"]} /> },
 
       { path: "/products/:id", element: <PrivateRoute element={<ProductDetail />} allowedRoles={["CUSTOMER", "MANAGER", "CUSTOMER_STAFF"]} /> },
+      { path: "/skin-quiz", element: <SkinQuiz /> },
     ],
   },
   { path: "/refund/:refundId", element: <RefundForm /> },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
   { path: "/forgot-password", element: <ForgotPassword /> },
+
+
 
 ]);
 

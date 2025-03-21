@@ -1,31 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  Card, 
-  Button, 
-  Radio, 
-  Spin, 
-  Result, 
-  Typography, 
-  Steps, 
+import {
+  Card,
+  Button,
+  Radio,
+  Spin,
+  Result,
+  Typography,
+  Steps,
   Space,
   Tag,
   Divider,
   List,
   message
 } from 'antd';
-import { 
-  ArrowRightOutlined, 
-  ArrowLeftOutlined, 
+import {
+  ArrowRightOutlined,
+  ArrowLeftOutlined,
   CheckOutlined,
   SkinOutlined,
-  InfoCircleOutlined 
+  InfoCircleOutlined
 } from '@ant-design/icons';
 import mapResponse from './mapResponse';
 const { Title, Paragraph, Text } = Typography;
 const { Step } = Steps;
 
-const SkinQuiz = ({ customerId, onComplete }) => {
+const SkinQuiz = ({ onComplete }) => {
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
   const [mappedResponses, setMappedResponses] = useState({});
@@ -34,20 +34,21 @@ const SkinQuiz = ({ customerId, onComplete }) => {
   const [results, setResults] = useState(null);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  
+  const customerId = sessionStorage.getItem("customerId");
+
   const API_BASE_URL = 'http://localhost:8080/api';
-  
+
   const mapResponseValues = (questionId, answer, label) => {
     return mapResponse(label, answer);
   };
-  
+
   const getKeyResponseIdentifier = (question) => {
     if (question.label) {
       return question.label;
     }
     return `question_${question.questionId}`;
   };
-  
+
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -76,7 +77,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
     };
     fetchQuestions();
   }, []);
-  
+
   const handleResponseChange = (questionId, selectedIndex) => {
     const currentQuestion = questions.find(q => q.questionId === questionId);
     if (!currentQuestion || !currentQuestion.options) return;
@@ -92,7 +93,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       [keyIdentifier]: mappedValue
     }));
   };
-  
+
   const nextQuestion = () => {
     const currentQuestion = questions[currentQuestionIndex];
     if (!currentQuestion || responses[currentQuestion.questionId] === null) {
@@ -102,13 +103,13 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       setCurrentQuestionIndex(prevIndex => prevIndex + 1);
     }
   };
-  
+
   const prevQuestion = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prevIndex => prevIndex - 1);
     }
   };
-  
+
   const goToQuestion = (index) => {
     const canNavigate = index <= currentQuestionIndex + 1;
     const allPreviousAnswered = questions.slice(0, index).every(q => responses[q.questionId] !== null);
@@ -116,7 +117,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       setCurrentQuestionIndex(index);
     }
   };
-  
+
   const handleSubmit = async () => {
     const unansweredQuestions = questions.filter(q => responses[q.questionId] === null).length;
     if (unansweredQuestions > 0) {
@@ -148,15 +149,15 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       message.error('Failed to submit quiz');
     }
   };
-  
+
   const viewProductDetails = (productId) => {
     window.location.href = `/products/${productId}`;
   };
-  
+
   const browseAllProducts = () => {
     window.location.href = '/products';
   };
-  
+
   if (isLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
@@ -164,7 +165,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <Result
@@ -179,10 +180,10 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       />
     );
   }
-  
+
   if (results) {
     return (
-      <Card 
+      <Card
         title={<Title level={3} style={{ textAlign: 'center' }}>Your Skin Analysis Results</Title>}
         style={{ maxWidth: 1000, margin: '0 auto' }}
       >
@@ -199,7 +200,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
             appropriate skincare products.
           </Paragraph>
         </div>
-        
+
         {results.recommendedConcerns && results.recommendedConcerns.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             <Title level={4}>Your Skin Concerns:</Title>
@@ -212,9 +213,9 @@ const SkinQuiz = ({ customerId, onComplete }) => {
             </Space>
           </div>
         )}
-        
+
         <Divider />
-        
+
         <div style={{ marginBottom: 24 }}>
           <Title level={4}>Recommended Products</Title>
           {recommendedProducts.length > 0 ? (
@@ -223,8 +224,8 @@ const SkinQuiz = ({ customerId, onComplete }) => {
               dataSource={recommendedProducts}
               renderItem={product => (
                 <List.Item>
-                  <Card 
-                    hoverable 
+                  <Card
+                    hoverable
                     cover={product.imageURL && <img alt={product.productName} src={product.imageURL} />}
                   >
                     <Card.Meta
@@ -239,8 +240,8 @@ const SkinQuiz = ({ customerId, onComplete }) => {
                               <Tag key={i} color="green">{concern}</Tag>
                             ))}
                           </Space>
-                          <Button 
-                            type="primary" 
+                          <Button
+                            type="primary"
                             style={{ marginTop: 12 }}
                             onClick={() => viewProductDetails(product.productID)}
                           >
@@ -257,7 +258,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
             <Paragraph>No specific products recommended at this time.</Paragraph>
           )}
         </div>
-        
+
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <Button type="primary" size="large" onClick={browseAllProducts}>
             Browse All Products
@@ -266,7 +267,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       </Card>
     );
   }
-  
+
   if (questions.length === 0) {
     return (
       <Result
@@ -276,14 +277,14 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       />
     );
   }
-  
+
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
   const options = currentQuestion.options || [];
   return (
     <div className="skin-quiz-container">
-      
+
       <Steps
         current={currentQuestionIndex}
         size="small"
@@ -291,13 +292,13 @@ const SkinQuiz = ({ customerId, onComplete }) => {
         onChange={goToQuestion}
       >
         {questions.map((_, index) => (
-          <Step 
-            key={index} 
-            disabled={index > currentQuestionIndex + 1} 
+          <Step
+            key={index}
+            disabled={index > currentQuestionIndex + 1}
           />
         ))}
       </Steps>
-      
+
       <Card
         title={<Title level={4}>Skin Type Assessment Quiz</Title>}
         style={{ maxWidth: 800, margin: '0 auto' }}
@@ -309,15 +310,15 @@ const SkinQuiz = ({ customerId, onComplete }) => {
           <Paragraph strong style={{ fontSize: 16, marginBottom: 20 }}>
             {currentQuestion.question}
           </Paragraph>
-          
-          <Radio.Group 
+
+          <Radio.Group
             onChange={(e) => handleResponseChange(currentQuestion.questionId, e.target.value)}
             value={responses[currentQuestion.questionId]}
             style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
           >
             {options.map((option, index) => (
-              <Radio 
-                key={`${currentQuestion.questionId}-${index}`} 
+              <Radio
+                key={`${currentQuestion.questionId}-${index}`}
                 value={index}
                 style={{ fontSize: 16 }}
               >
@@ -326,27 +327,27 @@ const SkinQuiz = ({ customerId, onComplete }) => {
             ))}
           </Radio.Group>
         </div>
-        
+
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
           {!isFirstQuestion && (
             <Button type="default" onClick={prevQuestion} icon={<ArrowLeftOutlined />}>
               Previous
             </Button>
           )}
-          
+
           <div style={{ marginLeft: 'auto' }}>
             {!isLastQuestion ? (
-              <Button 
-                type="primary" 
-                onClick={nextQuestion} 
+              <Button
+                type="primary"
+                onClick={nextQuestion}
                 disabled={responses[currentQuestion.questionId] === null}
                 icon={<ArrowRightOutlined />}
               >
                 Next
               </Button>
             ) : (
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 onClick={handleSubmit}
                 disabled={responses[currentQuestion.questionId] === null}
                 icon={<CheckOutlined />}
@@ -357,7 +358,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
           </div>
         </div>
       </Card>
-      
+
       <div style={{ textAlign: 'center', margin: '20px 0' }}>
         <Text type="secondary">
           <InfoCircleOutlined /> Your answers help us determine your skin type and recommend suitable products.
