@@ -97,3 +97,8 @@
   display: flex;
   justify-content: flex-end;
 }
+
+.rate-and-comment {
+  display: flex;
+  gap: 50px;
+}

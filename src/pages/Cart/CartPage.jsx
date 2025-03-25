@@ -314,6 +314,7 @@ const CartPage = () => {
                 <Table columns={batchColumns} dataSource={selectedProductBatches} rowKey="batchNumber" />
             </Modal>
             <Footer />
+
         </div>
     );
 };

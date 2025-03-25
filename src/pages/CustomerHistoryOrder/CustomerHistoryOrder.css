@@ -9,7 +9,7 @@ body {
 
 .totalprice-history {
     padding-right: 30px;
-    color: red;
+    color: rgb(89, 255, 0);
 }
 
 .div-total-price {
@@ -39,4 +39,12 @@ body {
 .review-or-refund {
     display: flex;
     gap: 20px;
+}
+
+p.original-price {
+    color: orange;
+}
+
+p.discount {
+    color: blueviolet;
 }

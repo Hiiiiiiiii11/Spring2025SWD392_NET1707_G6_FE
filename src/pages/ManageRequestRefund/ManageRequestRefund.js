@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Table, Typography, Button, Tag, Card, Upload, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
-import { GetAllRefundOrderRequestAPI, SendCompleteRefundAPI, VertifyRefundOrderRequestAPI } from "../../services/manageOrderService";
+import {
+    GetAllRefundOrderRequestAPI,
+    GetOrderByIdAPI,
+    SendCompleteRefundAPI,
+    VertifyRefundOrderRequestAPI,
+} from "../../services/manageOrderService";
 import Header from "../../components/Header/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../ManageRequestRefund/ManageRequestRefund.css";
 import { uploadToCloudinary } from "../../services/manageProductService";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons"; // đảm bảo API này được export
+import { GetCustomerProfileAPI } from "../../services/userService";
 
 const { Title } = Typography;
 
@@ -23,9 +29,13 @@ const statusColors = {
 
 const ManageRequestRefund = () => {
     const [refundRequests, setRefundRequests] = useState([]);
+    // state mapping orderId → customerName
+    const [orderCustomerNames, setOrderCustomerNames] = useState({});
     const [selectedRefundId, setSelectedRefundId] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [viewRefundModalVisible, setViewRefundModalVisible] = useState(false);
+    const [refundImageUrl, setRefundImageUrl] = useState("");
     const [file, setFile] = useState(null);
     const [fileList, setFileList] = useState([]);
     const staffId = sessionStorage.getItem("staffId");
@@ -35,15 +45,36 @@ const ManageRequestRefund = () => {
         fetchRefundRequests();
     }, []);
 
+    // Sau khi fetch refund requests, lấy thông tin customer dựa trên orderId
+    const fetchCustomerNames = async (refunds) => {
+        // Lấy danh sách orderId duy nhất
+        const uniqueOrderIds = [...new Set(refunds.map((r) => r.orderId))];
+        const namesMap = {};
+        await Promise.all(
+            uniqueOrderIds.map(async (orderId) => {
+                try {
+                    const order = await GetOrderByIdAPI(orderId);
+                    const customer = await GetCustomerProfileAPI(order.customerId);
+                    namesMap[orderId] = customer.name || customer.fullName || "Unknown";
+                } catch (error) {
+                    namesMap[orderId] = "Unknown";
+                }
+            })
+        );
+        setOrderCustomerNames(namesMap);
+    };
+
     const fetchRefundRequests = async () => {
         try {
             const data = await GetAllRefundOrderRequestAPI();
-            // Update refund status from localStorage if available
+            // Update refund status từ localStorage nếu có
             const updatedData = data.map((request) => ({
                 ...request,
                 status: localStorage.getItem(`refund_${request.id}`) || request.status,
             }));
             setRefundRequests(updatedData);
+            // Sau khi có refund requests, fetch customer names
+            fetchCustomerNames(updatedData);
         } catch (error) {
             toast.error("Failed to fetch refund requests");
         }
@@ -93,15 +124,15 @@ const ManageRequestRefund = () => {
             await SendCompleteRefundAPI(selectedRefundId, staffId, imageUrl);
             toast.success("Refund completed successfully");
 
-            // Update refund status locally and in localStorage
+            // Update refund status locally và lưu vào localStorage
             setRefundRequests((prev) =>
                 prev.map((request) =>
-                    request.id === selectedRefundId ? { ...request, status: "COMPLETED" } : request
+                    request.id === selectedRefundId ? { ...request, status: "COMPLETED", proofDocumentUrl: imageUrl } : request
                 )
             );
             localStorage.setItem(`refund_${selectedRefundId}`, "COMPLETED");
 
-            // Close modal and update refund list
+            // Đóng modal và refresh danh sách refund requests
             setModalVisible(false);
             fetchRefundRequests();
         } catch (error) {
@@ -113,9 +144,25 @@ const ManageRequestRefund = () => {
         }
     };
 
+    // Hàm mở modal xem hình ảnh refund
+    const handleViewRefundImage = (record) => {
+        if (record.proofDocumentUrl) {
+            setRefundImageUrl(record.proofDocumentUrl);
+            setViewRefundModalVisible(true);
+        } else {
+            toast.warning("No refund image available.");
+        }
+    };
+
     const columns = [
         { title: "Refund ID", dataIndex: "id", key: "id" },
         { title: "Order ID", dataIndex: "orderId", key: "orderId" },
+        {
+            title: "Customer Name",
+            dataIndex: "orderId",
+            key: "customerName",
+            render: (orderId) => orderCustomerNames[orderId] || "Loading...",
+        },
         {
             title: "Status",
             dataIndex: "status",
@@ -160,15 +207,24 @@ const ManageRequestRefund = () => {
                             </Button>
                         </div>
                     )}
-                    {(record.status === "REFUNDED" || record.status === "COMPLETED") && (
-                        <Button
-                            type="default"
-                            style={{ backgroundColor: "blue", color: "white" }}
-                            onClick={() => handleSendComplete(record.id)}
-                            disabled={record.status === "COMPLETED"}
-                        >
-                            {record.status === "COMPLETED" ? "Completed Refuned" : "Send Complete"}
-                        </Button>
+                    {record.status === "REFUNDED" && (
+                        <div style={{ display: "flex", gap: "8px" }}>
+                            <Button
+                                type="default"
+                                style={{ backgroundColor: "#7070f0", color: "white" }}
+                                onClick={() => handleSendComplete(record.id)}
+                                disabled={!!record.proofDocumentUrl}
+                            >
+                                Send Complete
+                            </Button>
+                            <Button
+                                type="default"
+                                style={{ backgroundColor: "green", color: "white" }}
+                                onClick={() => handleViewRefundImage(record)}
+                            >
+                                View Image
+                            </Button>
+                        </div>
                     )}
                 </div>
             ),
@@ -185,7 +241,7 @@ const ManageRequestRefund = () => {
                     <Table columns={columns} dataSource={refundRequests} rowKey="id" />
                 </Card>
             </div>
-            {/* Modal Upload */}
+            {/* Modal Upload for Send/Update Complete */}
             <Modal
                 title="Upload Proof of Refund Completion"
                 visible={modalVisible}
@@ -200,7 +256,7 @@ const ManageRequestRefund = () => {
                     beforeUpload={(file) => {
                         setFile(file);
                         setFileList([{ uid: "-1", url: URL.createObjectURL(file), name: file.name }]);
-                        return false; // Do not auto-upload
+                        return false; // Không tự động upload
                     }}
                     onRemove={() => {
                         setFile(null);
@@ -210,6 +266,20 @@ const ManageRequestRefund = () => {
                 >
                     {fileList.length >= 1 ? null : <Button icon={<UploadOutlined />}>Click to Upload</Button>}
                 </Upload>
+            </Modal>
+
+            {/* Modal View Refund Image */}
+            <Modal
+                title="View Refund Image"
+                visible={viewRefundModalVisible}
+                onCancel={() => setViewRefundModalVisible(false)}
+                footer={null}
+            >
+                {refundImageUrl ? (
+                    <img src={refundImageUrl} alt="Refund Proof" style={{ width: "100%" }} />
+                ) : (
+                    <p>No refund image available.</p>
+                )}
             </Modal>
         </div>
     );

@@ -141,7 +141,6 @@ export const GetOrderByIdAPI = async (id) => {
 
         return response.data;
     } catch (error) {
-        throw error.response?.data || "Error updating order status";
     }
 };
 export const SendCompleteRefundAPI = async (refundId, staffId, imagUrl) => {
@@ -158,6 +157,37 @@ export const SendCompleteRefundAPI = async (refundId, staffId, imagUrl) => {
 
         return response.data;
     } catch (error) {
-        throw error.response?.data || "Error updating order status";
+    }
+};
+export const AssignDeliveyForOrderAPI = async (orderId, staffId) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.post(`${API_URL}/orders/assign-delivery-staff?orderId=${orderId}&staffId=${staffId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "*/*",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+    }
+};
+export const GetAllOrderAssignByDeliverIdAPI = async (staffId) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const response = await axios.get(`${API_URL}/orders/by-staff/${staffId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "*/*",
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
     }
 };

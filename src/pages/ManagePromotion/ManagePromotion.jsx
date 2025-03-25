@@ -120,9 +120,11 @@ const ManagePromotion = () => {
       <Header />
       <div style={{ padding: 24, margin: '0 auto' }}>
         <Title level={2}>Promotion Management</Title>
-        <Button type="primary" onClick={showModal} style={{ marginBottom: 16 }}>
-          Add New Promotion
-        </Button>
+        <div style={{ marginBottom: 16, display: "flex", justifyContent: "flex-end" }}>
+          <Button type="primary" onClick={showModal} >
+            + Add New Promotion
+          </Button>
+        </div>
         <Table
           columns={columns}
           dataSource={promotions}
@@ -142,15 +144,6 @@ const ManagePromotion = () => {
             onFinish={handleSave}
             layout="vertical"
           >
-            {/* {!editingPromotion && (
-              <Form.Item
-                name="promotionId"
-                label="Promotion Id"
-                rules={[{ required: true, message: 'Please enter the promotion Id!' }]}
-              >
-                <Input placeholder="Enter promotion Id" />
-              </Form.Item>
-            )} */}
 
             <Form.Item
               name="promotionName"

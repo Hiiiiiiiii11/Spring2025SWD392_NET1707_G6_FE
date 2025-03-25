@@ -1,34 +1,93 @@
-import React, { useState, useEffect } from "react";
-import { Table, Card, Typography, Button, List, Select } from "antd";
+import React, { useState, useEffect, useMemo } from "react";
+import { Table, Card, Typography, Button, List, Select, Row, Col, Modal } from "antd";
 import Header from "../../components/Header/Header";
-import { GetAllCustomerOrderAPI, UpdateCustomerOrderStatusAPI } from "../../services/manageOrderService";
+import { AssignDeliveyForOrderAPI, GetAllCustomerOrderAPI, GetAllOrderAssignByDeliverIdAPI, UpdateCustomerOrderStatusAPI } from "../../services/manageOrderService";
 import { getProductByIdAPI } from "../../services/manageProductService";
-import "../ManageOrder/ManageOrders.css";
+import { getPromotionByIdAPI } from "../../services/managePromotionService"; // API lấy thông tin promotion
+import { GetCustomerProfileAPI } from "../../services/userService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend
+} from "recharts";
+import "../ManageOrder/ManageOrders.css";
+import { GetAllEmployeeAPI } from "../../services/manageEmployeeService";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-const statusOptions = ["PENDING", "SHIPPED", "DELIVERED", "PAID", "CANCELLED", "RETURNED", "REFUNDED"];
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [expandedOrders, setExpandedOrders] = useState([]);
   const [orderProductDetails, setOrderProductDetails] = useState({});
+  // State chứa thông tin customerName theo customerId
+  const [customerNames, setCustomerNames] = useState({});
+  // State chứa thông tin promotion theo orderId
+  const [orderPromotions, setOrderPromotions] = useState({});
   const role = sessionStorage.getItem("role");
+
+  const [assignModalVisible, setAssignModalVisible] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [employeeList, setEmployeeList] = useState([]);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [staffNames, setStaffNames] = useState({});
+  const staffId = sessionStorage.getItem('staffId');
+
+
   useEffect(() => {
     fetchOrders();
+    fetchDeliveryStaff();
   }, []);
+
+  // Sau khi đơn hàng được lấy về, nếu đơn hàng có promotionId, gọi API lấy thông tin khuyến mãi
+  useEffect(() => {
+    orders.forEach((order) => {
+      if (order.promotionId) {
+        getPromotionByIdAPI(order.promotionId)
+          .then((promotion) => {
+            setOrderPromotions((prev) => ({
+              ...prev,
+              [order.orderId]: promotion,
+            }));
+          })
+          .catch((error) => {
+            console.error(`Error fetching promotion for order ${order.orderId}`, error);
+          });
+      }
+    });
+  }, [orders]);
 
   const fetchOrders = async () => {
     try {
-      const data = await GetAllCustomerOrderAPI();
-      console.log(data);
+      let data;
+      if (role === "DELIVERY_STAFF") {
+        data = await GetAllOrderAssignByDeliverIdAPI(staffId); // Truyền staffId vào API
+      } else {
+        data = await GetAllCustomerOrderAPI();
+      }
       setOrders(data);
+
+      // Lấy danh sách customerId duy nhất từ orders
+      const uniqueCustomerIds = [...new Set(data.map((order) => order.customerId))];
+      const namesMap = {};
+
+      await Promise.all(
+        uniqueCustomerIds.map(async (customerId) => {
+          try {
+            const customer = await GetCustomerProfileAPI(customerId);
+            namesMap[customerId] = customer.name || customer.fullName || "Unknown";
+          } catch (error) {
+            namesMap[customerId] = "Unknown";
+          }
+        })
+      );
+      setCustomerNames(namesMap);
+
     } catch (error) {
       toast.error("Failed to fetch orders");
     }
   };
+
 
   const handleUpdateStatus = async (orderId, newStatus, currentStatus) => {
     const validTransitions = {
@@ -43,43 +102,149 @@ const ManageOrders = () => {
 
     try {
       await UpdateCustomerOrderStatusAPI(orderId, newStatus);
-      setOrders(orders.map(o =>
-        o.orderId === orderId ? { ...o, status: newStatus } : o
-      ));
+      setOrders(orders.map((o) => (o.orderId === orderId ? { ...o, status: newStatus } : o)));
       toast.success(`Order status updated to ${newStatus}`);
     } catch (error) {
       toast.error("Failed to update status");
     }
   };
 
-
   const fetchProductDetailsForOrder = async (order) => {
     try {
-      const promises = order.orderDetails.map(item => getProductByIdAPI(item.productId));
+      const promises = order.orderDetails.map((item) => getProductByIdAPI(item.productId));
       const products = await Promise.all(promises);
       const details = products.map((product, index) => ({
         ...product,
         quantity: order.orderDetails[index].quantity,
       }));
-      setOrderProductDetails(prev => ({ ...prev, [order.orderId]: details }));
+      setOrderProductDetails((prev) => ({ ...prev, [order.orderId]: details }));
     } catch (error) {
       toast.error("Failed to load product details");
     }
   };
+  const fetchDeliveryStaff = async () => {
+    try {
+      const employees = await GetAllEmployeeAPI();
+      const namesMap = {};
+      employees.forEach((emp) => {
+        namesMap[emp.staffId] = emp.fullname;
+      });
+      setStaffNames(namesMap);
+
+      const deliveryStaff = employees.filter((emp) => emp.role === "DELIVERY_STAFF");
+      setEmployeeList(deliveryStaff);
+    } catch (error) {
+      toast.error("Failed to fetch delivery staff");
+    }
+  };
+
+  const openAssignModal = (orderId) => {
+    setSelectedOrderId(orderId);
+    setAssignModalVisible(true);
+    // Fetch employee list and filter for role DELIVERY_STAFF
+    fetchDeliveryStaff();
+  };
 
   const handleToggleDetails = async (order) => {
     if (expandedOrders.includes(order.orderId)) {
-      setExpandedOrders(expandedOrders.filter(id => id !== order.orderId));
+      setExpandedOrders(expandedOrders.filter((id) => id !== order.orderId));
     } else {
       await fetchProductDetailsForOrder(order);
       setExpandedOrders([...expandedOrders, order.orderId]);
     }
   };
 
+  // Sắp xếp đơn hàng sao cho các đơn có status "PAID" được đưa lên đầu, sau đó sắp xếp theo ngày (mới nhất trước)
+  const sortedOrders = useMemo(() => {
+    return [...orders].sort((a, b) => {
+      if (a.status === "PAID" && b.status !== "PAID") return -1;
+      if (a.status !== "PAID" && b.status === "PAID") return 1;
+      return new Date(b.orderDate) - new Date(a.orderDate);
+    });
+  }, [orders]);
+
+  // Tính toán Payment & Refund History
+  const { paymentHistory, refundHistory, totalMoneyReceived, totalMoneyRefunded, totalRefundOrders } = useMemo(() => {
+    // Thêm customerId vào mỗi record để hiển thị tên khách hàng
+    const payments = orders
+      .filter((o) => ["PAID", "DELIVERED", "COMPLETED"].includes(o.status))
+      .map((o) => ({
+        orderId: o.orderId,
+        date: o.orderDate,
+        amount: o.totalAmount,
+        customerId: o.customerId,
+      }));
+    const refunds = orders
+      .filter((o) => o.refund && o.refund.status === "REFUNDED")
+      .map((o) => ({
+        orderId: o.orderId,
+        // Chỉ lấy phần ngày, ví dụ: "2025-03-22"
+        date: o.refund.refundCompletionTime.split("T")[0],
+        amount: o.refund.amount,
+        customerId: o.customerId,
+      }));
+    const totalReceived = payments.reduce((sum, p) => sum + p.amount, 0);
+    const totalRefunded = refunds.reduce((sum, r) => sum + r.amount, 0);
+    return {
+      paymentHistory: payments,
+      refundHistory: refunds,
+      totalMoneyReceived: totalReceived,
+      totalMoneyRefunded: totalRefunded,
+      totalRefundOrders: refunds.length,
+    };
+  }, [orders]);
+
+  // Tính tổng doanh thu ròng = Tổng tiền nhận - Tổng tiền refund
+  const netRevenue = totalMoneyReceived - totalMoneyRefunded;
+
+  // Tính toán dữ liệu cho sơ đồ doanh thu (Revenue Chart)
+  // Dữ liệu được lấy từ Payment History (Addition) và Refund History (Deduction)
+  const revenueChartData = useMemo(() => {
+    const grouped = {};
+    paymentHistory.forEach((item) => {
+      const date = new Date(item.date).toLocaleDateString();
+      if (!grouped[date]) {
+        grouped[date] = { date, Addition: 0, Deduction: 0 };
+      }
+      grouped[date].Addition += item.amount;
+    });
+    refundHistory.forEach((item) => {
+      const date = new Date(item.date).toLocaleDateString();
+      if (!grouped[date]) {
+        grouped[date] = { date, Addition: 0, Deduction: 0 };
+      }
+      grouped[date].Deduction += item.amount;
+    });
+    return Object.values(grouped);
+  }, [paymentHistory, refundHistory]);
+
+  const handleAssignDelivery = async () => {
+    if (!selectedOrderId || !selectedEmployeeId) {
+      toast.error("Please select a staff member");
+      console.log(selectedOrderId)
+      console.log(selectedEmployeeId)
+      return;
+    }
+    try {
+      await AssignDeliveyForOrderAPI(selectedOrderId, selectedEmployeeId);
+      toast.success("Delivery assigned successfully");
+      setAssignModalVisible(false);
+      // Optionally, refresh orders if needed:
+      fetchOrders();
+    } catch (error) {
+      toast.error("Failed to assign delivery");
+    }
+  };
+
   const columns = [
-    { title: "Order ID", dataIndex: "orderId", key: "orderId" },
     { title: "Order Date", dataIndex: "orderDate", key: "orderDate" },
     { title: "Order Address", dataIndex: "address", key: "address" },
+    {
+      title: "Customer Name",
+      dataIndex: "customerId",
+      key: "customerName",
+      render: (customerId) => customerNames[customerId] || "Loading...",
+    },
     {
       title: "Status",
       dataIndex: "status",
@@ -89,32 +254,34 @@ const ManageOrders = () => {
           PAID: ["SHIPPED"],
           SHIPPED: ["DELIVERED"],
         };
-
-        return (<>
-
+        return (
           <Select
             value={text}
             style={{ width: 150 }}
             onChange={(value) => handleUpdateStatus(order.orderId, value, text)}
             disabled={!allowedStatuses[text]}
           >
-            {role === "DELIVERY_STAFF" && (
-              <>
-                {(allowedStatuses[text] || []).map(status => (
-                  <Option key={status} value={status}>
-                    {status}
-                  </Option>
-                ))}
-              </>
-            )}
+            {role === "DELIVERY_STAFF" &&
+              allowedStatuses[text]?.map((status) => (
+                <Option key={status} value={status}>
+                  {status}
+                </Option>
+              ))}
           </Select>
-
-        </>
         );
       },
     },
-
-
+    {
+      title: "Promotion",
+      key: "promotion",
+      render: (_, order) => {
+        if (order.promotionId) {
+          const promotion = orderPromotions[order.orderId];
+          return promotion ? promotion.promotionName : "Loading...";
+        }
+        return "None";
+      },
+    },
     {
       title: "Total",
       dataIndex: "totalAmount",
@@ -122,25 +289,124 @@ const ManageOrders = () => {
       render: (text) => `$${text}`,
     },
     {
+      title: "Delivery BY",
+      dataIndex: "staffId",
+      key: "StaffName",
+      render: (staffId) => staffNames[staffId] || "None",
+    },
+    {
       title: "Actions",
       key: "actions",
       render: (_, order) => (
-        <Button type="default" onClick={() => handleToggleDetails(order)}>
-          {expandedOrders.includes(order.orderId) ? "Hide Details" : "View Details"}
-        </Button>
+        <div className="detail-and-aligndelivery">
+          <Button type="default" onClick={() => handleToggleDetails(order)}>
+            {expandedOrders.includes(order.orderId) ? "Hide Details" : "View Details"}
+          </Button>
+          {role === "CUSTOMER_STAFF" && order.status === "PAID" && (
+            <Button type="default" style={{ color: "blue" }}
+              disabled={order.staffId}
+              onClick={() => openAssignModal(order.orderId)}>
+              Assign Delivery
+            </Button>
+          )}
+        </div>
       ),
     },
   ];
 
   return (
-    <div style={{ minHeight: "100vh" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#f0f2f5", paddingBottom: "24px" }}>
       <ToastContainer />
       <Header />
-      <div style={{ padding: 24, margin: "0 auto" }}>
-        <Title level={2}>Order Management Dashboard</Title>
+      <div style={{ padding: "24px", margin: "0 auto" }}>
+        <Title level={2} >
+          Order Management Dashboard
+        </Title>
+
+        {/* Dashboard doanh thu ban đầu */}
+        {role === "MANAGER" && (
+          <>
+            <Card title="Revenue Dashboard" style={{ marginBottom: "24px", backgroundColor: "#fafafa" }}>
+              <Row gutter={[16, 16]}>
+                <Col xs={24} md={8}>
+                  <Card type="inner" style={{ backgroundColor: "#e6f7ff" }}>
+                    <Title level={4}>Total Revenue</Title>
+                    <p style={{ fontSize: "20px", fontWeight: "bold", color: "#52c41a" }}>
+                      ${totalMoneyReceived.toLocaleString()}
+                    </p>
+                  </Card>
+                </Col>
+                <Col xs={24} md={8}>
+                  <Card type="inner" style={{ backgroundColor: "#fff7e6" }}>
+                    <Title level={4}>Total Refunds</Title>
+                    <p style={{ fontSize: "20px", fontWeight: "bold", color: "#fa8c16" }}>
+                      ${totalMoneyRefunded.toLocaleString()}
+                    </p>
+                  </Card>
+                </Col>
+                <Col xs={24} md={8}>
+                  <Card type="inner" style={{ backgroundColor: "#f6ffed" }}>
+                    <Title level={4}>Net Revenue</Title>
+                    <p style={{ fontSize: "20px", fontWeight: "bold", color: "#52c41a" }}>
+                      ${netRevenue.toLocaleString()}
+                    </p>
+                  </Card>
+                </Col>
+              </Row>
+              <Row gutter={[16, 16]} style={{ marginTop: "24px" }}>
+                <Col xs={24} md={12}>
+                  <Card type="inner" title="Payment History" style={{ backgroundColor: "#e6f7ff" }}>
+                    <List
+                      dataSource={paymentHistory}
+                      renderItem={(item) => (
+                        <List.Item key={item.orderId}>
+                          <span>
+                            Payment Date: {new Date(item.date).toLocaleDateString()} | Receive: ${item.amount} from{" "}
+                            {customerNames[item.customerId] || "Loading..."}
+                          </span>
+                        </List.Item>
+                      )}
+                    />
+                  </Card>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Card type="inner" title="Refund History" style={{ backgroundColor: "#fff7e6" }}>
+                    <List
+                      dataSource={refundHistory}
+                      renderItem={(item) => (
+                        <List.Item key={item.orderId}>
+                          <span>
+                            Refund Date: {item.date} | Refund Amount: ${item.amount} to{" "}
+                            {customerNames[item.customerId] || "Loading..."}
+                          </span>
+                        </List.Item>
+                      )}
+                    />
+                  </Card>
+                </Col>
+              </Row>
+            </Card>
+
+            {/* Dashboard sơ đồ doanh thu */}
+            <Card title="Revenue Chart" style={{ marginBottom: "24px", backgroundColor: "#ffffff" }}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={revenueChartData}>
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Addition" fill="#52c41a" name="Addition" />
+                  <Bar dataKey="Deduction" fill="#fa8c16" name="Deduction" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </>
+        )}
+
+        {/* Bảng hiển thị đơn hàng */}
         <Table
           columns={columns}
-          dataSource={orders}
+          dataSource={sortedOrders}
           rowKey="orderId"
           expandable={{
             expandedRowRender: (order) => (
@@ -149,23 +415,19 @@ const ManageOrders = () => {
                   dataSource={orderProductDetails[order.orderId] || []}
                   renderItem={(item) => (
                     <List.Item key={item.productId}>
-                      <div className="item-order-detail">
-                        <Card style={{ display: "flex" }}>
-                          <div className="detail-item-product">
-                            <div>
-                              <img
-                                src={item.imageURL || "https://via.placeholder.com/150"}
-                                alt={item.productName}
-                                style={{ width: 80, height: 80, objectFit: "cover" }}
-                              />
-                            </div>
-                            <div>
-                              <p style={{ margin: 0 }}><strong>{item.productName}</strong></p>
-                              <p style={{ margin: 0 }}>Quantity: {item.quantity}</p>
-                            </div>
+                      <Card style={{ display: "flex", width: "100%", marginBottom: "8px" }}>
+                        <div className="detail-item-product" style={{ display: "flex", alignItems: "center" }}>
+                          <img
+                            src={item.imageURL || "https://via.placeholder.com/150"}
+                            alt={item.productName}
+                            style={{ width: 80, height: 80, objectFit: "cover", margin: 0 }}
+                          />
+                          <div>
+                            <p style={{ margin: 0, fontWeight: "bold" }}>{item.productName}</p>
+                            <p style={{ margin: 0 }}>Quantity: {item.quantity}</p>
                           </div>
-                        </Card>
-                      </div>
+                        </div>
+                      </Card>
                     </List.Item>
                   )}
                 />
@@ -175,6 +437,27 @@ const ManageOrders = () => {
           }}
         />
       </div>
+
+      {/* Assign Delivery Modal */}
+      <Modal
+        title="Assign Delivery Staff"
+        visible={assignModalVisible}
+        onCancel={() => setAssignModalVisible(false)}
+        onOk={handleAssignDelivery}
+        okText="Assign"
+      >
+        <Select
+          placeholder="Select Delivery Staff"
+          style={{ width: "100%" }}
+          onChange={(value) => setSelectedEmployeeId(value)}
+        >
+          {employeeList.map((employee) => (
+            <Option key={employee.staffId} value={employee.staffId}>
+              {employee.fullname}
+            </Option>
+          ))}
+        </Select>
+      </Modal>
     </div>
   );
 };

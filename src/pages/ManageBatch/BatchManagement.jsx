@@ -37,14 +37,21 @@ const BatchManagement = () => {
   const handleDelete = async (batchId) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this product?");
     if (!confirmDelete) return;
+
     try {
-      await deleteBatchAPI(batchId);
-      toast.success("Batch deleted successfully");
-      fetchBatchById();
+      const response = await deleteBatchAPI(batchId);
+
+      if (response?.status === 200) {
+        toast.success("Batch deleted successfully");
+        fetchBatchById();
+      } else {
+        toast.warning("Can't delete batch. The batch contains products that have been sold!");
+      }
     } catch (error) {
-      toast.warning("Can't not delete batch have product has been sold!");
+      toast.warning("Can't delete batch. The batch contains products that have been sold!");
     }
-  }
+  };
+
 
 
   const handleEdit = (batch) => {

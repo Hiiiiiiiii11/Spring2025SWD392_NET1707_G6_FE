@@ -57,6 +57,37 @@ const OrderConfirmationPage = () => {
       console.error("Failed to fetch promotions", error);
     }
   };
+  const handleShippingModalOk = async () => {
+    try {
+      const values = await shippingForm.validateFields();
+      setShippingInfo({
+        ...shippingInfo, // giữ nguyên name
+        address: values.shippingAddress,
+      });
+      setShippingModalVisible(false);
+      toast.success("Shipping info updated successfully!");
+    } catch (error) {
+      toast.warning("Please check the shipping information!");
+    }
+  };
+  const totalAmount = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const handleApplyPromotion = (promotionId) => {
+    const promo = promotions.find((p) => p.promotionId === promotionId);
+    console.log("Selected Promotion:", promo); // Kiểm tra giá trị minimumAmount
+    console.log("Total Amount:", totalAmount);
+
+    if (promo) {
+      if (totalAmount < Number(promo.minimumAmount)) { // Đổi từ minimumOrderAmount -> minimumAmount
+        toast.warning(`This promotion requires a minimum order amount of $${promo.minimumAmount}`);
+        return;
+      }
+
+      const discount = (totalAmount * promo.discountPercentage) / 100;
+      setDiscountedTotal(totalAmount - discount);
+      setSelectedPromotion(promo);
+      toast.success(`Applied Promotion: ${promo.promotionName}`);
+    }
+  };
   const onFinish = async () => {
     if (!selectedItems.length) {
       toast.warning("No products selected!");
@@ -95,15 +126,18 @@ const OrderConfirmationPage = () => {
 
     try {
       const orderResult = await createOrderAPI(orderData);
+      console.log(orderResult)
       // Navigate to the order detail page after a short delay.
-      if (orderResult === "") {
-        toast.error("Fail to process! Please try again later")
+      if (!orderResult || orderResult === "") {
+        toast.warning("Process failed. Please try again later.");
         setIsPlacingOrder(false);
         return;
       }
-      setTimeout(() => {
-        window.location.href = `${orderResult}`;
-      }, 2000);
+      if (orderResult) {
+        setTimeout(() => {
+          window.location.href = `${orderResult}`;
+        }, 2000);
+      }
     } catch (error) {
       toast.error(`Failed to place order: ${error}`);
       setIsPlacingOrder(false);
@@ -115,38 +149,9 @@ const OrderConfirmationPage = () => {
 
 
 
-  const handleShippingModalOk = async () => {
-    try {
-      const values = await shippingForm.validateFields();
-      setShippingInfo({
-        ...shippingInfo, // giữ nguyên name
-        address: values.shippingAddress,
-      });
-      setShippingModalVisible(false);
-      toast.success("Shipping info updated successfully!");
-    } catch (error) {
-      toast.warning("Please check the shipping information!");
-    }
-  };
-  const totalAmount = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const handleApplyPromotion = (promotionId) => {
-    const promo = promotions.find((p) => p.promotionId === promotionId);
-    console.log("Selected Promotion:", promo); // Kiểm tra giá trị minimumAmount
-    console.log("Total Amount:", totalAmount);
 
-    if (promo) {
-      if (totalAmount < Number(promo.minimumAmount)) { // Đổi từ minimumOrderAmount -> minimumAmount
-        toast.warning(`This promotion requires a minimum order amount of $${promo.minimumAmount}`);
-        return;
-      }
 
-      const discount = (totalAmount * promo.discountPercentage) / 100;
-      setDiscountedTotal(totalAmount - discount);
-      setSelectedPromotion(promo);
-      toast.success(`Applied Promotion: ${promo.promotionName}`);
-    }
-  };
 
 
 

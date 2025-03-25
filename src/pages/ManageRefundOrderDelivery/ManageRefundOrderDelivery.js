@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Table, Card, Typography, Button, List, Select } from "antd";
 import Header from "../../components/Header/Header";
-import { GetAllRefundOrderRequestAPI, ManageRefundOrderStatusByDeliveryAPI } from "../../services/manageOrderService";
+import {
+    GetAllRefundOrderRequestAPI,
+    GetOrderByIdAPI,
+    ManageRefundOrderStatusByDeliveryAPI,
+} from "../../services/manageOrderService";
 import { getProductByIdAPI } from "../../services/manageProductService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { GetCustomerProfileAPI } from "../../services/userService";
 
 const { Title } = Typography;
 const { Option } = Select;
+
 const statusTransitions = {
     VERIFIED: ["PICKED_UP"],
     PICKED_UP: ["RETURNED_TO_WAREHOUSE"],
@@ -17,9 +23,10 @@ const ManageRefundOrderDelivery = () => {
     const [refundOrders, setRefundOrders] = useState([]);
     const [expandedOrders, setExpandedOrders] = useState([]);
     const [orderProductDetails, setOrderProductDetails] = useState({});
+    // State mapping orderId => customerName
+    const [orderCustomerNames, setOrderCustomerNames] = useState({});
     const role = sessionStorage.getItem("role");
     const staffId = sessionStorage.getItem("staffId");
-    console.log(staffId)
 
     useEffect(() => {
         if (role === "DELIVERY_STAFF") {
@@ -27,11 +34,33 @@ const ManageRefundOrderDelivery = () => {
         }
     }, []);
 
+    // Sau khi lấy danh sách refund orders, fetch customer name từ orderId
+    const fetchCustomerNames = async (orders) => {
+        // Lấy danh sách orderId duy nhất từ refund orders
+        const uniqueOrderIds = [...new Set(orders.map((order) => order.orderId))];
+        const namesMap = {};
+        await Promise.all(
+            uniqueOrderIds.map(async (orderId) => {
+                try {
+                    const order = await GetOrderByIdAPI(orderId);
+                    const customer = await GetCustomerProfileAPI(order.customerId);
+                    namesMap[orderId] = customer.name || customer.fullName || "Unknown";
+                } catch (error) {
+                    namesMap[orderId] = "Unknown";
+                }
+            })
+        );
+        setOrderCustomerNames(namesMap);
+    };
+
     const fetchRefundOrders = async () => {
         try {
             const data = await GetAllRefundOrderRequestAPI();
+            // Lọc ra các đơn refund có status khác REQUESTED
             const verifiedOrders = data.filter(order => order.status !== "REQUESTED");
             setRefundOrders(verifiedOrders);
+            // Fetch customer names cho các order này
+            fetchCustomerNames(verifiedOrders);
         } catch (error) {
             toast.error("Failed to fetch refund orders");
         }
@@ -55,7 +84,6 @@ const ManageRefundOrderDelivery = () => {
             toast.error("Failed to update refund status");
         }
     };
-
 
     const fetchProductDetailsForOrder = async (order) => {
         try {
@@ -83,6 +111,12 @@ const ManageRefundOrderDelivery = () => {
     const columns = [
         { title: "Refund ID", dataIndex: "id", key: "id" },
         { title: "Order ID", dataIndex: "orderId", key: "orderId" },
+        {
+            title: "Customer Name",
+            dataIndex: "orderId",
+            key: "customerName",
+            render: (orderId) => orderCustomerNames[orderId] || "Loading...",
+        },
         {
             title: "Status",
             dataIndex: "status",
@@ -114,6 +148,7 @@ const ManageRefundOrderDelivery = () => {
             key: "refundRequestTime",
             render: (time) => new Date(time).toLocaleString(),
         },
+        // Nếu muốn hiển thị chi tiết sản phẩm, có thể mở rộng thêm cột Actions
         // {
         //     title: "Actions",
         //     key: "actions",
@@ -150,7 +185,9 @@ const ManageRefundOrderDelivery = () => {
                                                         style={{ width: 80, height: 80, objectFit: "cover" }}
                                                     />
                                                     <div>
-                                                        <p style={{ margin: 0 }}><strong>{item.productName}</strong></p>
+                                                        <p style={{ margin: 0 }}>
+                                                            <strong>{item.productName}</strong>
+                                                        </p>
                                                         <p style={{ margin: 0 }}>Quantity: {item.quantity}</p>
                                                     </div>
                                                 </div>

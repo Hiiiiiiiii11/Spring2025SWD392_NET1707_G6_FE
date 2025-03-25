@@ -3,11 +3,12 @@ import { List, Card, Button, Typography, Space, Modal, Input, Select, Rate } fro
 import Header from "../../components/Header/Header";
 import { GetAllHistoryOrderByIdAPI } from "../../services/customerOrderService";
 import { getProductByIdAPI } from "../../services/manageProductService";
+import { getPromotionByIdAPI } from "../../services/managePromotionService"; // Import API lấy thông tin promotion
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { CustomerCancelOrderAPI } from "../../services/manageOrderService"; // adjust the import path if needed
-import "../CustomerHistoryOrder/CustomerHistoryOrder.css";
+import { CustomerCancelOrderAPI } from "../../services/manageOrderService";
 import { SendReviewproductAPI } from "../../services/ManageReview";
+import "../CustomerHistoryOrder/CustomerHistoryOrder.css";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -16,6 +17,7 @@ const CustomerHistoryOrder = () => {
   const [orders, setOrders] = useState([]);
   const [expandedOrders, setExpandedOrders] = useState([]);
   const [orderProductDetails, setOrderProductDetails] = useState({});
+  const [orderPromotions, setOrderPromotions] = useState({}); // Lưu thông tin promotion theo orderId
   const [refundRequestedOrders, setRefundRequestedOrders] = useState([]);
   const [viewRefundModalVisible, setViewRefundModalVisible] = useState(false);
   const [refundImageUrl, setRefundImageUrl] = useState("");
@@ -54,6 +56,18 @@ const CustomerHistoryOrder = () => {
           (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
         );
         setOrders(sortedOrders);
+
+        // Với mỗi đơn hàng có promotionId, gọi API lấy thông tin promotion
+        sortedOrders.forEach(async (order) => {
+          if (order.promotionId) {
+            try {
+              const promotion = await getPromotionByIdAPI(order.promotionId);
+              setOrderPromotions(prev => ({ ...prev, [order.orderId]: promotion }));
+            } catch (error) {
+              console.error("Error fetching promotion for order " + order.orderId, error);
+            }
+          }
+        });
       } else {
         toast.error("Failed to load orders!");
       }
@@ -65,7 +79,6 @@ const CustomerHistoryOrder = () => {
   // Fetch product details for each order, include orderDetailId from order.orderDetails
   const fetchProductDetailsForOrder = async (order) => {
     try {
-      // order.orderDetails contains objects with productId and orderDetailId
       const promises = order.orderDetails.map((item) => getProductByIdAPI(item.productId));
       const products = await Promise.all(promises);
       const details = products.map((product, index) => ({
@@ -91,12 +104,11 @@ const CustomerHistoryOrder = () => {
 
   // Handle refund request (cancel order)
   const handleRefundRequest = async (orderId) => {
-    const confirmDelete = window.confirm("Are you sure you want to sent cancel order request?");
+    const confirmDelete = window.confirm("Are you sure you want to send cancel order request?");
     if (!confirmDelete) return;
     try {
       const data = await CustomerCancelOrderAPI(orderId);
       toast.success("Refund request submitted successfully!");
-      // Update state and localStorage so that the cancel button remains disabled permanently.
       setRefundRequestedOrders((prev) => {
         const updated = [...prev, orderId];
         localStorage.setItem("refundRequestedOrders", JSON.stringify(updated));
@@ -121,7 +133,6 @@ const CustomerHistoryOrder = () => {
   // Open review modal and set initial values
   const openReviewModal = async (order) => {
     setSelectedReviewOrder(order);
-    // Ensure product details are fetched
     if (!orderProductDetails[order.orderId]) {
       await fetchProductDetailsForOrder(order);
     }
@@ -143,12 +154,25 @@ const CustomerHistoryOrder = () => {
       if (response) {
         toast.success("Review sent successfully!");
       } else {
-        toast.warning("You already send review for this order!");
+        toast.warning("You already sent review for this order!");
       }
       setIsReviewModalVisible(false);
     } catch (error) {
       toast.error("Error sending review!");
     }
+  };
+
+  // Hàm tính giá ban đầu nếu có promotion:
+  // discountValue = totalAmount * discountPercentage  
+  // originalPrice = totalAmount + discountValue
+  const calculateOriginalPrice = (order) => {
+    if (order.promotionId && orderPromotions[order.orderId]) {
+      const promotion = orderPromotions[order.orderId];
+      // discountPercentage ở đây được giả định là phần trăm, ví dụ 20 cho 20%
+      const discountValue = order.totalAmount * promotion.discountPercentage / 100;
+      return order.totalAmount + discountValue;
+    }
+    return null;
   };
 
   return (
@@ -164,118 +188,151 @@ const CustomerHistoryOrder = () => {
         ) : (
           <List
             dataSource={orders}
-            renderItem={(order) => (
-              <List.Item key={order.orderId}>
-                <Card
-                  title={`Order Date : ${new Date(order.orderDate).toLocaleDateString()}`}
-                  style={{ width: "100%" }}
-                >
-                  <div className="card-order-history">
-                    <div>
-                      <p>
-                        Status :{" "}
-                        <Text type={getStatusColor(order.status)} strong>
-                          {order.status}
-                        </Text>
-                      </p>
-                      <p>Payment Method : VN Pay</p>
-                      <p>Order Address : {order.address}</p>
-                    </div>
-                    <div className="div-total-price">
-                      <p className="totalprice-history" style={{ fontWeight: "bold" }}>
-                        Original Total: ${order.totalAmount}
-                      </p>
-                    </div>
-                  </div>
+            renderItem={(order) => {
+              const originalPrice = calculateOriginalPrice(order);
+              const promotion = order.promotionId && orderPromotions[order.orderId];
+              return (
+                <List.Item key={order.orderId}>
+                  <Card
+                    title={`Order Date: ${new Date(order.orderDate).toLocaleDateString()}`}
+                    style={{ width: "100%" }}
+                  >
+                    <div className="card-order-history">
+                      <div>
+                        <p>
+                          Status:{" "}
+                          <Text type={getStatusColor(order.status)} strong>
+                            {order.status}
+                          </Text>
+                        </p>
+                        <p>Payment Method: VN Pay</p>
+                        <p>Order Address: {order.address}</p>
 
-                  <Space style={{ marginTop: 10, width: "100%" }}>
-                    <div className="group-button-order">
-                      <Button type="default" onClick={() => handleToggleDetails(order)}>
-                        {expandedOrders.includes(order.orderId) ? "Hide Details" : "View Details"}
-                      </Button>
-                      {order.status === "PENDING" && (
-                        <Button
-                          className="order-continue-payment"
-                          type="primary"
-                          onClick={() => (window.location.href = order.paymentUrl)}
-                        >
-                          Continue Payment
+                        <p>
+                          <strong>Promotion:</strong> {
+                            promotion
+                              ? `${promotion.promotionName} (Discount: ${promotion.discountPercentage}%)`
+                              : "None"
+                          }
+                        </p>
+
+
+                      </div>
+                      <div className="div-total-price">
+                        <p className="totalprice-history" style={{ fontWeight: "bold" }}>
+                          {originalPrice != null ? (
+                            <>
+                              <p className="original-price">
+                                <strong>Original Price: </strong> ${originalPrice.toFixed(2)}
+                              </p>
+                              <p className="discount">
+                                <strong>Discount: </strong>${(originalPrice - order.totalAmount).toFixed(2)}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="original-price">
+                                <strong>Original Price: </strong> ${order.totalAmount}
+                              </p>
+                              <p className="discount">
+                                <strong>Discount: </strong> 0.0
+                              </p>
+                            </>
+                          )}
+
+
+                          Original Total: ${order.totalAmount}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Space style={{ marginTop: 10, width: "100%" }}>
+                      <div className="group-button-order">
+                        <Button type="default" onClick={() => handleToggleDetails(order)}>
+                          {expandedOrders.includes(order.orderId) ? "Hide Details" : "View Details"}
                         </Button>
-                      )}
-                      {order.status === "PAID" && (
-                        <Button
-                          className="order-continue-payment"
-                          type={refundRequestedOrders.includes(order.orderId) ? "default" : "primary"}
-                          disabled={refundRequestedOrders.includes(order.orderId)}
-                          onClick={() => handleRefundRequest(order.orderId)}
-                        >
-                          {refundRequestedOrders.includes(order.orderId) ? "Request Cancel Sent" : "Cancel Order"}
-                        </Button>
-                      )}
-                      {order.status === "COMPLETED" && (
-                        <Button type="primary" onClick={() => openReviewModal(order)}>
-                          Send Review
-                        </Button>
-                      )}
-                      {order.status === "DELIVERED" && (
-                        <div className="review-or-refund">
+                        {order.status === "PENDING" && (
+                          <Button
+                            className="order-continue-payment"
+                            type="primary"
+                            onClick={() => (window.location.href = order.paymentUrl)}
+                          >
+                            Continue Payment
+                          </Button>
+                        )}
+                        {order.status === "PAID" && (
                           <Button
                             className="order-continue-payment"
                             type={refundRequestedOrders.includes(order.orderId) ? "default" : "primary"}
                             disabled={refundRequestedOrders.includes(order.orderId)}
                             onClick={() => handleRefundRequest(order.orderId)}
                           >
-                            {refundRequestedOrders.includes(order.orderId) ? "Request Sent" : "Return Product"}
+                            {refundRequestedOrders.includes(order.orderId) ? "Request Cancel Sent" : "Cancel Order"}
                           </Button>
-                        </div>
-                      )}
-                      {(order.status === "REFUNDED" || order.status === "CANCELLED") && (
-                        <Button
-                          className="order-continue-payment"
-                          type="primary"
-                          onClick={() => handleViewRefundImage(order)}
-                        >
-                          View Refund Image
-                        </Button>
-                      )}
-                    </div>
-                  </Space>
-
-                  {/* Show order details if expanded */}
-                  {expandedOrders.includes(order.orderId) && (
-                    <div style={{ marginTop: 20 }}>
-                      <List
-                        dataSource={orderProductDetails[order.orderId] || []}
-                        renderItem={(item) => (
-                          <List.Item key={item.orderDetailId}>
-                            <Card size="small" style={{ width: "100%" }}>
-                              <div style={{ display: "flex", alignItems: "center" }}>
-                                <img
-                                  src={item.imageURL || "https://via.placeholder.com/150"}
-                                  alt={item.productName}
-                                  style={{ width: 80, height: 80, objectFit: "cover", marginRight: 16 }}
-                                />
-                                <div>
-                                  <p style={{ margin: 0 }}>
-                                    <strong>{item.productName}</strong>
-                                  </p>
-                                  <p style={{ margin: 0 }}>Quantity: {item.quantity}</p>
-                                </div>
-                              </div>
-                            </Card>
-                          </List.Item>
                         )}
-                      />
-                    </div>
-                  )}
-                </Card>
-              </List.Item>
-            )}
+                        {order.status === "COMPLETED" && (
+                          <Button type="primary" onClick={() => openReviewModal(order)}>
+                            Send Review
+                          </Button>
+                        )}
+                        {order.status === "DELIVERED" && (
+                          <div className="review-or-refund">
+                            <Button
+                              className="order-continue-payment"
+                              type={refundRequestedOrders.includes(order.orderId) ? "default" : "primary"}
+                              disabled={refundRequestedOrders.includes(order.orderId)}
+                              onClick={() => handleRefundRequest(order.orderId)}
+                            >
+                              {refundRequestedOrders.includes(order.orderId) ? "Request Sent" : "Return Product"}
+                            </Button>
+                          </div>
+                        )}
+                        {(order.status === "REFUNDED" || order.status === "CANCELLED") && (
+                          <Button
+                            className="order-continue-payment"
+                            type="primary"
+                            onClick={() => handleViewRefundImage(order)}
+                          >
+                            View Refund Image
+                          </Button>
+                        )}
+                      </div>
+                    </Space>
+
+                    {expandedOrders.includes(order.orderId) && (
+                      <div style={{ marginTop: 20 }}>
+                        <List
+                          dataSource={orderProductDetails[order.orderId] || []}
+                          renderItem={(item) => (
+                            <List.Item key={item.orderDetailId}>
+                              <Card size="small" style={{ width: "100%" }}>
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                  <img
+                                    src={item.imageURL || "https://via.placeholder.com/150"}
+                                    alt={item.productName}
+                                    style={{ width: 80, height: 80, objectFit: "cover", marginRight: 16 }}
+                                  />
+                                  <div>
+                                    <p style={{ margin: 0 }}>
+                                      <strong>{item.productName}</strong>
+                                    </p>
+                                    <p style={{ margin: 0 }}>Quantity: {item.quantity}</p>
+                                  </div>
+                                </div>
+                              </Card>
+                            </List.Item>
+                          )}
+                        />
+                      </div>
+                    )}
+                  </Card>
+                </List.Item>
+              );
+            }}
           />
         )}
       </div>
 
-      {/* Modal for viewing refund image */}
       <Modal
         title="Refund Image"
         visible={viewRefundModalVisible}
@@ -289,7 +346,6 @@ const CustomerHistoryOrder = () => {
         )}
       </Modal>
 
-      {/* Modal for sending review */}
       <Modal
         title="Send Review"
         visible={isReviewModalVisible}

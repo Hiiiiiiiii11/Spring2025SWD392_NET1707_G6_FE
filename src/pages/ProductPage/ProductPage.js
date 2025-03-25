@@ -225,10 +225,12 @@ const ProductPage = () => {
   const handleQuizComplete = (quizData) => {
     console.log("Received quiz data:", quizData.quizResult);
     if (quizData.quizResult) {
-      setRecommendedSkinConcerns(quizData.quizResult);
+      // Convert each quiz result to lowercase
+      setRecommendedSkinConcerns(quizData.quizResult.map(item => item.toLowerCase()));
     }
     setIsQuizModalVisible(false);
   };
+
 
   return (
     <div>
@@ -236,10 +238,6 @@ const ProductPage = () => {
       <Header />
       <div className="product-page">
         <h1>Skincare Products</h1>
-        {/* Nút hiển thị:
-            - Nếu filterActive true thì hiển thị "Exit Filter" và gọi resetFilter.
-            - Nếu không, mà ô search trống và có recommendedSkinConcerns thì hiển thị "Filter" và gọi applyFilter.
-            - Ngược lại, hiển thị "Take Quiz". */}
         <div className="take-quiz">
           {role === "CUSTOMER" && (
             <Button
@@ -261,7 +259,7 @@ const ProductPage = () => {
           )}
         </div>
         {/* Ô search luôn hiển thị: nếu người dùng nhập giá trị thì tự động lọc theo tên sản phẩm */}
-        <div className="search-product-page" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="search-product-page" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <div className="compare-product-btn">
             {role === "CUSTOMER" && (
               <Button type="primary" onClick={toggleCompareMode}>

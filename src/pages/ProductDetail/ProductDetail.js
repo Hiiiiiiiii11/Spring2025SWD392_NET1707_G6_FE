@@ -7,6 +7,7 @@ import "./ProductDetail.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GetReviewProductByProductIdAPI } from "../../services/ManageReview";
+import { GetCustomerProfileAPI } from "../../services/userService";
 
 const { Meta } = Card;
 
@@ -21,9 +22,17 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const role = sessionStorage.getItem("role");
 
-  // New state for reviews and average rating
+  // State cho reviews và average rating
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
+
+  // State để lưu mapping customerId -> customer name (cho review)
+  const [customerProfiles, setCustomerProfiles] = useState({});
+
+  // State cho profile của customer đang đăng nhập (dùng trong form gửi review)
+  const [customerProfile, setCustomerProfile] = useState(null);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,9 +44,15 @@ const ProductDetail = () => {
 
         setProduct(productData);
 
-        // Filter related products (exclude the current product)
-        const filteredProducts = allProducts.filter((p) => p.productID !== id);
-        setRelatedProducts(filteredProducts.slice(0, 4)); // Limit to 4 related products
+        // Chuyển id sang số để đảm bảo so sánh đúng
+        const currentProductId = Number(id);
+
+        // Lọc sản phẩm liên quan theo skinTypeCompatibility và loại bỏ sản phẩm hiện tại
+        const filteredProducts = allProducts
+          .filter((p) => p.productID !== currentProductId && p.skinTypeCompatibility === productData.skinTypeCompatibility)
+          .slice(0, 4); // Giới hạn 4 sản phẩm liên quan
+
+        setRelatedProducts(filteredProducts);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -49,7 +64,9 @@ const ProductDetail = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  // Fetch reviews for the current product and calculate the average rating
+
+
+  // Fetch reviews cho sản phẩm và tính điểm trung bình
   useEffect(() => {
     const fetchReviews = async () => {
       if (product) {
@@ -58,12 +75,41 @@ const ProductDetail = () => {
           setReviews(data);
           const total = data.reduce((sum, review) => sum + review.rating, 0);
           setAverageRating(data.length ? total / data.length : 0);
+
+          // Với mỗi review, lấy thông tin customer name nếu chưa có
+          data.forEach(async (review) => {
+            if (!customerProfiles[review.customerId]) {
+              try {
+                const profile = await GetCustomerProfileAPI(review.customerId);
+                setCustomerProfiles((prev) => ({ ...prev, [review.customerId]: profile.fullName || profile.name || "Unknown" }));
+              } catch (error) {
+                console.error("Error fetching customer profile for review", review.reviewId, error);
+              }
+            }
+          });
         }
       }
     };
 
     fetchReviews();
-  }, [product]);
+  }, [product, customerProfiles]);
+
+  // Fetch profile của customer đang đăng nhập (sử dụng trong form gửi review)
+  useEffect(() => {
+    const fetchCustomerProfile = async () => {
+      const customerId = sessionStorage.getItem("customerId");
+      if (customerId) {
+        try {
+          const profile = await GetCustomerProfileAPI(customerId);
+          setCustomerProfile(profile);
+        } catch (error) {
+          console.error("Error fetching logged in customer profile:", error);
+        }
+      }
+    };
+
+    fetchCustomerProfile();
+  }, []);
 
   if (loading) return <div>Loading...</div>;
   if (!product) return <div>Product not found!</div>;
@@ -86,11 +132,10 @@ const ProductDetail = () => {
     }
 
     try {
-      // Get current cart items
       let cartItems = await GetAllProductCartAPI();
       cartItems = Array.isArray(cartItems) ? cartItems : [];
 
-      // Check if the product already exists in the cart
+      // Kiểm tra nếu sản phẩm đã tồn tại trong giỏ hàng
       const existingItem = cartItems.find(
         (item) => item.product.productID === selectedProduct.productID
       );
@@ -101,7 +146,6 @@ const ProductDetail = () => {
         return;
       }
 
-      // Call API to add the product to the cart
       const response = await AddProductToCartAPI({
         product: selectedProduct,
         quantity,
@@ -137,8 +181,6 @@ const ProductDetail = () => {
         </div>
         <div className="product-info">
           <h1>{product.productName}</h1>
-          {/* Moved average rating display into product detail */}
-
           <p className="price">
             {product.price > 1000
               ? `${product.price.toLocaleString()}đ`
@@ -151,7 +193,6 @@ const ProductDetail = () => {
             <p style={{ marginRight: "8px", fontSize: "16px" }}>
               Rating: <Rate disabled allowHalf value={averageRating} />
             </p>
-
           </div>
           <p className="description">✅Available Product: {product.stockQuantity}</p>
           {role === "CUSTOMER" && (
@@ -165,22 +206,29 @@ const ProductDetail = () => {
       {/* Reviews Section */}
       <div className="customer-review-section">
         <h2>Customer Reviews</h2>
-        <Card>
-          <div className="reviews-section" style={{ padding: "24px", background: "#fafafa", marginTop: "20px" }}>
-            {reviews.length === 0 ? (
-              <p>No reviews available for this product.</p>
-            ) : (
-              reviews.map((review) => (
-                <Card key={review.reviewId} style={{ marginBottom: "10px" }}>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <Rate disabled defaultValue={review.rating} style={{ marginRight: "8px" }} />
+        {reviews.length === 0 ? (
+          <p>No reviews available for this product.</p>
+        ) : (
+          reviews.map((review) => (
+            <Card key={review.reviewId} style={{ marginBottom: "10px" }}>
+              <div >
+                <div className="name-and-date" style={{ fontSize: "16px" }}>
+                  <p>
+                    {customerProfiles[review.customerId] || "Loading..."}{" "}
+                    {review.orderDate ? `on ${new Date(review.orderDate).toLocaleDateString()}` : ""}
+                  </p>
+                </div>
+                <div className="rate-and-comment">
+                  <Rate disabled defaultValue={review.rating} style={{ marginRight: "8px" }} />
+                  <div>
                     <p style={{ margin: 0 }}>{review.comment}</p>
+
                   </div>
-                </Card>
-              ))
-            )}
-          </div>
-        </Card>
+                </div>
+              </div>
+            </Card>
+          ))
+        )}
       </div>
 
       {/* Related Products Section */}
@@ -219,7 +267,9 @@ const ProductDetail = () => {
                           : "$" + item.price.toFixed(2)}
                       </p>
                       {item.category && <p className="brand">Category: {item.category}</p>}
-                      <p className="available-product">✅Available Product: {product.stockQuantity}</p>
+                      <p className="available-product">
+                        ✅Available Product: {product.stockQuantity}
+                      </p>
                     </>
                   }
                 />
@@ -252,6 +302,7 @@ const ProductDetail = () => {
           </>
         )}
       </Modal>
+
     </div>
   );
 };
