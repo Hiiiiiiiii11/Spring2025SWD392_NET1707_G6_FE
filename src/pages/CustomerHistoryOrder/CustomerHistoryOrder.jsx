@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { CustomerCancelOrderAPI } from "../../services/manageOrderService";
 import { SendReviewproductAPI } from "../../services/ManageReview";
 import "../CustomerHistoryOrder/CustomerHistoryOrder.css";
+import { getBatchByIdAPI } from "../../services/manageBatchService";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -79,13 +80,24 @@ const CustomerHistoryOrder = () => {
   // Fetch product details for each order, include orderDetailId from order.orderDetails
   const fetchProductDetailsForOrder = async (order) => {
     try {
-      const promises = order.orderDetails.map((item) => getProductByIdAPI(item.productId));
-      const products = await Promise.all(promises);
-      const details = products.map((product, index) => ({
-        ...product,
-        quantity: order.orderDetails[index].quantity,
-        orderDetailId: order.orderDetails[index].orderDetailId,
-      }));
+      const details = await Promise.all(
+        order.orderDetails.map(async (item) => {
+          // Fetch product information
+          const product = await getProductByIdAPI(item.productId);
+          // Fetch batch information
+          const batchData = await getBatchByIdAPI(item.batchId);
+          // Extract expired date from batchData (assuming it's in ISO format)
+          const expireDate = batchData && batchData.expireDate
+            ? batchData.expireDate.split("T")[0]
+            : "N/A";
+          return {
+            ...product,
+            quantity: item.quantity,
+            orderDetailId: item.orderDetailId,
+            expireDate, // add expireDate property
+          };
+        })
+      );
       setOrderProductDetails((prev) => ({ ...prev, [order.orderId]: details }));
     } catch (error) {
       toast.error("Failed to load product details for order " + order.orderId);
@@ -313,14 +325,14 @@ const CustomerHistoryOrder = () => {
                                     style={{ width: 80, height: 80, objectFit: "cover", marginRight: 16 }}
                                   />
                                   <div>
-                                    <p style={{ margin: 0 }}>
-                                      <strong>{item.productName}</strong>
-                                    </p>
+                                    <p style={{ margin: 0, fontWeight: "bold" }}>{item.productName}</p>
                                     <p style={{ margin: 0 }}>Quantity: {item.quantity}</p>
+                                    <p style={{ margin: 0 }}>Expire Date: {item.expireDate}</p>
                                   </div>
                                 </div>
                               </Card>
                             </List.Item>
+
                           )}
                         />
                       </div>

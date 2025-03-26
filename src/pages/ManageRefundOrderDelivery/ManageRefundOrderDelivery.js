@@ -25,6 +25,7 @@ const ManageRefundOrderDelivery = () => {
     const [orderProductDetails, setOrderProductDetails] = useState({});
     // State mapping orderId => customerName
     const [orderCustomerNames, setOrderCustomerNames] = useState({});
+    const [customerPhone, setCustomerPhone] = useState({});
     const role = sessionStorage.getItem("role");
     const staffId = sessionStorage.getItem("staffId");
 
@@ -39,18 +40,21 @@ const ManageRefundOrderDelivery = () => {
         // Lấy danh sách orderId duy nhất từ refund orders
         const uniqueOrderIds = [...new Set(orders.map((order) => order.orderId))];
         const namesMap = {};
+        const phoneMap = {};
         await Promise.all(
             uniqueOrderIds.map(async (orderId) => {
                 try {
                     const order = await GetOrderByIdAPI(orderId);
                     const customer = await GetCustomerProfileAPI(order.customerId);
                     namesMap[orderId] = customer.name || customer.fullName || "Unknown";
+                    namesMap[orderId] = customer.phone || "Unknown";
                 } catch (error) {
                     namesMap[orderId] = "Unknown";
                 }
             })
         );
         setOrderCustomerNames(namesMap);
+        setCustomerPhone(namesMap);
     };
 
     const fetchRefundOrders = async () => {
@@ -116,6 +120,12 @@ const ManageRefundOrderDelivery = () => {
             dataIndex: "orderId",
             key: "customerName",
             render: (orderId) => orderCustomerNames[orderId] || "Loading...",
+        },
+        {
+            title: "Customer Phone",
+            dataIndex: "orderId",
+            key: "customerPhone",
+            render: (orderId) => customerPhone[orderId] || "Loading...",
         },
         {
             title: "Status",

@@ -31,6 +31,7 @@ const ManageRequestRefund = () => {
     const [refundRequests, setRefundRequests] = useState([]);
     // state mapping orderId → customerName
     const [orderCustomerNames, setOrderCustomerNames] = useState({});
+    const [customerPhone, setCustomerPhone] = useState({});
     const [selectedRefundId, setSelectedRefundId] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -50,18 +51,21 @@ const ManageRequestRefund = () => {
         // Lấy danh sách orderId duy nhất
         const uniqueOrderIds = [...new Set(refunds.map((r) => r.orderId))];
         const namesMap = {};
+        const phoneMap = {};
         await Promise.all(
             uniqueOrderIds.map(async (orderId) => {
                 try {
                     const order = await GetOrderByIdAPI(orderId);
                     const customer = await GetCustomerProfileAPI(order.customerId);
                     namesMap[orderId] = customer.name || customer.fullName || "Unknown";
+                    phoneMap[orderId] = customer.phone || "Unknown";
                 } catch (error) {
                     namesMap[orderId] = "Unknown";
                 }
             })
         );
         setOrderCustomerNames(namesMap);
+        setCustomerPhone(phoneMap);
     };
 
     const fetchRefundRequests = async () => {
@@ -164,6 +168,12 @@ const ManageRequestRefund = () => {
             render: (orderId) => orderCustomerNames[orderId] || "Loading...",
         },
         {
+            title: "Customer Phone",
+            dataIndex: "orderId",
+            key: "customerPhone",
+            render: (orderId) => customerPhone[orderId] || "Loading...",
+        },
+        {
             title: "Status",
             dataIndex: "status",
             key: "status",
@@ -207,7 +217,7 @@ const ManageRequestRefund = () => {
                             </Button>
                         </div>
                     )}
-                    {record.status === "REFUNDED" && (
+                    {record.status === "REFUNDED" || record.status === "COMPLETED" && (
                         <div style={{ display: "flex", gap: "8px" }}>
                             <Button
                                 type="default"
@@ -217,13 +227,15 @@ const ManageRequestRefund = () => {
                             >
                                 Send Complete
                             </Button>
-                            <Button
-                                type="default"
-                                style={{ backgroundColor: "green", color: "white" }}
-                                onClick={() => handleViewRefundImage(record)}
-                            >
-                                View Image
-                            </Button>
+                            {record.status === "COMPLETED" && (
+                                <Button
+                                    type="default"
+                                    style={{ backgroundColor: "green", color: "white" }}
+                                    onClick={() => handleViewRefundImage(record)}
+                                >
+                                    View Image
+                                </Button>
+                            )}
                         </div>
                     )}
                 </div>

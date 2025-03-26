@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Table, Card, Typography, Button, List, Select, Row, Col, Modal } from "antd";
+import moment from "moment";
+import { Table, Card, Typography, Button, List, Select, Row, Col, Modal, DatePicker } from "antd";
 import Header from "../../components/Header/Header";
 import { AssignDeliveyForOrderAPI, GetAllCustomerOrderAPI, GetAllOrderAssignByDeliverIdAPI, UpdateCustomerOrderStatusAPI } from "../../services/manageOrderService";
 import { getProductByIdAPI } from "../../services/manageProductService";
-import { getPromotionByIdAPI } from "../../services/managePromotionService"; // API lấy thông tin promotion
+import { getPromotionByIdAPI } from "../../services/managePromotionService";
 import { GetCustomerProfileAPI } from "../../services/userService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend
-} from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import "../ManageOrder/ManageOrders.css";
 import { GetAllEmployeeAPI } from "../../services/manageEmployeeService";
 
@@ -20,9 +19,8 @@ const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [expandedOrders, setExpandedOrders] = useState([]);
   const [orderProductDetails, setOrderProductDetails] = useState({});
-  // State chứa thông tin customerName theo customerId
   const [customerNames, setCustomerNames] = useState({});
-  // State chứa thông tin promotion theo orderId
+  const [customerPhone, setCustomerPhone] = useState({});
   const [orderPromotions, setOrderPromotions] = useState({});
   const role = sessionStorage.getItem("role");
 
@@ -31,15 +29,16 @@ const ManageOrders = () => {
   const [employeeList, setEmployeeList] = useState([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [staffNames, setStaffNames] = useState({});
-  const staffId = sessionStorage.getItem('staffId');
+  const staffId = sessionStorage.getItem("staffId");
 
+  // Sử dụng picker="month" để chọn tháng và năm, mặc định là tháng hiện tại
+  const [selectedMonth, setSelectedMonth] = useState(moment());
 
   useEffect(() => {
     fetchOrders();
     fetchDeliveryStaff();
   }, []);
 
-  // Sau khi đơn hàng được lấy về, nếu đơn hàng có promotionId, gọi API lấy thông tin khuyến mãi
   useEffect(() => {
     orders.forEach((order) => {
       if (order.promotionId) {
@@ -61,33 +60,33 @@ const ManageOrders = () => {
     try {
       let data;
       if (role === "DELIVERY_STAFF") {
-        data = await GetAllOrderAssignByDeliverIdAPI(staffId); // Truyền staffId vào API
+        data = await GetAllOrderAssignByDeliverIdAPI(staffId);
       } else {
         data = await GetAllCustomerOrderAPI();
       }
       setOrders(data);
 
-      // Lấy danh sách customerId duy nhất từ orders
       const uniqueCustomerIds = [...new Set(data.map((order) => order.customerId))];
       const namesMap = {};
+      const phoneMap = {};
 
       await Promise.all(
         uniqueCustomerIds.map(async (customerId) => {
           try {
             const customer = await GetCustomerProfileAPI(customerId);
             namesMap[customerId] = customer.name || customer.fullName || "Unknown";
+            phoneMap[customerId] = customer.phone || "Unknown";
           } catch (error) {
             namesMap[customerId] = "Unknown";
           }
         })
       );
       setCustomerNames(namesMap);
-
+      setCustomerPhone(phoneMap);
     } catch (error) {
       toast.error("Failed to fetch orders");
     }
   };
-
 
   const handleUpdateStatus = async (orderId, newStatus, currentStatus) => {
     const validTransitions = {
@@ -122,6 +121,7 @@ const ManageOrders = () => {
       toast.error("Failed to load product details");
     }
   };
+
   const fetchDeliveryStaff = async () => {
     try {
       const employees = await GetAllEmployeeAPI();
@@ -141,7 +141,6 @@ const ManageOrders = () => {
   const openAssignModal = (orderId) => {
     setSelectedOrderId(orderId);
     setAssignModalVisible(true);
-    // Fetch employee list and filter for role DELIVERY_STAFF
     fetchDeliveryStaff();
   };
 
@@ -154,7 +153,7 @@ const ManageOrders = () => {
     }
   };
 
-  // Sắp xếp đơn hàng sao cho các đơn có status "PAID" được đưa lên đầu, sau đó sắp xếp theo ngày (mới nhất trước)
+  // Sắp xếp đơn hàng theo status và ngày (có thể dùng nếu cần sắp xếp lại danh sách)
   const sortedOrders = useMemo(() => {
     return [...orders].sort((a, b) => {
       if (a.status === "PAID" && b.status !== "PAID") return -1;
@@ -163,10 +162,21 @@ const ManageOrders = () => {
     });
   }, [orders]);
 
-  // Tính toán Payment & Refund History
+  // Lọc đơn hàng theo tháng và năm được chọn
+  const filteredOrders = useMemo(() => {
+    if (!selectedMonth) return orders;
+    return orders.filter((order) => {
+      const orderDate = new Date(order.orderDate);
+      return (
+        orderDate.getMonth() + 1 === parseInt(selectedMonth.format("M"), 10) &&
+        orderDate.getFullYear() === parseInt(selectedMonth.format("YYYY"), 10)
+      );
+    });
+  }, [orders, selectedMonth]);
+
+  // Các tính toán doanh thu dựa trên filteredOrders
   const { paymentHistory, refundHistory, totalMoneyReceived, totalMoneyRefunded, totalRefundOrders } = useMemo(() => {
-    // Thêm customerId vào mỗi record để hiển thị tên khách hàng
-    const payments = orders
+    const payments = filteredOrders
       .filter((o) => ["PAID", "DELIVERED", "COMPLETED"].includes(o.status))
       .map((o) => ({
         orderId: o.orderId,
@@ -174,11 +184,10 @@ const ManageOrders = () => {
         amount: o.totalAmount,
         customerId: o.customerId,
       }));
-    const refunds = orders
+    const refunds = filteredOrders
       .filter((o) => o.refund && o.refund.status === "REFUNDED")
       .map((o) => ({
         orderId: o.orderId,
-        // Chỉ lấy phần ngày, ví dụ: "2025-03-22"
         date: o.refund.refundCompletionTime.split("T")[0],
         amount: o.refund.amount,
         customerId: o.customerId,
@@ -192,13 +201,10 @@ const ManageOrders = () => {
       totalMoneyRefunded: totalRefunded,
       totalRefundOrders: refunds.length,
     };
-  }, [orders]);
+  }, [filteredOrders]);
 
-  // Tính tổng doanh thu ròng = Tổng tiền nhận - Tổng tiền refund
   const netRevenue = totalMoneyReceived - totalMoneyRefunded;
 
-  // Tính toán dữ liệu cho sơ đồ doanh thu (Revenue Chart)
-  // Dữ liệu được lấy từ Payment History (Addition) và Refund History (Deduction)
   const revenueChartData = useMemo(() => {
     const grouped = {};
     paymentHistory.forEach((item) => {
@@ -221,15 +227,12 @@ const ManageOrders = () => {
   const handleAssignDelivery = async () => {
     if (!selectedOrderId || !selectedEmployeeId) {
       toast.error("Please select a staff member");
-      console.log(selectedOrderId)
-      console.log(selectedEmployeeId)
       return;
     }
     try {
       await AssignDeliveyForOrderAPI(selectedOrderId, selectedEmployeeId);
       toast.success("Delivery assigned successfully");
       setAssignModalVisible(false);
-      // Optionally, refresh orders if needed:
       fetchOrders();
     } catch (error) {
       toast.error("Failed to assign delivery");
@@ -244,6 +247,12 @@ const ManageOrders = () => {
       dataIndex: "customerId",
       key: "customerName",
       render: (customerId) => customerNames[customerId] || "Loading...",
+    },
+    {
+      title: "Customer Phone",
+      dataIndex: "customerId",
+      key: "customerPhone",
+      render: (customerId) => customerPhone[customerId] || "Loading...",
     },
     {
       title: "Status",
@@ -303,9 +312,12 @@ const ManageOrders = () => {
             {expandedOrders.includes(order.orderId) ? "Hide Details" : "View Details"}
           </Button>
           {role === "CUSTOMER_STAFF" && order.status === "PAID" && (
-            <Button type="default" style={{ color: "blue" }}
+            <Button
+              type="default"
+              style={{ color: "blue" }}
               disabled={order.staffId}
-              onClick={() => openAssignModal(order.orderId)}>
+              onClick={() => openAssignModal(order.orderId)}
+            >
               Assign Delivery
             </Button>
           )}
@@ -319,11 +331,29 @@ const ManageOrders = () => {
       <ToastContainer />
       <Header />
       <div style={{ padding: "24px", margin: "0 auto" }}>
-        <Title level={2} >
-          Order Management Dashboard
-        </Title>
+        <Title level={2}>Order Management Dashboard</Title>
 
-        {/* Dashboard doanh thu ban đầu */}
+        {/* Filter theo tháng và năm: mặc định là tháng hiện tại */}
+        {role === "MANAGER" && (
+          <Card style={{ marginBottom: "24px", backgroundColor: "#fafafa" }}>
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} md={8}>
+                <Text strong>Select Month:</Text>
+              </Col>
+              <Col xs={24} md={16}>
+                <DatePicker
+                  picker="month"
+                  style={{ width: "100%" }}
+                  onChange={(value) => setSelectedMonth(value)}
+                  value={selectedMonth}
+                  placeholder="Select Month"
+                />
+              </Col>
+            </Row>
+          </Card>
+        )}
+
+        {/* Dashboard doanh thu */}
         {role === "MANAGER" && (
           <>
             <Card title="Revenue Dashboard" style={{ marginBottom: "24px", backgroundColor: "#fafafa" }}>
@@ -387,7 +417,6 @@ const ManageOrders = () => {
               </Row>
             </Card>
 
-            {/* Dashboard sơ đồ doanh thu */}
             <Card title="Revenue Chart" style={{ marginBottom: "24px", backgroundColor: "#ffffff" }}>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={revenueChartData}>
@@ -403,10 +432,10 @@ const ManageOrders = () => {
           </>
         )}
 
-        {/* Bảng hiển thị đơn hàng */}
+        {/* Bảng hiển thị đơn hàng từ filteredOrders */}
         <Table
           columns={columns}
-          dataSource={sortedOrders}
+          dataSource={filteredOrders}
           rowKey="orderId"
           expandable={{
             expandedRowRender: (order) => (
@@ -438,7 +467,7 @@ const ManageOrders = () => {
         />
       </div>
 
-      {/* Assign Delivery Modal */}
+      {/* Modal gán giao hàng */}
       <Modal
         title="Assign Delivery Staff"
         visible={assignModalVisible}
