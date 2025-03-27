@@ -244,27 +244,23 @@ const OrderConfirmationPage = () => {
                     <Card key={promo.promotionId} style={{ marginBottom: "8px" }}>
                       <div className="promotion-select">
                         <div className="promotion-info">
-                          <div >
+                          <div>
                             <p><strong>{promo.promotionName}</strong></p>
                             <p>{promo.description}</p>
                           </div>
                           <div className="valid-date-pro">
                             <p>Valid: {new Date(promo.startDate).toLocaleDateString()} - {new Date(promo.endDate).toLocaleDateString()}</p>
-                            <div className="apply-promotion" >
-                              <Button
-                                type="primary"
-                                onClick={() => handleApplyPromotion(promo.promotionId)}
-                                disabled={totalAmount < Number(promo.minimumAmount)}
-                              >
-                                Apply
-                              </Button>
-                            </div>
-
-                          </div >
-                          {/* <div className="apply-promotion"> */}
+                          </div>
                         </div>
-
-
+                        <div className="apply-promotion">
+                          <Button
+                            type="primary"
+                            onClick={() => handleApplyPromotion(promo.promotionId)}
+                            disabled={selectedPromotion?.promotionId === promo.promotionId || totalAmount < Number(promo.minimumAmount)}
+                          >
+                            {selectedPromotion?.promotionId === promo.promotionId ? "Apply Selected" : "Apply"}
+                          </Button>
+                        </div>
                       </div>
                     </Card>
                   ))

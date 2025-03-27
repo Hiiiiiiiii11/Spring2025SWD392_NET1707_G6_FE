@@ -105,7 +105,6 @@ export const ManageRefundOrderStatusByDeliveryAPI = async (refundId, status, sta
 
         return response.data;
     } catch (error) {
-        throw error.response?.data || "Error updating order status";
     }
 };
 

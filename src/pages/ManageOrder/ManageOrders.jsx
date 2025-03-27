@@ -89,24 +89,68 @@ const ManageOrders = () => {
   };
 
   const handleUpdateStatus = async (orderId, newStatus, currentStatus) => {
-    const validTransitions = {
-      PAID: ["SHIPPED"],
-      SHIPPED: ["DELIVERED"],
-    };
-
-    if (!validTransitions[currentStatus]?.includes(newStatus)) {
-      toast.error(`Invalid status transition from ${currentStatus} to ${newStatus}`);
+    const order = orders.find((o) => o.orderId === orderId);
+    if (!order) {
+      toast.error("Order not found");
       return;
     }
 
+    const validTransitions = {
+      PAID: ["SHIPPED"],
+      SHIPPED: ["DELIVERY_FAILED", "DELIVERED"],
+      DELIVERY_FAILED: ["DELIVERED"],
+    };
+
+
+    // Nếu chuyển từ SHIPPED sang DELIVERY_FAILED
+    if (currentStatus === "SHIPPED" && newStatus === "DELIVERY_FAILED") {
+      const currentFailCount = order.deliveryFailCount || 0;
+      const newFailCount = currentFailCount + 1;
+      try {
+        await UpdateCustomerOrderStatusAPI(orderId, "DELIVERY_FAILED");
+        const updatedOrders = orders.map((o) =>
+          o.orderId === orderId ? { ...o, status: "DELIVERY_FAILED", deliveryFailCount: newFailCount } : o
+        );
+        setOrders(updatedOrders);
+        toast.warning(`Order status updated to DELIVERY_FAILED (fail attempt ${newFailCount}).`);
+      } catch (error) {
+        toast.error("Failed to update status");
+      }
+      return;
+    }
+
+    // Nếu chuyển sang DELIVERED (từ SHIPPED hoặc DELIVERY_FAILED)
+    if (newStatus === "DELIVERED") {
+      try {
+        await UpdateCustomerOrderStatusAPI(orderId, "DELIVERED");
+        const updatedOrders = orders.map((o) =>
+          o.orderId === orderId ? { ...o, status: "DELIVERED" } : o
+        );
+        setOrders(updatedOrders);
+        toast.success("Order status updated to DELIVERED");
+      } catch (error) {
+        toast.error("Failed to update status");
+      }
+      return;
+    }
+
+    // Các chuyển đổi khác (ví dụ: PAID -> SHIPPED)
     try {
       await UpdateCustomerOrderStatusAPI(orderId, newStatus);
-      setOrders(orders.map((o) => (o.orderId === orderId ? { ...o, status: newStatus } : o)));
+      const updatedOrders = orders.map((o) =>
+        o.orderId === orderId ? { ...o, status: newStatus } : o
+      );
+      setOrders(updatedOrders);
       toast.success(`Order status updated to ${newStatus}`);
     } catch (error) {
       toast.error("Failed to update status");
     }
+    fetchOrders();
   };
+
+
+
+
 
   const fetchProductDetailsForOrder = async (order) => {
     try {
@@ -259,25 +303,72 @@ const ManageOrders = () => {
       dataIndex: "status",
       key: "status",
       render: (text, order) => {
-        const allowedStatuses = {
-          PAID: ["SHIPPED"],
-          SHIPPED: ["DELIVERED"],
-        };
-        return (
-          <Select
-            value={text}
-            style={{ width: 150 }}
-            onChange={(value) => handleUpdateStatus(order.orderId, value, text)}
-            disabled={!allowedStatuses[text]}
-          >
-            {role === "DELIVERY_STAFF" &&
-              allowedStatuses[text]?.map((status) => (
-                <Option key={status} value={status}>
-                  {status}
-                </Option>
-              ))}
-          </Select>
-        );
+        if (order.status === "DELIVERED") {
+          // Nếu trạng thái là DELIVERED, hiển thị Select bị disable
+          return (
+            <Select value={order.status} style={{ width: 150 }} disabled>
+              <Option value="DELIVERED">DELIVERED</Option>
+            </Select>
+          );
+        } else if (order.status === "PAID") {
+          return (
+            <Select
+              value={text}
+              style={{ width: 150 }}
+              onChange={(value) => handleUpdateStatus(order.orderId, value, text)}
+            >
+              <Option value="SHIPPED">SHIPPED</Option>
+            </Select>
+          );
+        } else if (order.status === "SHIPPED") {
+          return (
+            <Select
+              value={text}
+              style={{ width: 150 }}
+              onChange={(value) => handleUpdateStatus(order.orderId, value, text)}
+            >
+              <Option value="DELIVERY_FAILED">DELIVERY_FAILED</Option>
+              <Option value="DELIVERED">DELIVERED</Option>
+            </Select>
+          );
+        } else if (order.status === "DELIVERY_FAILED") {
+          const failCount = order.deliveryAttempts || 0;
+          const disableAll = failCount === 3;
+          return (
+            <div className="button-fail-increase">
+              <Select
+                value={order.status}
+                style={{ width: 150, marginLeft: 8 }}
+                onChange={(value) => handleUpdateStatus(order.orderId, value, order.status)}
+                disabled={disableAll}
+              >
+                <Option value="DELIVERED">DELIVERED</Option>
+              </Select>
+              {failCount < 3 && (
+                <Button
+                  size="small"
+                  onClick={() => handleUpdateStatus(order.orderId, "DELIVERY_FAILED", order.status)}
+                  disabled={disableAll}
+                >
+                  ^
+                </Button>
+              )}
+            </div>
+          );
+        } else {
+          return text;
+        }
+      },
+    },
+
+
+    {
+      title: "Delivery Fail Attempts",
+      key: "deliveryFailAttempts",
+      render: (_, record) => {
+        // Ưu tiên sử dụng deliveryFailCount, nếu không có thì dùng deliveryAttempts, nếu cũng không có thì trả về 0.
+        const attempts = record.deliveryFailCount !== undefined ? record.deliveryFailCount : (record.deliveryAttempts || 0);
+        return attempts;
       },
     },
     {

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { Card, Button, Typography, message, Collapse, Spin, Image } from "antd";
+import { Card, Button, Typography, Collapse, Spin, Image } from "antd";
 import { CheckCircleOutlined, MoneyCollectOutlined } from "@ant-design/icons";
-import html2canvas from "html2canvas"; // Import thư viện chụp màn hình
+import html2canvas from "html2canvas";
 import "../FormRefund/FormRefund.css";
 import { GetOrderByIdAPI, GetRefundOrderByIdAPI } from "../../services/manageOrderService";
 import { GetCustomerProfileAPI } from "../../services/userService";
@@ -23,7 +24,9 @@ const RefundForm = () => {
     const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
-    const refundRef = useRef(null); // Tham chiếu đến phần cần chụp ảnh
+    const refundRef = useRef(null);
+    const staffId = sessionStorage.getItem("staffId");
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchRefundDetails = async () => {
@@ -47,7 +50,7 @@ const RefundForm = () => {
                 const productList = await Promise.all(productPromises);
                 setProducts(productList);
             } catch (error) {
-                message.error("Failed to fetch refund details");
+                toast.error("Failed to fetch refund details");
             } finally {
                 setLoading(false);
             }
@@ -56,15 +59,10 @@ const RefundForm = () => {
         fetchRefundDetails();
     }, [refundId]);
 
-    const handleRefund = () => {
-        setSuccess(true);
+    const handleRefund = async () => {
+        // Gọi API cập nhật trạng thái refund thành REFUNDED
         toast.success("Refund successful!");
-        setRefundData((prev) => ({ ...prev, status: "REFUNDED" }));
-
-        // Cập nhật localStorage để thông báo ManageRequestRefund
-        localStorage.setItem(`refund_${refundId}`, "REFUNDED");
-
-        // Chờ 1 giây rồi chụp ảnh màn hình
+        setSuccess(true);
         setTimeout(() => {
             if (refundRef.current) {
                 html2canvas(refundRef.current).then((canvas) => {
@@ -74,7 +72,11 @@ const RefundForm = () => {
                     link.click();
                 });
             }
-        }, 2000);
+            // Truyền state với openUploadModal và refundId
+            navigate("/manager-request-orders", {
+                state: { openUploadModal: true, refundId: refundData.id },
+            });
+        }, 5000);
     };
 
     if (loading) {
@@ -92,7 +94,10 @@ const RefundForm = () => {
                             <CheckCircleOutlined style={{ fontSize: 60, color: "#52c41a" }} />
                             <Title level={3}>Refund Successful</Title>
                             <Text strong>${refundData?.amount?.toLocaleString() || "0"}</Text>
-                            <p>Refund has been processed for order <strong>{customerData?.fullName || "Unknown"}</strong>.</p>
+                            <p>
+                                Refund has been processed for order{" "}
+                                <strong>{customerData?.fullName || "Unknown"}</strong>.
+                            </p>
                             <Button type="default" style={{ color: "blue" }} onClick={() => setShowDetails(!showDetails)}>
                                 {showDetails ? "Hide Details" : "View Details"}
                             </Button>
@@ -102,8 +107,12 @@ const RefundForm = () => {
                                         {products.map((product) => (
                                             <Panel header={product.productName} key={product.id}>
                                                 <Image width={100} src={product.imageUrl} />
-                                                <p><strong>Price:</strong> ${product.unitPrice.toLocaleString()}</p>
-                                                <p><strong>Quantity:</strong> {product.quantity}</p>
+                                                <p>
+                                                    <strong>Price:</strong> ${product.unitPrice.toLocaleString()}
+                                                </p>
+                                                <p>
+                                                    <strong>Quantity:</strong> {product.quantity}
+                                                </p>
                                             </Panel>
                                         ))}
                                     </Collapse>
@@ -114,11 +123,17 @@ const RefundForm = () => {
                         <>
                             <MoneyCollectOutlined style={{ fontSize: 60, color: "#1890ff" }} />
                             <Title level={3}>Refund Order</Title>
-                            <p>Customer: <strong>{customerData?.fullName || "Unknown"}</strong></p>
+                            <p>
+                                Customer: <strong>{customerData?.fullName || "Unknown"}</strong>
+                            </p>
                             {refundData && (
-                                <p>Total Refund Amount: <strong>${refundData.amount.toLocaleString()}</strong></p>
+                                <p>
+                                    Total Refund Amount: <strong>${refundData.amount.toLocaleString()}</strong>
+                                </p>
                             )}
-                            <Button type="primary" onClick={handleRefund}>Process Refund</Button>
+                            <Button type="primary" onClick={handleRefund}>
+                                Process Refund
+                            </Button>
                         </>
                     )}
                 </Card>

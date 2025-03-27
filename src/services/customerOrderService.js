@@ -70,6 +70,24 @@ export const DeleteOrderByIdAPI = async (id) => {
     throw error.response?.data;
   }
 };
+export const UpdateOrderByIdAPI = async (id, data) => {
+  try {
+    const token = sessionStorage.getItem("token");
+    const response = await axios.put(
+      `${API_URL}/orders/${id}`, data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "*/*",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data;
+  }
+};
 
 export const sendPaymentResultToBackend = async (paymentData) => {
   return await axios.post(`${API_URL}/orders/return`, paymentData);

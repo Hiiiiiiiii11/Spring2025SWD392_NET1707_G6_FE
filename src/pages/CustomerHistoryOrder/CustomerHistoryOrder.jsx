@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { List, Card, Button, Typography, Space, Modal, Input, Select, Rate } from "antd";
+import { List, Card, Button, Typography, Space, Modal, Input, Radio, Rate } from "antd";
 import Header from "../../components/Header/Header";
-import { GetAllHistoryOrderByIdAPI } from "../../services/customerOrderService";
+import { GetAllHistoryOrderByIdAPI, UpdateOrderByIdAPI } from "../../services/customerOrderService";
 import { getProductByIdAPI } from "../../services/manageProductService";
-import { getPromotionByIdAPI } from "../../services/managePromotionService"; // Import API lấy thông tin promotion
+import { getPromotionByIdAPI } from "../../services/managePromotionService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { CustomerCancelOrderAPI } from "../../services/manageOrderService";
+import { CustomerCancelOrderAPI, GetOrderByIdAPI } from "../../services/manageOrderService";
 import { SendReviewproductAPI } from "../../services/ManageReview";
 import "../CustomerHistoryOrder/CustomerHistoryOrder.css";
 import { getBatchByIdAPI } from "../../services/manageBatchService";
 
 const { Title, Text } = Typography;
-const { Option } = Select;
+
+const predefinedReasons = [
+  "Change purchase decision",
+  "Product not as described",
+  "Detect defective products",
+  "Other (please specify)"
+];
 
 const CustomerHistoryOrder = () => {
   const [orders, setOrders] = useState([]);
@@ -32,18 +38,21 @@ const CustomerHistoryOrder = () => {
     comment: "",
   });
 
+  // New states cho modal hủy đơn (Cancel Order/Return Order)
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [cancelOrderId, setCancelOrderId] = useState(null);
+  // state để lưu lý do đã chọn (radioValue) và lý do tùy chỉnh nếu chọn "Khác (vui lòng ghi rõ)"
+  const [selectedReason, setSelectedReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+
   const customerId = sessionStorage.getItem("customerId");
 
   const getStatusColor = (status) => {
     return status === "Delivered" ? "success" : "warning";
   };
 
-  // On mount, load any previously saved refund requested order IDs from localStorage
+  // On mount, load orders
   useEffect(() => {
-    const storedRefundRequests = localStorage.getItem("refundRequestedOrders");
-    if (storedRefundRequests) {
-      setRefundRequestedOrders(JSON.parse(storedRefundRequests));
-    }
     fetchCustomerHistoryOrder();
   }, []);
 
@@ -77,16 +86,13 @@ const CustomerHistoryOrder = () => {
     }
   };
 
-  // Fetch product details for each order, include orderDetailId from order.orderDetails
+  // Fetch product details for each order
   const fetchProductDetailsForOrder = async (order) => {
     try {
       const details = await Promise.all(
         order.orderDetails.map(async (item) => {
-          // Fetch product information
           const product = await getProductByIdAPI(item.productId);
-          // Fetch batch information
           const batchData = await getBatchByIdAPI(item.batchId);
-          // Extract expired date from batchData (assuming it's in ISO format)
           const expireDate = batchData && batchData.expireDate
             ? batchData.expireDate.split("T")[0]
             : "N/A";
@@ -94,7 +100,7 @@ const CustomerHistoryOrder = () => {
             ...product,
             quantity: item.quantity,
             orderDetailId: item.orderDetailId,
-            expireDate, // add expireDate property
+            expireDate,
           };
         })
       );
@@ -114,25 +120,51 @@ const CustomerHistoryOrder = () => {
     }
   };
 
-  // Handle refund request (cancel order)
-  const handleRefundRequest = async (orderId) => {
-    const confirmDelete = window.confirm("Are you sure you want to send cancel order request?");
-    if (!confirmDelete) return;
+  // Mở modal hủy đơn (Cancel Order/Return Order)
+  const openCancelModal = (orderId) => {
+    setCancelOrderId(orderId);
+    // Reset lại giá trị của radio và input nếu có
+    setSelectedReason("");
+    setCustomReason("");
+    setCancelModalVisible(true);
+  };
+
+  // Xử lý submit hủy đơn: update reason rồi mới gọi API hủy đơn
+  const handleCancelSubmit = async () => {
     try {
-      const data = await CustomerCancelOrderAPI(orderId);
-      toast.success("Refund request submitted successfully!");
-      setRefundRequestedOrders((prev) => {
-        const updated = [...prev, orderId];
-        localStorage.setItem("refundRequestedOrders", JSON.stringify(updated));
-        return updated;
-      });
+      const finalReason = selectedReason === "Other (please specify)" ? customReason : selectedReason;
+      if (!finalReason) {
+        toast.error("Please select or enter a reason for cancellation!");
+        return;
+      }
+      // Lấy dữ liệu đơn hàng hiện tại (giả sử có API GetOrderByIdAPI)
+      const currentOrder = await GetOrderByIdAPI(cancelOrderId);
+      if (!currentOrder) {
+        toast.error("Can't found order!");
+        return;
+      }
+      // Merge dữ liệu: chỉ cập nhật trường reason, giữ nguyên các trường khác
+      const updatedOrderData = { ...currentOrder, status: "CANCELLED", reason: finalReason };
+      // Gọi API update order với dữ liệu đã merge
+      await UpdateOrderByIdAPI(cancelOrderId, updatedOrderData);
+      // Sau đó gọi API hủy đơn
+      const data = await CustomerCancelOrderAPI(cancelOrderId);
+      if (data) {
+        toast.success("Refund request submitted successfully!");
+      } else {
+        toast.error("Refund request submission failed!");
+      }
+      setCancelModalVisible(false);
+      setSelectedReason("");
+      setCustomReason("");
       fetchCustomerHistoryOrder(); // Refresh orders list
     } catch (error) {
       toast.error("Failed to process refund request.");
     }
   };
 
-  // Open modal to view refund image
+
+  // Open modal xem refund image
   const handleViewRefundImage = (order) => {
     if (order.refund && order.refund.proofDocumentUrl) {
       setRefundImageUrl(order.refund.proofDocumentUrl);
@@ -142,7 +174,7 @@ const CustomerHistoryOrder = () => {
     }
   };
 
-  // Open review modal and set initial values
+  // Mở modal gửi đánh giá
   const openReviewModal = async (order) => {
     setSelectedReviewOrder(order);
     if (!orderProductDetails[order.orderId]) {
@@ -159,7 +191,7 @@ const CustomerHistoryOrder = () => {
     setIsReviewModalVisible(true);
   };
 
-  // Handle sending review to API
+  // Gửi đánh giá
   const handleSendReview = async () => {
     try {
       const response = await SendReviewproductAPI(reviewForm);
@@ -174,13 +206,10 @@ const CustomerHistoryOrder = () => {
     }
   };
 
-  // Hàm tính giá ban đầu nếu có promotion:
-  // discountValue = totalAmount * discountPercentage  
-  // originalPrice = totalAmount + discountValue
+  // Tính giá ban đầu nếu có promotion
   const calculateOriginalPrice = (order) => {
     if (order.promotionId && orderPromotions[order.orderId]) {
       const promotion = orderPromotions[order.orderId];
-      // discountPercentage ở đây được giả định là phần trăm, ví dụ 20 cho 20%
       const discountValue = order.totalAmount * promotion.discountPercentage / 100;
       return order.totalAmount + discountValue;
     }
@@ -217,18 +246,17 @@ const CustomerHistoryOrder = () => {
                             {order.status}
                           </Text>
                         </p>
+                        {order.reason && (
+                          <p>Reason: {order.reason}</p>
+                        )}
                         <p>Payment Method: VN Pay</p>
                         <p>Order Address: {order.address}</p>
-
                         <p>
-                          <strong>Promotion:</strong> {
-                            promotion
-                              ? `${promotion.promotionName} (Discount: ${promotion.discountPercentage}%)`
-                              : "None"
-                          }
+                          <strong>Promotion:</strong>{" "}
+                          {promotion
+                            ? `${promotion.promotionName} (Discount: ${promotion.discountPercentage}%)`
+                            : "None"}
                         </p>
-
-
                       </div>
                       <div className="div-total-price">
                         <p className="totalprice-history" style={{ fontWeight: "bold" }}>
@@ -251,8 +279,6 @@ const CustomerHistoryOrder = () => {
                               </p>
                             </>
                           )}
-
-
                           Original Total: ${order.totalAmount}
                         </p>
                       </div>
@@ -272,30 +298,42 @@ const CustomerHistoryOrder = () => {
                             Continue Payment
                           </Button>
                         )}
-                        {order.status === "PAID" && (
-                          <Button
-                            className="order-continue-payment"
-                            type={refundRequestedOrders.includes(order.orderId) ? "default" : "primary"}
-                            disabled={refundRequestedOrders.includes(order.orderId)}
-                            onClick={() => handleRefundRequest(order.orderId)}
-                          >
-                            {refundRequestedOrders.includes(order.orderId) ? "Request Cancel Sent" : "Cancel Order"}
-                          </Button>
-                        )}
                         {order.status === "COMPLETED" && (
                           <Button type="primary" onClick={() => openReviewModal(order)}>
                             Send Review
+                          </Button>
+                        )}
+                        {order.status === "PAID" && (
+                          <Button
+                            className="order-continue-payment"
+                            type={
+                              refundRequestedOrders.includes(order.orderId) || (order.refund && order.refund.id)
+                                ? "default"
+                                : "primary"
+                            }
+                            disabled={refundRequestedOrders.includes(order.orderId) || (order.refund && order.refund.id)}
+                            onClick={() => openCancelModal(order.orderId)}
+                          >
+                            {refundRequestedOrders.includes(order.orderId) || (order.refund && order.refund.id)
+                              ? "Request Cancel Sent"
+                              : "Cancel Order"}
                           </Button>
                         )}
                         {order.status === "DELIVERED" && (
                           <div className="review-or-refund">
                             <Button
                               className="order-continue-payment"
-                              type={refundRequestedOrders.includes(order.orderId) ? "default" : "primary"}
-                              disabled={refundRequestedOrders.includes(order.orderId)}
-                              onClick={() => handleRefundRequest(order.orderId)}
+                              type={
+                                refundRequestedOrders.includes(order.orderId) || (order.refund && order.refund.id)
+                                  ? "default"
+                                  : "primary"
+                              }
+                              disabled={refundRequestedOrders.includes(order.orderId) || (order.refund && order.refund.id)}
+                              onClick={() => openCancelModal(order.orderId)}
                             >
-                              {refundRequestedOrders.includes(order.orderId) ? "Request Sent" : "Return Product"}
+                              {refundRequestedOrders.includes(order.orderId) || (order.refund && order.refund.id)
+                                ? "Request Sent"
+                                : "Return Order"}
                             </Button>
                           </div>
                         )}
@@ -332,7 +370,6 @@ const CustomerHistoryOrder = () => {
                                 </div>
                               </Card>
                             </List.Item>
-
                           )}
                         />
                       </div>
@@ -345,6 +382,7 @@ const CustomerHistoryOrder = () => {
         )}
       </div>
 
+      {/* Modal hiển thị refund image */}
       <Modal
         title="Refund Image"
         visible={viewRefundModalVisible}
@@ -358,6 +396,7 @@ const CustomerHistoryOrder = () => {
         )}
       </Modal>
 
+      {/* Modal gửi đánh giá */}
       <Modal
         title="Send Review"
         visible={isReviewModalVisible}
@@ -370,17 +409,19 @@ const CustomerHistoryOrder = () => {
             <p>
               <strong>Select Product:</strong>
             </p>
-            <Select
-              style={{ width: "100%", marginBottom: 16 }}
+            <Radio.Group
+              onChange={(e) =>
+                setReviewForm({ ...reviewForm, orderDetailId: e.target.value })
+              }
               value={reviewForm.orderDetailId}
-              onChange={(value) => setReviewForm({ ...reviewForm, orderDetailId: value })}
+              style={{ marginBottom: 16 }}
             >
               {orderProductDetails[selectedReviewOrder.orderId].map((detail) => (
-                <Option key={detail.orderDetailId} value={detail.orderDetailId}>
+                <Radio key={detail.orderDetailId} value={detail.orderDetailId}>
                   {detail.productName}
-                </Option>
+                </Radio>
               ))}
-            </Select>
+            </Radio.Group>
             <p>
               <strong>Rating:</strong>
             </p>
@@ -396,6 +437,42 @@ const CustomerHistoryOrder = () => {
               value={reviewForm.comment}
               onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
               placeholder="Enter your review..."
+            />
+          </>
+        )}
+      </Modal>
+
+      {/* Modal nhập lý do hủy đơn (Cancel/Return Order) */}
+      <Modal
+        title="Enter Reason for Cancellation"
+        visible={cancelModalVisible}
+        onCancel={() => setCancelModalVisible(false)}
+        onOk={handleCancelSubmit}
+        okText="Submit"
+      >
+        <p>
+          <strong>Select Reason:</strong>
+        </p>
+        <Radio.Group
+          onChange={(e) => setSelectedReason(e.target.value)}
+          value={selectedReason}
+        >
+          {predefinedReasons.map((reason, index) => (
+            <Radio key={index} value={reason} style={{ display: "block", marginBottom: 8 }}>
+              {reason}
+            </Radio>
+          ))}
+        </Radio.Group>
+        {selectedReason === "Other (please specify)" && (
+          <>
+            <p>
+              <strong>Custom Reason:</strong>
+            </p>
+            <Input.TextArea
+              rows={3}
+              placeholder="Enter detailed reason..."
+              value={customReason}
+              onChange={(e) => setCustomReason(e.target.value)}
             />
           </>
         )}

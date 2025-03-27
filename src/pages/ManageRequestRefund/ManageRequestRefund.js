@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Typography, Button, Tag, Card, Upload, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     GetAllRefundOrderRequestAPI,
     GetOrderByIdAPI,
@@ -12,7 +12,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../ManageRequestRefund/ManageRequestRefund.css";
 import { uploadToCloudinary } from "../../services/manageProductService";
-import { UploadOutlined } from "@ant-design/icons"; // đảm bảo API này được export
+import { UploadOutlined } from "@ant-design/icons";
 import { GetCustomerProfileAPI } from "../../services/userService";
 
 const { Title } = Typography;
@@ -29,7 +29,6 @@ const statusColors = {
 
 const ManageRequestRefund = () => {
     const [refundRequests, setRefundRequests] = useState([]);
-    // state mapping orderId → customerName
     const [orderCustomerNames, setOrderCustomerNames] = useState({});
     const [customerPhone, setCustomerPhone] = useState({});
     const [selectedRefundId, setSelectedRefundId] = useState(null);
@@ -41,14 +40,21 @@ const ManageRequestRefund = () => {
     const [fileList, setFileList] = useState([]);
     const staffId = sessionStorage.getItem("staffId");
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         fetchRefundRequests();
-    }, []);
+        // Kiểm tra state truyền qua từ RefundForm
+        if (location.state?.openUploadModal && location.state?.refundId) {
+            setSelectedRefundId(location.state.refundId);
+            setModalVisible(true);
+            // Nếu cần, reset lại state của location sau khi dùng xong
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     // Sau khi fetch refund requests, lấy thông tin customer dựa trên orderId
     const fetchCustomerNames = async (refunds) => {
-        // Lấy danh sách orderId duy nhất
         const uniqueOrderIds = [...new Set(refunds.map((r) => r.orderId))];
         const namesMap = {};
         const phoneMap = {};
@@ -71,14 +77,10 @@ const ManageRequestRefund = () => {
     const fetchRefundRequests = async () => {
         try {
             const data = await GetAllRefundOrderRequestAPI();
-            // Update refund status từ localStorage nếu có
-            const updatedData = data.map((request) => ({
-                ...request,
-                status: localStorage.getItem(`refund_${request.id}`) || request.status,
-            }));
-            setRefundRequests(updatedData);
+            // Lấy dữ liệu trực tiếp từ API, không ghi đè status từ localStorage
+            setRefundRequests(data);
             // Sau khi có refund requests, fetch customer names
-            fetchCustomerNames(updatedData);
+            fetchCustomerNames(data);
         } catch (error) {
             toast.error("Failed to fetch refund requests");
         }
@@ -114,7 +116,6 @@ const ManageRequestRefund = () => {
             toast.error("Please upload an image first!");
             return;
         }
-
         setUploading(true);
         try {
             // Upload image to Cloudinary
@@ -123,20 +124,11 @@ const ManageRequestRefund = () => {
                 toast.error("Failed to upload image");
                 return;
             }
-
-            // Call API to complete refund using the image URL
-            await SendCompleteRefundAPI(selectedRefundId, staffId, imageUrl);
-            toast.success("Refund completed successfully");
-
-            // Update refund status locally và lưu vào localStorage
-            setRefundRequests((prev) =>
-                prev.map((request) =>
-                    request.id === selectedRefundId ? { ...request, status: "COMPLETED", proofDocumentUrl: imageUrl } : request
-                )
-            );
-            localStorage.setItem(`refund_${selectedRefundId}`, "COMPLETED");
-
-            // Đóng modal và refresh danh sách refund requests
+            // Gọi API SendCompleteRefundAPI với imageUrl vừa nhận được
+            const data = await SendCompleteRefundAPI(selectedRefundId, staffId, imageUrl);
+            if (data) {
+                toast.success("Send refund image successfully!");
+            }
             setModalVisible(false);
             fetchRefundRequests();
         } catch (error) {
@@ -147,6 +139,7 @@ const ManageRequestRefund = () => {
             setFileList([]);
         }
     };
+
 
     // Hàm mở modal xem hình ảnh refund
     const handleViewRefundImage = (record) => {
@@ -205,42 +198,41 @@ const ManageRequestRefund = () => {
                             Accept
                         </Button>
                     </div>
-                    {(record.status === "RETURNED_TO_WAREHOUSE" || record.status === "VERIFIED") && (
-                        <div>
+                    <div>
+                        {(record.status === "RETURNED_TO_WAREHOUSE" || record.status === "VERIFIED") && (
                             <Button
                                 type="default"
-                                disabled={record.status === "REFUNDED"}
                                 style={{ backgroundColor: "blue", color: "white" }}
                                 onClick={() => handleRefund(record.id)}
                             >
                                 Refund
                             </Button>
-                        </div>
-                    )}
-                    {record.status === "REFUNDED" || record.status === "COMPLETED" && (
+                        )}
+                        {record.status === "REFUNDED" && (
+                            <Button
+                                type="default"
+                                disabled
+                                style={{ backgroundColor: "gray", color: "white" }}
+                            >
+                                Already Refund
+                            </Button>
+                        )}
+                    </div>
+                    {record.status === "REFUNDED" && (
                         <div style={{ display: "flex", gap: "8px" }}>
                             <Button
                                 type="default"
-                                style={{ backgroundColor: "#7070f0", color: "white" }}
-                                onClick={() => handleSendComplete(record.id)}
-                                disabled={!!record.proofDocumentUrl}
+                                style={{ backgroundColor: "green", color: "white" }}
+                                onClick={() => handleViewRefundImage(record)}
                             >
-                                Send Complete
+                                View Image
                             </Button>
-                            {record.status === "COMPLETED" && (
-                                <Button
-                                    type="default"
-                                    style={{ backgroundColor: "green", color: "white" }}
-                                    onClick={() => handleViewRefundImage(record)}
-                                >
-                                    View Image
-                                </Button>
-                            )}
                         </div>
                     )}
                 </div>
             ),
         },
+
     ];
 
     return (
