@@ -44,6 +44,19 @@ const SkinQuiz = ({ customerId, onComplete }) => {
     return `question_${question.questionId}`;
   };
   
+  const formatOptionForDisplay = (option) => {
+    if (!option) return '';
+    const words = option.split('_');
+    
+    
+    const capitalizedWords = words.map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    );
+    
+   
+    return capitalizedWords.join(' ');
+  };
+
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -330,7 +343,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
                 value={index}
                 style={{ fontSize: 16 }}
               >
-                {option}
+                {formatOptionForDisplay(option)}
               </Radio>
             ))}
           </Radio.Group>
