@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import "../ManageOrder/ManageOrders.css";
 import { GetAllEmployeeAPI } from "../../services/manageEmployeeService";
+import { UpdateOrderByIdAPI } from "../../services/customerOrderService";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -95,26 +96,70 @@ const ManageOrders = () => {
       return;
     }
 
+    // Cho phép từ DELIVERY_FAILED chuyển về DELIVERY_FAILED để tăng thêm attempt
     const validTransitions = {
       PAID: ["SHIPPED"],
       SHIPPED: ["DELIVERY_FAILED", "DELIVERED"],
-      DELIVERY_FAILED: ["DELIVERED"],
+      DELIVERY_FAILED: ["DELIVERY_FAILED", "DELIVERED"],
     };
 
+    if (!validTransitions[currentStatus]?.includes(newStatus)) {
+      toast.error(`Invalid status transition from ${currentStatus} to ${newStatus}`);
+      return;
+    }
 
     // Nếu chuyển từ SHIPPED sang DELIVERY_FAILED
     if (currentStatus === "SHIPPED" && newStatus === "DELIVERY_FAILED") {
-      const currentFailCount = order.deliveryFailCount || 0;
+      const currentFailCount = order.deliveryAttempts || 0;
       const newFailCount = currentFailCount + 1;
       try {
         await UpdateCustomerOrderStatusAPI(orderId, "DELIVERY_FAILED");
         const updatedOrders = orders.map((o) =>
-          o.orderId === orderId ? { ...o, status: "DELIVERY_FAILED", deliveryFailCount: newFailCount } : o
+          o.orderId === orderId
+            ? { ...o, status: "DELIVERY_FAILED", deliveryAttempts: newFailCount }
+            : o
         );
         setOrders(updatedOrders);
         toast.warning(`Order status updated to DELIVERY_FAILED (fail attempt ${newFailCount}).`);
+
+        if (newFailCount === 3) {
+          const orderToUpdate = updatedOrders.find((o) => o.orderId === orderId);
+          if (orderToUpdate) {
+            const updatedData = { ...orderToUpdate, reason: "Customer does not receive goods" };
+            await UpdateOrderByIdAPI(orderId, updatedData);
+            toast.success("Order reason updated to 'Customer does not receive goods'");
+          }
+        }
       } catch (error) {
         toast.error("Failed to update status");
+      }
+      return;
+    }
+
+    // Nếu đang ở DELIVERY_FAILED và người dùng nhấn nút mũi tên (tức là newStatus === DELIVERY_FAILED) để tăng attempt
+    if (currentStatus === "DELIVERY_FAILED" && newStatus === "DELIVERY_FAILED") {
+      const currentFailCount = order.deliveryAttempts || 0;
+      const newFailCount = currentFailCount + 1;
+      try {
+        await UpdateCustomerOrderStatusAPI(orderId, "DELIVERY_FAILED");
+        const updatedOrders = orders.map((o) =>
+          o.orderId === orderId
+            ? { ...o, deliveryAttempts: newFailCount }
+            : o
+        );
+        setOrders(updatedOrders);
+        toast.warning(`Fail attempt increased to ${newFailCount}.`);
+        if (newFailCount === 3) {
+          const orderToUpdate = updatedOrders.find((o) => o.orderId === orderId);
+          if (orderToUpdate) {
+            const updatedData = { ...orderToUpdate, reason: "Customer does not receive goods" };
+            await UpdateOrderByIdAPI(orderId, updatedData);
+            toast.success("Order reason updated to 'Customer does not receive goods'");
+          }
+        }
+        fetchOrders();
+      } catch (error) {
+        toast.error("Failed to update fail attempt");
       }
       return;
     }
@@ -147,8 +192,6 @@ const ManageOrders = () => {
     }
     fetchOrders();
   };
-
-
 
 
 
@@ -219,9 +262,9 @@ const ManageOrders = () => {
   }, [orders, selectedMonth]);
 
   // Các tính toán doanh thu dựa trên filteredOrders
-  const { paymentHistory, refundHistory, totalMoneyReceived, totalMoneyRefunded, totalRefundOrders } = useMemo(() => {
+  const { paymentHistory, refundHistory, totalMoneyReceived, totalMoneyRefunded } = useMemo(() => {
     const payments = filteredOrders
-      .filter((o) => ["PAID", "DELIVERED", "COMPLETED"].includes(o.status))
+      .filter((o) => ["PAID", "DELIVERED", "COMPLETED", "REFUNDED", "CANCELLED", "SHIPPED", "DELIVERY_FAILED", "RETURNED"].includes(o.status))
       .map((o) => ({
         orderId: o.orderId,
         date: o.orderDate,
@@ -303,8 +346,9 @@ const ManageOrders = () => {
       dataIndex: "status",
       key: "status",
       render: (text, order) => {
+        // Chỉ cho phép chỉnh sửa nếu role là DELIVERY_STAFF
+        const canEdit = role === "DELIVERY_STAFF";
         if (order.status === "DELIVERED") {
-          // Nếu trạng thái là DELIVERED, hiển thị Select bị disable
           return (
             <Select value={order.status} style={{ width: 150 }} disabled>
               <Option value="DELIVERED">DELIVERED</Option>
@@ -316,6 +360,7 @@ const ManageOrders = () => {
               value={text}
               style={{ width: 150 }}
               onChange={(value) => handleUpdateStatus(order.orderId, value, text)}
+              disabled={!canEdit}
             >
               <Option value="SHIPPED">SHIPPED</Option>
             </Select>
@@ -326,14 +371,16 @@ const ManageOrders = () => {
               value={text}
               style={{ width: 150 }}
               onChange={(value) => handleUpdateStatus(order.orderId, value, text)}
+              disabled={!canEdit}
             >
               <Option value="DELIVERY_FAILED">DELIVERY_FAILED</Option>
               <Option value="DELIVERED">DELIVERED</Option>
             </Select>
           );
         } else if (order.status === "DELIVERY_FAILED") {
-          const failCount = order.deliveryAttempts || 0;
-          const disableAll = failCount === 3;
+          // Sử dụng deliveryAttempts nếu không có deliveryFailCount
+          const failCount = order.deliveryFailCount || order.deliveryAttempts || 0;
+          const disableAll = failCount === 3 || !canEdit;
           return (
             <div className="button-fail-increase">
               <Select
@@ -361,7 +408,6 @@ const ManageOrders = () => {
       },
     },
 
-
     {
       title: "Delivery Fail Attempts",
       key: "deliveryFailAttempts",
@@ -369,6 +415,15 @@ const ManageOrders = () => {
         // Ưu tiên sử dụng deliveryFailCount, nếu không có thì dùng deliveryAttempts, nếu cũng không có thì trả về 0.
         const attempts = record.deliveryFailCount !== undefined ? record.deliveryFailCount : (record.deliveryAttempts || 0);
         return attempts;
+      },
+    },
+    {
+      title: "Reason",
+      key: "reason",
+      render: (_, record) => {
+        // Ưu tiên sử dụng deliveryFailCount, nếu không có thì dùng deliveryAttempts, nếu cũng không có thì trả về 0.
+        const reason = record.reason !== undefined ? record.reason : "None"
+        return reason;
       },
     },
     {

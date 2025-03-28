@@ -23,7 +23,7 @@ function ManageQuiz() {
     const navigate = useNavigate();
 
     // Quiz types available in your system
-    const quizTypes = ["MULTI_CHOICE", "SINGLE_CHOICE"];
+    const quizTypes = ["HYPERPIGMENTATION", "REDNESS", "AGING", "ACNE", "SENSITIVITY", "DRYNESS", "OILINESS"];
     // Dropdown labels from your provided JSON (ensure these are unique)
     const quizLabels = ["oiliness", "dryness", "sensitivity", "acne", "aging", "hyperpigmentation", "redness"];
 
@@ -110,7 +110,7 @@ function ManageQuiz() {
             setIsModalVisible(false);
             form.resetFields();
         } catch (error) {
-            alert("Error processing quiz question!");
+            toast.error("Error processing quiz question!");
         }
     };
 
@@ -129,11 +129,6 @@ function ManageQuiz() {
             title: "Type",
             dataIndex: "type",
             key: "type",
-        },
-        {
-            title: "Label",
-            dataIndex: "label",
-            key: "label",
         },
         {
             title: "Options",
@@ -211,19 +206,7 @@ function ManageQuiz() {
                                     ))}
                                 </Select>
                             </Form.Item>
-                            <Form.Item
-                                name="label"
-                                label="Label"
-                                rules={[{ required: true, message: "Please select a label" }]}
-                            >
-                                <Select placeholder="Select a label">
-                                    {quizLabels.map((label) => (
-                                        <Select.Option key={label} value={label}>
-                                            {label}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
+
                             <Form.Item
                                 name="options"
                                 label="Options (separated by comma)"
