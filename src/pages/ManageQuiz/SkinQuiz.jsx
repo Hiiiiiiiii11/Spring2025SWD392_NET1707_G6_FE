@@ -37,10 +37,6 @@ const SkinQuiz = ({ customerId, onComplete }) => {
   
   const API_BASE_URL = 'http://localhost:8080/api';
   
-  const mapResponseValues = (questionId, answer, label) => {
-    return mapResponse(label, answer);
-  };
-  
   const getKeyResponseIdentifier = (question) => {
     if (question.label) {
       return question.label;
@@ -80,13 +76,19 @@ const SkinQuiz = ({ customerId, onComplete }) => {
   const handleResponseChange = (questionId, selectedIndex) => {
     const currentQuestion = questions.find(q => q.questionId === questionId);
     if (!currentQuestion || !currentQuestion.options) return;
+    
     const selectedOption = currentQuestion.options[selectedIndex];
-    const mappedValue = mapResponseValues(questionId, selectedOption);
     const keyIdentifier = getKeyResponseIdentifier(currentQuestion);
+    
+    // Get mapped value using the correct label
+    const label = currentQuestion.label;
+    const mappedValue = mapResponse(label, selectedOption);
+    
     setResponses(prev => ({
       ...prev,
       [questionId]: selectedIndex
     }));
+    
     setMappedResponses(prev => ({
       ...prev,
       [keyIdentifier]: mappedValue
@@ -98,6 +100,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
     if (!currentQuestion || responses[currentQuestion.questionId] === null) {
       return;
     }
+    
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prevIndex => prevIndex + 1);
     }
@@ -123,23 +126,37 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       message.warning(`Please answer all ${unansweredQuestions} remaining questions before submitting.`);
       return;
     }
+    
     try {
       setIsLoading(true);
-      const finalResponses = Object.fromEntries(
-        Object.entries(mappedResponses).filter(([_, v]) => v !== null)
-      );
+      
+      // Chuyển đổi responses sang format mảng như yêu cầu
+      const formattedResponses = questions.map(question => {
+        const questionId = question.questionId;
+        const selectedIndex = responses[questionId];
+        const selectedOption = question.options[selectedIndex];
+        
+        return {
+          questionId: questionId,
+          response: selectedOption
+        };
+      });
+      
       const response = await axios.post(
-        `${API_BASE_URL}/quiz/submit/${customerId}`,
-        finalResponses
+        `${API_BASE_URL}/quiz/submit/${customerId || 1}`,
+        formattedResponses
       );
+      
       setResults(response.data.quizResult);
       setRecommendedProducts(response.data.recommendedProducts);
+      
       if (onComplete) {
         onComplete({
           quizResult: response.data.quizResult,
           recommendedProducts: response.data.recommendedProducts
         });
       }
+      
       setIsLoading(false);
     } catch (err) {
       setError('Failed to submit quiz. Please try again later.');
@@ -147,14 +164,6 @@ const SkinQuiz = ({ customerId, onComplete }) => {
       console.error('Error submitting quiz:', err);
       message.error('Failed to submit quiz');
     }
-  };
-  
-  const viewProductDetails = (productId) => {
-    window.location.href = `/products/${productId}`;
-  };
-  
-  const browseAllProducts = () => {
-    window.location.href = '/products';
   };
   
   if (isLoading) {
@@ -242,7 +251,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
                           <Button 
                             type="primary" 
                             style={{ marginTop: 12 }}
-                            onClick={() => viewProductDetails(product.productID)}
+                            onClick={() => window.location.href = `/products/${product.productID}`}
                           >
                             View Details
                           </Button>
@@ -259,7 +268,7 @@ const SkinQuiz = ({ customerId, onComplete }) => {
         </div>
         
         <div style={{ textAlign: 'center', marginTop: 24 }}>
-          <Button type="primary" size="large" onClick={browseAllProducts}>
+          <Button type="primary" size="large" onClick={() => window.location.href = '/products'}>
             Browse All Products
           </Button>
         </div>
@@ -281,9 +290,9 @@ const SkinQuiz = ({ customerId, onComplete }) => {
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
   const options = currentQuestion.options || [];
+  
   return (
     <div className="skin-quiz-container">
-      
       <Steps
         current={currentQuestionIndex}
         size="small"
