@@ -268,7 +268,7 @@ const ProductDetail = () => {
                       </p>
                       {item.category && <p className="brand">Category: {item.category}</p>}
                       <p className="available-product">
-                        ✅Available Product: {product.stockQuantity}
+                        ✅Available Product: {item.stockQuantity}
                       </p>
                     </>
                   }

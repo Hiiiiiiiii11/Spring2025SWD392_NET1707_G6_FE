@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Radio, Typography, Steps, Space, Tag, Divider, List } from 'antd';
+import { Card, Button, Radio, Typography, Steps, Spin } from 'antd';
 import { ArrowRightOutlined, ArrowLeftOutlined, CheckOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import mapResponse from './mapResponse';
 import { GetAllQuizAPI, submitQuizAPI } from '../../services/ManageQuizService';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,30 +10,28 @@ const { Step } = Steps;
 
 const SkinQuiz = ({ onComplete }) => {
   const [questions, setQuestions] = useState([]);
-  const [responses, setResponses] = useState({});
-  const [mappedResponses, setMappedResponses] = useState({});
-  const [error, setError] = useState(null);
-  const [results, setResults] = useState(null);
+  const [responses, setResponses] = useState({}); // lưu index option trả lời theo questionId
+  const [mappedResponses, setMappedResponses] = useState({}); // lưu giá trị mapped theo question (key có thể là questionId hoặc label)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
   const customerId = sessionStorage.getItem("customerId");
 
+  // Hàm chuyển đổi giá trị trả lời (bạn có thể tuỳ chỉnh theo logic của mình)
   const mapResponseValues = (questionId, answer) => {
-    return mapResponse(null, answer);
+    return answer;
   };
 
+  // Hàm lấy key identifier cho mỗi câu hỏi
   const getKeyResponseIdentifier = (question) => {
-    if (question.label) {
-      return question.label;
-    }
-    return `question_${question.questionId}`;
+    return question.questionId;
   };
 
   useEffect(() => {
     const loadQuestions = async () => {
       try {
         let quizQuestions = await GetAllQuizAPI();
-        // Check if quizQuestions is an array
         if (Array.isArray(quizQuestions)) {
+          // Giới hạn nếu cần, ví dụ lấy 15 câu đầu
           if (quizQuestions.length > 15) {
             quizQuestions = quizQuestions.slice(0, 15);
           }
@@ -52,6 +49,8 @@ const SkinQuiz = ({ onComplete }) => {
         }
       } catch (err) {
         toast.error('Failed to load quiz questions');
+      } finally {
+        setLoading(false);
       }
     };
     loadQuestions();
@@ -98,25 +97,32 @@ const SkinQuiz = ({ onComplete }) => {
   };
 
   const handleSubmit = async () => {
-    const unansweredQuestions = questions.filter(q => responses[q.questionId] === null).length;
-    if (unansweredQuestions > 0) {
-      toast.warning(`Please answer all ${unansweredQuestions} remaining questions before submitting.`);
+    // Kiểm tra nếu còn câu hỏi chưa trả lời
+    const unansweredCount = questions.filter(q => responses[q.questionId] === null).length;
+    if (unansweredCount > 0) {
+      toast.warning(`Please answer all ${unansweredCount} remaining questions before submitting.`);
       return;
     }
     try {
-      const finalResponses = Object.fromEntries(
-        Object.entries(mappedResponses).filter(([_, v]) => v !== null)
-      );
+      const finalResponses = questions.map(q => ({
+        questionId: q.questionId,
+        response: mappedResponses[getKeyResponseIdentifier(q)]
+      }));
       const submissionResult = await submitQuizAPI(customerId, finalResponses);
-      setResults(submissionResult.quizResult.customer.skinConcerns);
-      if (onComplete) {
-        onComplete({
-          quizResult: submissionResult.quizResult.customer.skinConcerns,
-        });
-
+      console.log(submissionResult);
+      // Giả sử API trả về kết quả trong submissionResult.quizResult
+      if (submissionResult && submissionResult.quizResult) {
+        const { recommendedSkinType } = submissionResult.quizResult;
+        // Lưu recommendedSkinType vào session
+        sessionStorage.setItem("recommendedSkinType", recommendedSkinType);
+        if (onComplete) {
+          onComplete({ quizResult: recommendedSkinType });
+        }
+        toast.success("Quiz submitted successfully!");
+      } else {
+        toast.error("Quiz submission failed!");
       }
-
-      // Clear answers after successful submission:
+      // Reset lại câu trả lời sau khi submit
       const resetResponses = {};
       const resetMappedResponses = {};
       questions.forEach(question => {
@@ -130,13 +136,26 @@ const SkinQuiz = ({ onComplete }) => {
       toast.error('Failed to submit quiz!');
     }
   };
+  const formatOptionForDisplay = (option) => {
+    if (!option) return '';
+    const words = option.split('_');
 
+
+    const capitalizedWords = words.map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1)
+    );
+
+
+    return capitalizedWords.join(' ');
+  };
+
+
+  if (loading) {
+    return <Spin size="large" style={{ display: "block", margin: "50px auto" }} />;
+  }
 
   const currentQuestion = questions[currentQuestionIndex];
-  // Guard: in case currentQuestion is undefined
-  if (!currentQuestion) {
-    return null;
-  }
+  if (!currentQuestion) return null;
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
   const options = currentQuestion.options || [];
@@ -174,7 +193,7 @@ const SkinQuiz = ({ onComplete }) => {
           >
             {options.map((option, index) => (
               <Radio key={`${currentQuestion.questionId}-${index}`} value={index} style={{ fontSize: 16 }}>
-                {option}
+                {formatOptionForDisplay(option)}
               </Radio>
             ))}
           </Radio.Group>

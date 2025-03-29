@@ -9,7 +9,7 @@ import { AddProductToCartAPI, GetAllProductCartAPI } from "../../services/cartSe
 import { GetReviewProductByProductIdAPI } from "../../services/ManageReview";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import SkinQuiz from "../ManageQuiz/SkinQuiz"; // adjust path as needed
+import SkinQuiz from "../ManageQuiz/SkinQuiz";
 
 const { Meta } = Card;
 
@@ -30,6 +30,8 @@ const ProductPage = () => {
   const [selectedForCompare, setSelectedForCompare] = useState([]);
   const [isCompareModalVisible, setIsCompareModalVisible] = useState(false);
   const [compareRatings, setCompareRatings] = useState({});
+  const [quizResultModalVisible, setQuizResultModalVisible] = useState(false);
+  const [quizResult, setQuizResult] = useState(null);
 
   // State cho modal quiz
   const [isQuizModalVisible, setIsQuizModalVisible] = useState(false);
@@ -220,17 +222,20 @@ const ProductPage = () => {
   const openQuizModal = () => {
     setIsQuizModalVisible(true);
   };
+  // Thêm hàm xử lý quiz hoàn thành trong ProductPage
 
-  // Giả sử dữ liệu trả về từ SkinQuiz là object có thuộc tính quizResult là mảng (ví dụ: ['oily', 'combination'])
   const handleQuizComplete = (quizData) => {
-    console.log("Received quiz data:", quizData.quizResult);
-    if (quizData.quizResult) {
-      // Convert each quiz result to lowercase
-      setRecommendedSkinConcerns(quizData.quizResult.map(item => item.toLowerCase()));
+    if (quizData && quizData.quizResult) {
+      // Ở đây SkinQuiz truyền qua onComplete { quizResult: recommendedSkinType }
+      const recommendedSkinType = quizData.quizResult;
+      // Lưu vào session
+      sessionStorage.setItem("recommendedSkinType", recommendedSkinType);
+      // Lưu kết quả vào state và hiển thị modal
+      setQuizResult(recommendedSkinType);
+      setQuizResultModalVisible(true);
+      setIsQuizModalVisible(false);
     }
-    setIsQuizModalVisible(false);
   };
-
 
   return (
     <div>
@@ -403,12 +408,51 @@ const ProductPage = () => {
       {/* Quiz Modal */}
       <Modal
         title="Skin Type Quiz"
-        open={isQuizModalVisible}
+        visible={isQuizModalVisible}
         onCancel={() => setIsQuizModalVisible(false)}
         footer={null}
         width={800}
       >
         <SkinQuiz onComplete={handleQuizComplete} />
+      </Modal>
+
+      <Modal
+        title="Kết Quả Quiz"
+        visible={quizResultModalVisible}
+        onCancel={() => setQuizResultModalVisible(false)}
+        footer={[
+          <Button
+            key="ok"
+            onClick={() => {
+              // Sau khi nhấn OK, lọc sản phẩm theo recommendedSkinType
+              if (quizResult) {
+                const filtered = productData.filter((product) => {
+                  const productSkinTypes = product.skinTypeCompatibility
+                    ? product.skinTypeCompatibility.split(",").map((s) => s.trim().toLowerCase())
+                    : [];
+                  return productSkinTypes.includes(quizResult.toLowerCase());
+                });
+                if (filtered.length === 0) {
+                  setFilteredProducts(
+                    productData.filter(
+                      (product) => product.skinTypeCompatibility.toLowerCase() === "all skin types"
+                    )
+                  );
+                } else {
+                  setFilteredProducts(filtered);
+                }
+                setFilterActive(true);
+              }
+              setQuizResultModalVisible(false);
+            }}
+          >
+            OK
+          </Button>,
+        ]}
+      >
+        <p>
+          Your recommendation type is: <strong>{quizResult}</strong>
+        </p>
       </Modal>
     </div>
   );

@@ -129,6 +129,9 @@ const ManageRequestRefund = () => {
             if (data) {
                 toast.success("Send refund image successfully!");
             }
+            else {
+                toast.warning("Product has deliveried must be returned to warehouse before send complete!");
+            }
             setModalVisible(false);
             fetchRefundRequests();
         } catch (error) {
@@ -199,7 +202,7 @@ const ManageRequestRefund = () => {
                         </Button>
                     </div>
                     <div>
-                        {(record.status === "RETURNED_TO_WAREHOUSE" || record.status === "VERIFIED") && (
+                        {(record.status === "RETURNED_TO_WAREHOUSE" || record.status === "CANCELLED") && (
                             <Button
                                 type="default"
                                 style={{ backgroundColor: "blue", color: "white" }}

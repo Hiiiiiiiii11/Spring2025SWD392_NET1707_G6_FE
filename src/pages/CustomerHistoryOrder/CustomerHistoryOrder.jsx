@@ -143,11 +143,13 @@ const CustomerHistoryOrder = () => {
         toast.error("Can't found order!");
         return;
       }
-      // Merge dữ liệu: chỉ cập nhật trường reason, giữ nguyên các trường khác
-      const updatedOrderData = { ...currentOrder, status: "CANCELLED", reason: finalReason };
+      // Kiểm tra trạng thái đơn hàng: nếu Delivered thì update thành REFUNDED, còn lại thì cập nhật thành CANCELLED
+      const updatedStatus = currentOrder.status === "DELIVERED" ? "RETURNED" : "CANCELLED";
+      // Merge dữ liệu: cập nhật status và reason, giữ nguyên các trường khác
+      const updatedOrderData = { ...currentOrder, status: updatedStatus, reason: finalReason };
       // Gọi API update order với dữ liệu đã merge
       await UpdateOrderByIdAPI(cancelOrderId, updatedOrderData);
-      // Sau đó gọi API hủy đơn
+      // Sau đó gọi API hủy đơn hoặc refund đơn
       const data = await CustomerCancelOrderAPI(cancelOrderId);
       if (data) {
         toast.success("Refund request submitted successfully!");
@@ -162,6 +164,7 @@ const CustomerHistoryOrder = () => {
       toast.error("Failed to process refund request.");
     }
   };
+
 
 
   // Open modal xem refund image
@@ -257,6 +260,9 @@ const CustomerHistoryOrder = () => {
                             ? `${promotion.promotionName} (Discount: ${promotion.discountPercentage}%)`
                             : "None"}
                         </p>
+                        {order.status === "DELIVERED" && (
+                          <p>* You have 3 day to request return if goods be errored *  </p>
+                        )}
                       </div>
                       <div className="div-total-price">
                         <p className="totalprice-history" style={{ fontWeight: "bold" }}>
